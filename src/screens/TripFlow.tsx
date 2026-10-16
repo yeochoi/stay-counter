@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Day, fmtDate, fmtRange, toNum } from '../lib/dates'
-import { daysPerEntry, editStay, Entry, legs, newId, Profile, Trip, warnings } from '../lib/plan'
+import { daysIn, daysPerEntry, editStay, Entry, legs, newId, Profile, Trip, warnings } from '../lib/plan'
 import { COUNTRIES, entryRule, shortName, taxRule } from '../lib/rules'
 import { Alert, Check, Chevron } from '../components/Icons'
 import { Actions, DateRow, Sec, Seg, SelectRow, Sheet } from '../components/ui'
@@ -59,7 +59,7 @@ export function TripFlow({ profile, trips, today, existing, startBooked, onClose
     return (
       <Sheet title={shortName(trip.country)} foot={<><div className="note" style={{ textAlign: 'center', padding: '0 0 12px' }}>Not legal advice.</div><Actions left="Back" right={existing ? 'Save' : 'Save trip'} onLeft={() => setStep({ kind: 'form' })} onRight={() => onSave(trip)} /></>}>
         <div className="big">{exits === 0 ? 'No need to leave' : `Leave ${exits === 1 ? 'once' : `${exits} times`}`}</div>
-        <div className="big-sub">{max ? `${trip.entry.kind === 'visafree' ? 'Visa free' : 'Your visa'} allows ${max} days per entry` : 'No entry limit we know of'}</div>
+        <div className="big-sub">{(() => { const n = daysIn(trip, profile); return `${n} ${n === 1 ? 'day' : 'days'} in ${shortName(trip.country)}. ` })()}{max ? `${trip.entry.kind === 'visafree' ? 'Visa free' : 'Your visa'} allows ${max} days per entry` : 'No entry limit we know of'}</div>
         <div className="card" style={{ marginTop: 20, padding: '0 16px' }}>
           {ls.map((l, i) => (
             <button key={i} className="stay-row" onClick={() => setStep({ kind: 'stay', index: i })}>

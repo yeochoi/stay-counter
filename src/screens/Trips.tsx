@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import { Day, fmtRange, toNum, year } from '../lib/dates'
-import { Profile, status, Trip } from '../lib/plan'
+import { daysIn, Profile, status, Trip } from '../lib/plan'
 import { shortName } from '../lib/rules'
 import { Export, Plus } from '../components/Icons'
 import { Sec } from '../components/ui'
+
+const plural = (n: number) => `${n} ${n === 1 ? 'day' : 'days'}`
 
 type Filter = 'All' | 'Business' | 'Personal'
 
@@ -23,7 +25,7 @@ export function Trips({ trips, profile, today, onOpen, onExport, onNew }: { trip
     <button key={x.id} className="row two" onClick={() => onOpen(x)}>
       <span className="col">
         <span className="t">{shortName(x.country)}</span>
-        <span className="sub">{fmtRange(x.start, x.end, today)}{!x.booked ? ' · Planning' : ''}</span>
+        <span className="sub">{fmtRange(x.start, x.end, today)} · {plural(daysIn(x, profile))}{!x.booked ? ' · Planning' : ''}</span>
       </span>
       {chip}
     </button>
@@ -51,7 +53,7 @@ export function Trips({ trips, profile, today, onOpen, onExport, onNew }: { trip
             <Sec>Now</Sec>
             {now.map((x) => {
               const st = status(x, profile, today)
-              const sub = st.phase === 'in' && st.legs.length > 1 ? `${fmtRange(x.start, x.end, today)} · Stay ${st.index + 1} of ${st.legs.length}` : fmtRange(x.start, x.end, today)
+              const sub = `${fmtRange(x.start, x.end, today)} · ${plural(daysIn(x, profile))}`
               const chip = st.phase === 'in' ? `${st.daysLeft} ${st.daysLeft === 1 ? 'day' : 'days'} left` : st.phase === 'out' ? `Back in ${st.daysToGo} ${st.daysToGo === 1 ? 'day' : 'days'}` : x.type
               return (
                 <div key={x.id} className="card current">

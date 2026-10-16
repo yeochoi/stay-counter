@@ -1,5 +1,5 @@
 import { Day, fmtRange, fmtWeekday, toNum } from '../lib/dates'
-import { last12Months, Profile, status, Trip } from '../lib/plan'
+import { daysIn, last12Months, Profile, status, Trip } from '../lib/plan'
 import { shortName, taxRule } from '../lib/rules'
 import { Check, Chevron, Gear, Plane, Plus } from '../components/Icons'
 import { Ring, Sec } from '../components/ui'
@@ -90,6 +90,7 @@ export function Today({ trips, profile, today, onNew, onOpen, onEditStay, onSett
             </div>
           </button>
           <div className="chips">
+            <span>{daysIn(main, profile)} days</span>
             <span>{main.type}</span>
             <span>{main.entry.kind === 'visafree' ? 'Visa free' : 'Visa'}</span>
             {ls.length > 1 && <span>{ls.length} stays</span>}

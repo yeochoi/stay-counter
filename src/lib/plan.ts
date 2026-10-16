@@ -74,6 +74,11 @@ export function editStay(trip: Trip, profile: Profile, i: number, start: Day, en
   return { ...trip, start: stays[0].start, end: stays[stays.length - 1].end, stays }
 }
 
+/** Days you are inside the country on this trip, leaving out the days between stays. */
+export function daysIn(trip: Trip, profile: Profile): number {
+  return legs(trip, profile).reduce((n, l) => n + l.days, 0)
+}
+
 /** Every day you are inside a country, across all trips. */
 export function presence(trips: Trip[], profile: Profile, country: string): Set<number> {
   const s = new Set<number>()
