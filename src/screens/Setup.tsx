@@ -51,17 +51,22 @@ function PassportCard({ p, setP }: { p: Profile; setP: (p: Profile) => void }) {
 export function Onboarding({ onDone }: { onDone: (p: Profile) => void }) {
   const [p, setP] = useState<Profile>({ passport: 'South Korea', home: 'Netherlands' })
   return (
-    <div className="welcome" style={{ display: 'flex', flexDirection: 'column', minHeight: '100dvh' }}>
-      <header className="hero">
+    <div className="welcome">
+      <header className="hero w-intro">
         <div className="eyebrow">Stay Counter</div>
         <h1>Know your days,<br /><span style={{ color: 'var(--hero-text)' }}>Wherever you are</span></h1>
         <div className="chips"><span>Visa free limits</span><span>183 day rule</span><span>Leave by dates</span></div>
+        <div className="feat">
+          <div><b>30 days</b>Visa free limits per entry</div>
+          <div><b>183 days</b>Tax limit per year</div>
+          <div><b>Leave by</b>Dates before you book</div>
+        </div>
       </header>
-      <main className="content">
+      <main className="content w-form">
         <div style={{ fontSize: 15, color: 'var(--muted)' }}>We use these to find the rules that apply to you.</div>
         <div style={{ marginTop: 2 }}><PassportCard p={p} setP={setP} /></div>
         <PickCard k="Home" value={p.home} options={HOMES} onChange={(v) => setP({ ...p, home: v })} />
-        <div style={{ flexGrow: 1, minHeight: 24 }} />
+        <div className="w-gap" />
         <button className="btn primary" onClick={() => onDone(p)}>Continue</button>
       </main>
     </div>

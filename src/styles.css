@@ -156,7 +156,10 @@ button.row:hover, label.row:hover { background: #fbfaf8; }
 @keyframes up { from { transform: translateY(24px); opacity: 0.6; } }
 
 /* First open */
+.welcome { display: flex; flex-direction: column; min-height: 100vh; min-height: 100dvh; }
 .welcome .hero { padding-top: calc(var(--top) + 72px); padding-bottom: 30px; }
+.welcome .feat { display: none; }
+.w-gap { flex-grow: 1; min-height: 24px; }
 .eyebrow { font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--hero-text); }
 .welcome h1 { margin: 0; padding-top: 10px; font-family: var(--serif); font-weight: 400; font-size: 38px; line-height: 1.1; letter-spacing: -0.01em; }
 .welcome .chips { padding-top: 22px; }
@@ -172,7 +175,7 @@ button.row:hover, label.row:hover { background: #fbfaf8; }
 .sw div p { margin: 0; padding: 6px 8px; line-height: 1.35; }
 
 /* Side padding that grows on wide screens, so content sits in a centered area like a web page. */
-.hero, .welcome .hero, .content, .welcome .content, .tabs, .empty, .nav { padding-left: max(var(--gutter), calc((100% - var(--max)) / 2 + var(--gutter))); padding-right: max(var(--gutter), calc((100% - var(--max)) / 2 + var(--gutter))); }
+.hero, .content, .tabs, .empty, .nav { padding-left: max(var(--gutter), calc((100% - var(--max)) / 2 + var(--gutter))); padding-right: max(var(--gutter), calc((100% - var(--max)) / 2 + var(--gutter))); }
 
 /* Tablet and laptop. Full width hero, centered content, two columns of cards. */
 @media (min-width: 900px) {
@@ -196,9 +199,14 @@ button.row:hover, label.row:hover { background: #fbfaf8; }
   .empty { padding-bottom: 80px; }
   .empty-actions { flex-direction: row; justify-content: center; }
   .empty-actions .btn { width: 240px; }
-  .welcome .hero { padding-top: 96px; padding-bottom: 48px; }
+  .welcome { background: var(--hero); flex-direction: row; align-items: center; justify-content: center; gap: 80px; padding: 64px var(--gutter); }
+  .welcome .hero, .welcome .content { padding: 0; }
+  .welcome .w-intro { flex: 1; max-width: 520px; }
   .welcome h1 { font-size: 56px; }
-  .welcome .content { columns: auto; padding-top: 32px; }
-  .welcome .content > * { max-width: 480px; width: 100%; }
-  .welcome { min-height: auto !important; }
+  .welcome .chips { display: none; }
+  .welcome .feat { display: flex; gap: 24px; margin-top: 40px; }
+  .welcome .feat div { flex: 1; font-size: 15px; line-height: 1.5; color: var(--hero-text); }
+  .welcome .feat b { display: block; font-family: var(--serif); font-weight: 400; font-size: 26px; color: #fff; margin-bottom: 6px; }
+  .welcome .w-form { flex: 0 0 420px; columns: auto; display: flex; flex-direction: column; background: var(--bg); border-radius: 20px; padding: 28px; }
+  .welcome .w-gap { flex-grow: 0; min-height: 24px; }
 }
