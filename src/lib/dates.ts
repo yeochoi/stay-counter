@@ -64,14 +64,15 @@ export function fmtWeekday(d: Day, today: Day): string {
 
 /**
  * Ranges use a spaced en dash.
- * Nov 1 – 30, Feb 2 – Mar 3, Jan 2 – 31, 2027, Nov 1, 2026 – Mar 31, 2027
+ * Nov 1 – 30, Feb 2 – Mar 3, Jan 2 – 31, 2027, Nov 1 – Mar 31, 2027
  */
 export function fmtRange(a: Day, b: Day, today: Day): string {
   const pa = parts(a)
   const pb = parts(b)
   const ty = year(today)
   if (pa.y !== pb.y) {
-    return `${MONTHS[pa.m - 1]} ${pa.d}, ${pa.y} – ${MONTHS[pb.m - 1]} ${pb.d}, ${pb.y}`
+    const startYear = pa.y === ty ? '' : `, ${pa.y}`
+    return `${MONTHS[pa.m - 1]} ${pa.d}${startYear} – ${MONTHS[pb.m - 1]} ${pb.d}, ${pb.y}`
   }
   const tail = pa.y === ty ? '' : `, ${pa.y}`
   if (pa.m === pb.m) {
