@@ -1,4 +1,4 @@
-import { Day, fmtDate, fmtRange, fmtWeekday, toNum } from '../lib/dates'
+import { Day, fmtRange, fmtWeekday, toNum } from '../lib/dates'
 import { last12Months, Profile, status, Trip } from '../lib/plan'
 import { shortName, taxRule } from '../lib/rules'
 import { Check, Chevron, Gear, Plane, Plus } from '../components/Icons'
@@ -55,7 +55,6 @@ export function Today({ trips, profile, today, onNew, onOpen, onEditStay, onSett
     const ls = st.legs
     const country = shortName(main.country)
     if (st.phase === 'in') {
-      const next = ls[st.index + 1]
       hero = (
         <>
           <button className="hero-main" onClick={() => onEditStay(main, st.index)}>
@@ -63,10 +62,8 @@ export function Today({ trips, profile, today, onNew, onOpen, onEditStay, onSett
             <div className="stack">
               <div className="l">Leave {country} by</div>
               <div className="a">{fmtWeekday(st.leg.end, today)}</div>
-              <div className="l">Stay {st.index + 1} of {ls.length}</div>
             </div>
           </button>
-          {next && <div className="chips"><span>Next entry {fmtDate(next.start, today)}</span></div>}
         </>
       )
     } else if (st.phase === 'out') {
@@ -77,7 +74,6 @@ export function Today({ trips, profile, today, onNew, onOpen, onEditStay, onSett
           <div className="stack">
             <div className="l">Back in {country}</div>
             <div className="a">{fmtWeekday(next.start, today)}</div>
-            <div className="l">Stay {st.next + 1} of {ls.length}</div>
           </div>
         </button>
       )
