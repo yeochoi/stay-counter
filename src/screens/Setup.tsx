@@ -96,7 +96,7 @@ export function Settings({ profile, previewDate, onProfile, onPreview, onSample,
         <DateRow k="Pretend today is" value={previewDate ?? real} today={previewDate ?? real} onChange={(d) => onPreview(d === real ? undefined : d)} />
         <button className="row" onClick={() => onPreview('2026-10-15')}><span className="k">Before the China trip</span><span className="v">Oct 15<Chevron /></span></button>
         <button className="row" onClick={() => onPreview('2026-11-22')}><span className="k">During stay 1</span><span className="v">Nov 22<Chevron /></span></button>
-        <button className="row" onClick={() => onPreview('2026-12-01')}><span className="k">Out of China</span><span className="v">Dec 1<Chevron /></span></button>
+        <button className="row" onClick={() => onPreview('2026-12-01')}><span className="k">Between stays</span><span className="v">Dec 1<Chevron /></span></button>
         {previewDate && <button className="row" onClick={() => onPreview(undefined)}><span className="k">Use the real date</span><span className="v">{real.slice(5).replace('-', '/')}<Chevron /></span></button>}
       </div>
       <div className="card" style={{ marginTop: 12 }}>

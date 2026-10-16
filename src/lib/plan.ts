@@ -58,7 +58,7 @@ export function suggest(start: Day, end: Day, max?: number): Leg[] {
 
 /**
  * Change one stay to match real flights. Earlier stays stay put.
- * Later stays move to start the day after you come back out, unless you already set them.
+ * Later stays move to start the day after this one ends, unless you already set them.
  */
 export function editStay(trip: Trip, profile: Profile, i: number, start: Day, end: Day): Trip {
   const cur = legs(trip, profile)
@@ -68,8 +68,8 @@ export function editStay(trip: Trip, profile: Profile, i: number, start: Day, en
   const tripEnd = toNum(end) > toNum(trip.end) ? end : trip.end
   const later = cur.slice(i + 1)
   let tail: Stay[]
-  if (later.length && later[0].edited && toNum(later[0].start) > toNum(end) + 1) tail = later.map(strip)
-  else tail = toNum(end) + 2 <= toNum(tripEnd) ? suggest(addDays(end, 2), tripEnd, daysPerEntry(trip, profile)).map(strip) : []
+  if (later.length && later[0].edited && toNum(later[0].start) > toNum(end)) tail = later.map(strip)
+  else tail = toNum(end) + 1 <= toNum(tripEnd) ? suggest(addDays(end, 1), tripEnd, daysPerEntry(trip, profile)).map(strip) : []
   const stays = [...head, me, ...tail]
   return { ...trip, start: stays[0].start, end: stays[stays.length - 1].end, stays }
 }

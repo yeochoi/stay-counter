@@ -1,8 +1,7 @@
 import { useState } from 'react'
 import { addDays, Day, daysInclusive, fmtDate, fmtWeekday, toNum } from '../lib/dates'
 import { daysPerEntry, legs, Profile, Trip } from '../lib/plan'
-import { shortName } from '../lib/rules'
-import { Actions, DateRow, Sec, Sheet } from '../components/ui'
+import { Actions, DateRow, Sheet } from '../components/ui'
 
 /** Change one stay to match real flights. Later stays move along. */
 export function EditStay({ trip, profile, index, today, onCancel, onSave }: { trip: Trip; profile: Profile; index: number; today: Day; onCancel: () => void; onSave: (start: Day, end: Day) => void }) {
@@ -15,8 +14,7 @@ export function EditStay({ trip, profile, index, today, onCancel, onSave }: { tr
   const days = valid ? daysInclusive(start, end) : 0
   const prev = ls[index - 1]
   const tooEarly = prev && toNum(start) <= toNum(prev.end)
-  const country = shortName(trip.country)
-  const hasNext = index < ls.length - 1 || toNum(end) + 2 <= toNum(trip.end)
+  const hasNext = index < ls.length - 1 || toNum(end) + 1 <= toNum(trip.end)
   let sub = ''
   let over = false
   if (!valid) { sub = 'Leave must be after you arrive'; over = true }
@@ -36,15 +34,8 @@ export function EditStay({ trip, profile, index, today, onCancel, onSave }: { tr
         <DateRow k="Leave" value={end} today={today} min={start} onChange={setEnd} />
       </div>
       <div className="note">Match these to your flights.{max ? ` Each stay can last up to ${max} days.` : ''}</div>
-      {hasNext && valid && (
-        <>
-          <Sec>Next stays move too</Sec>
-          <div className="card">
-            <div className="row small"><span className="k">Out of {country}</span><span className="v">{fmtDate(addDays(end, 1), today)}</span></div>
-            <div className="row small"><span className="k">Stay {index + 2} starts</span><span className="v">{fmtWeekday(addDays(end, 2), today)}</span></div>
-          </div>
-          <div className="note">Changed something else? Edit that stay next.</div>
-        </>
+      {hasNext && valid && !over && (
+        <div className="note" style={{ paddingTop: 16 }}>Stay {index + 2} can start from {fmtWeekday(addDays(end, 1), today)}.</div>
       )}
     </Sheet>
   )

@@ -113,7 +113,7 @@ export function Today({ trips, profile, today, onNew, onOpen, onEditStay, onSett
               <button key={i} className="row" style={{ minHeight: 54 }} onClick={() => onEditStay(main, i)}>
                 <span className="t">{fmtRange(l.start, l.end, today)}</span>
                 <span className="s">
-                  {i === now ? <span className="pill now">Now</span> : <>{l.edited && <Check />}{l.days} days</>}
+                  {i === now ? <span className="pill now">Now</span> : <>{l.edited && <Check />}{l.days} {l.days === 1 ? 'day' : 'days'}</>}
                   <Chevron />
                 </span>
               </button>

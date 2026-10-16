@@ -66,7 +66,7 @@ export function TripFlow({ profile, trips, today, existing, startBooked, onClose
               <span className="tl" aria-hidden="true"><i className={i === 0 ? 'off' : ''} /><b /><i className={i === ls.length - 1 ? 'off' : ''} /></span>
               <span className="in">
                 <span className="t" style={{ fontSize: 17, fontWeight: 600 }}>{fmtRange(l.start, l.end, today)}</span>
-                <span className="s" style={{ fontSize: 15, color: 'var(--muted)', display: 'flex', alignItems: 'center', gap: 6 }}>{l.edited && <Check />}{l.days} days<Chevron /></span>
+                <span className="s" style={{ fontSize: 15, color: 'var(--muted)', display: 'flex', alignItems: 'center', gap: 6 }}>{l.edited && <Check />}{l.days} {l.days === 1 ? 'day' : 'days'}<Chevron /></span>
               </span>
             </button>
           ))}
