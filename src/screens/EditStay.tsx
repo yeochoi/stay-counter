@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { addDays, Day, daysInclusive, fmtDate, fmtWeekday, toNum } from '../lib/dates'
 import { daysPerEntry, legs, Profile, Trip } from '../lib/plan'
+import { shortName } from '../lib/rules'
 import { Actions, DateRow, Sheet } from '../components/ui'
 
 /** Change one stay to match real flights. Later stays move along. */
@@ -26,7 +27,7 @@ export function EditStay({ trip, profile, index, today, onCancel, onSave }: { tr
   }
 
   return (
-    <Sheet title={`Stay ${index + 1}`} foot={<Actions left="Cancel" right="Save" onLeft={onCancel} onRight={() => onSave(start, end)} disabled={!valid || !!tooEarly} />}>
+    <Sheet title={ls.length > 1 ? `Stay ${index + 1}` : shortName(trip.country)} foot={<Actions left="Cancel" right="Save" onLeft={onCancel} onRight={() => onSave(start, end)} disabled={!valid || !!tooEarly} />}>
       <div className="big">{days} {days === 1 ? 'day' : 'days'}</div>
       <div className="big-sub" style={over ? { color: 'var(--coral-text)' } : undefined}>{sub}</div>
       <div className="card" style={{ marginTop: 20 }}>
