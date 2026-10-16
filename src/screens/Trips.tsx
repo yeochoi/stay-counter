@@ -51,7 +51,7 @@ export function Trips({ trips, profile, today, onOpen, onExport, onNew }: { trip
             <Sec>Now</Sec>
             {now.map((x) => {
               const st = status(x, profile, today)
-              const sub = st.phase === 'in' ? `${fmtRange(st.leg.start, st.leg.end, today)} · Stay ${st.index + 1} of ${st.legs.length}` : fmtRange(x.start, x.end, today)
+              const sub = st.phase === 'in' && st.legs.length > 1 ? `${fmtRange(x.start, x.end, today)} · Stay ${st.index + 1} of ${st.legs.length}` : fmtRange(x.start, x.end, today)
               const chip = st.phase === 'in' ? `${st.daysLeft} ${st.daysLeft === 1 ? 'day' : 'days'} left` : st.phase === 'out' ? `Back in ${st.daysToGo} ${st.daysToGo === 1 ? 'day' : 'days'}` : x.type
               return (
                 <div key={x.id} className="card current">
