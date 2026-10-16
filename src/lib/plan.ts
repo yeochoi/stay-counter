@@ -13,14 +13,19 @@ export type Trip = {
   entry: Entry
   type: 'Business' | 'Personal'
   booked: boolean
+  /** Stays the person set to match real flights. Missing means we suggest them. */
+  stays?: Stay[]
 }
+
+export type Stay = { start: Day; end: Day; edited?: boolean }
 
 export type Profile = {
   passport: string
+  passport2?: string
   home: string
 }
 
-export type Leg = { start: Day; end: Day; days: number }
+export type Leg = { start: Day; end: Day; days: number; edited?: boolean }
 
 /** Days allowed per entry for this trip, or undefined when there is no limit we know. */
 export function daysPerEntry(trip: Trip, profile: Profile): number | undefined {
@@ -33,17 +38,40 @@ export function daysPerEntry(trip: Trip, profile: Profile): number | undefined {
  * then you leave for one day and come back the next.
  */
 export function legs(trip: Trip, profile: Profile): Leg[] {
-  const max = daysPerEntry(trip, profile)
-  if (!max || max <= 0) return [{ start: trip.start, end: trip.end, days: daysInclusive(trip.start, trip.end) }]
+  if (trip.stays?.length) return trip.stays.map((s) => ({ ...s, days: daysInclusive(s.start, s.end) }))
+  return suggest(trip.start, trip.end, daysPerEntry(trip, profile))
+}
+
+/** Suggested stays from start to end, leaving for one day between them. */
+export function suggest(start: Day, end: Day, max?: number): Leg[] {
+  if (!max || max <= 0) return [{ start, end, days: daysInclusive(start, end) }]
   const out: Leg[] = []
-  let cursor = trip.start
-  while (toNum(cursor) <= toNum(trip.end) && out.length < 60) {
+  let cursor = start
+  while (toNum(cursor) <= toNum(end) && out.length < 60) {
     let legEnd = addDays(cursor, max - 1)
-    if (toNum(legEnd) > toNum(trip.end)) legEnd = trip.end
+    if (toNum(legEnd) > toNum(end)) legEnd = end
     out.push({ start: cursor, end: legEnd, days: daysInclusive(cursor, legEnd) })
     cursor = addDays(legEnd, 2)
   }
   return out
+}
+
+/**
+ * Change one stay to match real flights. Earlier stays stay put.
+ * Later stays move to start the day after you come back out, unless you already set them.
+ */
+export function editStay(trip: Trip, profile: Profile, i: number, start: Day, end: Day): Trip {
+  const cur = legs(trip, profile)
+  const strip = (l: Leg): Stay => ({ start: l.start, end: l.end, edited: l.edited })
+  const head = cur.slice(0, i).map(strip)
+  const me: Stay = { start, end, edited: true }
+  const tripEnd = toNum(end) > toNum(trip.end) ? end : trip.end
+  const later = cur.slice(i + 1)
+  let tail: Stay[]
+  if (later.length && later[0].edited && toNum(later[0].start) > toNum(end) + 1) tail = later.map(strip)
+  else tail = toNum(end) + 2 <= toNum(tripEnd) ? suggest(addDays(end, 2), tripEnd, daysPerEntry(trip, profile)).map(strip) : []
+  const stays = [...head, me, ...tail]
+  return { ...trip, start: stays[0].start, end: stays[stays.length - 1].end, stays }
 }
 
 /** Every day you are inside a country, across all trips. */
@@ -146,6 +174,7 @@ export function status(trip: Trip, profile: Profile, today: Day) {
   if (t > toNum(trip.end)) return { phase: 'after' as const, legs: ls }
   // Between two entries, outside the country for a day.
   const next = ls.findIndex((l) => toNum(l.start) > t)
+  if (next < 0) return { phase: 'after' as const, legs: ls }
   return { phase: 'out' as const, legs: ls, next, daysToGo: toNum(ls[next].start) - t }
 }
 

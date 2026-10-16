@@ -1,86 +1,38 @@
-import tokens from '../design/tokens.json'
-import { useState } from 'react'
-import { ChevronLeft } from '../components/Icons'
-import { Ring, Segmented, Warnings } from '../components/ui'
+import { Sheet } from '../components/ui'
 
-type Style = { name: string; fontSize: string; lineHeight: string; fontWeight: number; letterSpacing?: string; textTransform?: string; sample: string; usage: string }
+const COLORS: [string, string][] = [
+  ['Hero', '#2F2360'], ['Hero text', '#CFC4FF'], ['Ring', '#B7A5FF'], ['Primary', '#5B3FD0'],
+  ['Purple text', '#4B32B8'], ['Soft', '#EEEAFB'], ['Current', '#F1EDFD'], ['Background', '#F7F5F2'],
+  ['Ink', '#1E1B2E'], ['Muted', '#6B6778'], ['Line', '#ECE9E4'], ['Chip', '#EFECE7'],
+  ['Coral text', '#A83C18'], ['Coral', '#E2683C'], ['Coral soft', '#FCEEE8'], ['Backdrop', '#3A3550'],
+]
 
 export function DesignSystem({ onBack }: { onBack: () => void }) {
-  const [seg, setSeg] = useState<'Planning' | 'Booked'>('Planning')
-  const styles = tokens.type.groups[0].styles as Style[]
   return (
-    <div className="backdrop" style={{ padding: 0, background: 'var(--bg)' }} role="dialog" aria-label="Design system">
-      <main className="screen" style={{ paddingBottom: 60 }}>
-        <div className="sheet-bar" style={{ paddingTop: 0 }}>
-          <button className="left" onClick={onBack}><ChevronLeft />Back</button>
-          <div className="center">Design system</div>
-          <span />
+    <Sheet title="Design system" foot={<button className="btn primary" onClick={onBack}>Done</button>}>
+      <div className="ds">
+        <h3>Color</h3>
+        <div className="sw">{COLORS.map(([n, c]) => <div key={n}><span style={{ background: c }} /><p>{n}<br /><span className="muted" style={{ display: 'inline', height: 'auto' }}>{c}</span></p></div>)}</div>
+        <h3>Type</h3>
+        <div className="card" style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div style={{ fontFamily: 'var(--serif)', fontSize: 44, lineHeight: 1 }}>17 <span className="muted" style={{ fontFamily: 'var(--sans)', fontSize: 13 }}>Newsreader 44, numbers</span></div>
+          <div style={{ fontFamily: 'var(--serif)', fontSize: 34, lineHeight: 1 }}>Mon, Nov 30 <span className="muted" style={{ fontFamily: 'var(--sans)', fontSize: 13 }}>34, answers</span></div>
+          <div style={{ fontSize: 17, fontWeight: 600 }}>China <span className="muted" style={{ fontSize: 13, fontWeight: 400 }}>Outfit 17 semibold, primary content</span></div>
+          <div style={{ fontSize: 15 }} className="muted">Visa free allows 30 days per entry <span style={{ fontSize: 13 }}>15, labels</span></div>
+          <div className="sec" style={{ padding: 0 }}>Section label 12 caps</div>
         </div>
-
-        <h1 className="large-title" style={{ margin: '14px 0 0' }}>Stay Counter</h1>
-        <p className="body muted" style={{ lineHeight: 1.5, margin: '6px 0 0' }}>
-          Calm, native and purple. One answer per screen, lists not cards, purple acts and coral warns.
-        </p>
-
-        <section className="section">
-          <div className="label">Color</div>
-          <div className="rows">
-            {tokens.color.tokens.map((c) => (
-              <div key={c.name} className="list-row" style={{ alignItems: 'flex-start', padding: '12px 0', gap: 14 }}>
-                <span style={{ width: 36, height: 36, borderRadius: 10, background: c.value, border: '1px solid var(--line)', flexShrink: 0 }} />
-                <span style={{ flex: 1, minWidth: 0 }}>
-                  <span style={{ display: 'flex', justifyContent: 'space-between', gap: 8 }}>
-                    <span className="name" style={{ fontSize: 15 }}>{c.name}</span>
-                    <span className="value" style={{ fontSize: 13 }}>{c.value}</span>
-                  </span>
-                  <span className="muted" style={{ display: 'block', fontSize: 13, lineHeight: 1.4, paddingTop: 2 }}>{c.usage}</span>
-                </span>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section className="section after-plain">
-          <div className="label">Type</div>
-          <div className="rows">
-            {styles.map((s) => (
-              <div key={s.name} className="list-row" style={{ flexDirection: 'column', alignItems: 'flex-start', padding: '12px 0', gap: 4 }}>
-                <span style={{ fontSize: s.fontSize, lineHeight: s.lineHeight, fontWeight: s.fontWeight, letterSpacing: s.letterSpacing, textTransform: s.textTransform as 'uppercase' | undefined }}>{s.sample}</span>
-                <span className="muted" style={{ fontSize: 13 }}>{s.name} · {parseInt(s.fontSize)} · {s.fontWeight}</span>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section className="section after-plain">
-          <div className="label">Spacing and shape</div>
-          <div className="rows">
-            {[...tokens.spacing.tokens, ...tokens.radius.tokens].map((t) => (
-              <div key={t.name} className="list-row" style={{ minHeight: 48 }}>
-                <span className="name" style={{ fontSize: 15 }}>{t.name}</span>
-                <span className="value">{t.value}</span>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section className="section after-plain">
-          <div className="label">Components</div>
-          <div className="stack" style={{ paddingTop: 12 }}>
-            <button className="btn primary">Save trip</button>
-            <button className="btn secondary">Add booked trip</button>
-            <Segmented label="Example" options={['Planning', 'Booked'] as const} value={seg} onChange={setSeg} />
-          </div>
-          <div className="hero" style={{ paddingTop: 28 }}>
-            <div className="ring">
-              <Ring value={22} total={30} />
-              <div className="inside"><div className="num">8</div><div className="unit muted">days left</div></div>
-            </div>
-            <div className="disc"><div className="num">17</div><div className="unit">days to go</div></div>
-          </div>
-          <Warnings items={['Visa free ends Dec 31, 2026', 'You hit 183 days on Dec 12']} />
-        </section>
-      </main>
-    </div>
+        <h3>Hero</h3>
+        <div className="hero" style={{ borderRadius: 16, padding: 20 }}>
+          <div className="stack"><div className="l">Leave China by</div><div className="a">Mon, Nov 30</div><div className="l">Stay 1 of 5</div></div>
+          <div className="chips"><span>Next entry Dec 2</span></div>
+        </div>
+        <h3>Buttons</h3>
+        <div className="actions"><button className="btn soft">Cancel</button><button className="btn primary">Save</button></div>
+        <h3>Chips</h3>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}><span className="pill now">Now</span><span className="pill grey">Personal</span><span className="pill coral">164 of 183 days</span></div>
+        <h3>Rules</h3>
+        <div className="note" style={{ paddingTop: 0 }}>Serif only for answers and numbers. Bold only for primary content. White cards with a 1px line, radius 16, no shadows. One action row at the bottom of each sheet, soft left and primary right.</div>
+      </div>
+    </Sheet>
   )
 }

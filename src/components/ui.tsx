@@ -1,95 +1,105 @@
-import { ReactNode } from 'react'
-import { Alert, Calendar, ChevronLeft, Home } from './Icons'
-
-export function TabHeader({ eyebrow, title, action }: { eyebrow?: string; title: string; action?: ReactNode }) {
-  return (
-    <header className="tab-header">
-      <div className="eyebrow label">{eyebrow}</div>
-      <div className="bar">
-        <h1 className="large-title" style={{ margin: 0 }}>{title}</h1>
-        {action}
-      </div>
-    </header>
-  )
-}
+import { ReactNode, useEffect } from 'react'
+import { Day, fmtWeekday } from '../lib/dates'
+import { Chevron, HomeIcon, TripsIcon } from './Icons'
 
 export type Tab = 'today' | 'trips'
 
 export function TabBar({ tab, onChange }: { tab: Tab; onChange: (t: Tab) => void }) {
   return (
-    <nav className="tabbar" aria-label="Tabs">
-      <button className={`tab ${tab === 'today' ? 'active' : ''}`} onClick={() => onChange('today')} aria-current={tab === 'today'}>
-        <Home active={tab === 'today'} />
-        Today
-      </button>
-      <button className={`tab ${tab === 'trips' ? 'active' : ''}`} onClick={() => onChange('trips')} aria-current={tab === 'trips'}>
-        <Calendar active={tab === 'trips'} />
-        Trips
-      </button>
+    <nav className="nav">
+      <button className={tab === 'today' ? 'on' : ''} onClick={() => onChange('today')}><HomeIcon on={tab === 'today'} />Today</button>
+      <button className={tab === 'trips' ? 'on' : ''} onClick={() => onChange('trips')}><TripsIcon on={tab === 'trips'} />Trips</button>
     </nav>
   )
 }
 
-type BarAction = { label: string; onClick: () => void; back?: boolean; done?: boolean; disabled?: boolean }
+export function Sec({ children }: { children: ReactNode }) {
+  return <div className="sec">{children}</div>
+}
 
-export function Sheet({ title, left, right, children }: { title: string; left?: BarAction; right?: BarAction; children: ReactNode }) {
+/** A bottom sheet on phones, a centered panel on desktop. Title on top, one action row at the bottom. */
+export function Sheet({ title, children, foot }: { title: string; children: ReactNode; foot?: ReactNode }) {
+  useEffect(() => {
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = prev }
+  }, [])
   return (
-    <div className="backdrop" role="dialog" aria-modal="true" aria-label={title}>
+    <div className="sheet-wrap" role="dialog" aria-modal="true" aria-label={title}>
       <div className="sheet">
-        <div className="sheet-scroll">
-          <div className="sheet-bar">
-            {left ? (
-              <button className={`left ${left.back ? '' : 'plain'}`} onClick={left.onClick}>
-                {left.back && <ChevronLeft />}
-                {left.label}
-              </button>
-            ) : <span />}
-            <div className="center">{title}</div>
-            {right ? (
-              <button className={`right ${right.done ? 'done' : ''}`} onClick={right.onClick} disabled={right.disabled}>
-                {right.label}
-              </button>
-            ) : <span />}
-          </div>
-          {children}
-        </div>
+        <div className="sheet-head">{title}</div>
+        <div className="sheet-body">{children}</div>
+        {foot && <div className="sheet-foot">{foot}</div>}
       </div>
     </div>
   )
 }
 
-export function Segmented<T extends string>({ options, value, onChange, label }: { options: readonly T[]; value: T; onChange: (v: T) => void; label: string }) {
+export function Actions({ left, right, onLeft, onRight, disabled }: { left: string; right: string; onLeft: () => void; onRight: () => void; disabled?: boolean }) {
   return (
-    <div className="segmented" role="radiogroup" aria-label={label}>
+    <div className="actions">
+      <button className="btn soft" onClick={onLeft}>{left}</button>
+      <button className="btn primary" onClick={onRight} disabled={disabled}>{right}</button>
+    </div>
+  )
+}
+
+export function Seg<T extends string>({ value, options, onChange, label }: { value: T; options: T[]; onChange: (v: T) => void; label: string }) {
+  return (
+    <div className="seg" role="radiogroup" aria-label={label}>
       {options.map((o) => (
-        <button key={o} role="radio" aria-checked={o === value} className={o === value ? 'on' : ''} onClick={() => onChange(o)}>
-          {o}
-        </button>
+        <button key={o} role="radio" aria-checked={o === value} className={o === value ? 'on' : ''} onClick={() => onChange(o)}>{o}</button>
       ))}
     </div>
   )
 }
 
-export function Warnings({ items }: { items: string[] }) {
-  if (!items.length) return null
+/** Row that opens a native list picker. */
+export function SelectRow({ k, value, options, onChange }: { k: string; value: string; options: readonly string[]; onChange: (v: string) => void }) {
   return (
-    <div className="warning" role="note">
-      <div className="icon"><Alert /></div>
-      <div className="text">
-        {items.map((t) => <div key={t}>{t}</div>)}
-      </div>
-    </div>
+    <label className="row">
+      <span className="k">{k}</span>
+      <span className="v">{value}<Chevron /></span>
+      <select aria-label={k} value={value} onChange={(e) => onChange(e.target.value)}>
+        {options.map((o) => <option key={o}>{o}</option>)}
+      </select>
+    </label>
   )
 }
 
-export function Ring({ value, total, coral }: { value: number; total: number; coral?: boolean }) {
-  const r = 46
-  const c = 2 * Math.PI * r
-  const fill = Math.max(0, Math.min(1, value / total)) * c
+/** Row that opens the native date picker. */
+export function DateRow({ k, value, today, onChange, min }: { k: string; value: Day; today: Day; onChange: (d: Day) => void; min?: Day }) {
   return (
-    <svg width="104" height="104" viewBox="0 0 104 104" aria-hidden="true">
-      <circle cx="52" cy="52" r={r} fill="none" stroke="var(--ring-track)" strokeWidth="8" />
-      <circle cx="52" cy="52" r={r} fill="none" stroke={coral ? 'var(--secondary)' : 'var(--primary)'} strokeWidth="8" strokeLinecap="round" strokeDasharray={`${fill} ${c}`} transform="rotate(-90 52 52)" />
-    </svg>
+    <label className="row">
+      <span className="k">{k}</span>
+      <span className="v">{value ? fmtWeekday(value, today) : 'Choose'}<Chevron /></span>
+      <input
+        className="overlay"
+        type="date"
+        aria-label={k}
+        value={value}
+        min={min}
+        onClick={(e) => { try { (e.currentTarget as HTMLInputElement).showPicker?.() } catch { /* not supported */ } }}
+        onChange={(e) => e.target.value && onChange(e.target.value)}
+      />
+    </label>
+  )
+}
+
+export function Ring({ n, unit, of, value }: { n: number; unit: string; of?: number; value?: number }) {
+  const r = 53
+  const c = 2 * Math.PI * r
+  const frac = of && value !== undefined ? Math.max(0, Math.min(1, value / of)) : 0
+  return (
+    <div className="disc" style={of ? { background: 'none' } : undefined}>
+      {of && (
+        <svg width="112" height="112" viewBox="0 0 112 112" aria-hidden="true">
+          <circle cx="56" cy="56" r={r} fill="rgba(255,255,255,0.09)" stroke="rgba(255,255,255,0.12)" strokeWidth="4" />
+          <circle cx="56" cy="56" r={r} fill="none" stroke="#B7A5FF" strokeWidth="4" strokeLinecap="round" strokeDasharray={`${(c * frac).toFixed(1)} ${c.toFixed(1)}`} transform="rotate(-90 56 56)" />
+        </svg>
+      )}
+      <div className="n">{n}</div>
+      <div className="u">{unit}</div>
+    </div>
   )
 }

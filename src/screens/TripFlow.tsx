@@ -1,17 +1,15 @@
 import { useState } from 'react'
-import { addDays, Day, fmtDate, fmtRange, fmtWeekday, plural, toNum } from '../lib/dates'
-import { daysPerEntry, Entry, legs, newId, Profile, Trip, warnings } from '../lib/plan'
-import { COUNTRIES, entryRule } from '../lib/rules'
-import { Check, ChevronRight } from '../components/Icons'
-import { Segmented, Sheet, Warnings } from '../components/ui'
-
-type Step = 'form' | 'visa' | 'plan'
+import { addDays, Day, fmtDate, fmtRange, toNum } from '../lib/dates'
+import { daysPerEntry, editStay, Entry, legs, newId, Profile, Trip, warnings } from '../lib/plan'
+import { COUNTRIES, entryRule, shortName, taxRule } from '../lib/rules'
+import { Alert, Check, Chevron } from '../components/Icons'
+import { Actions, DateRow, Sec, Seg, SelectRow, Sheet } from '../components/ui'
+import { EditStay } from './EditStay'
 
 type Props = {
   profile: Profile
   trips: Trip[]
   today: Day
-  /** An existing trip to view, or undefined for a new one. */
   existing?: Trip
   startBooked?: boolean
   onClose: () => void
@@ -19,147 +17,135 @@ type Props = {
   onDelete: (id: string) => void
 }
 
-export function TripFlow({ profile, trips, today, existing, startBooked, onClose, onSave, onDelete }: Props) {
-  const [step, setStep] = useState<Step>(existing ? 'plan' : 'form')
-  const [trip, setTrip] = useState<Trip>(
-    existing ?? {
-      id: newId(),
-      country: 'China',
-      start: addDays(today, 14),
-      end: addDays(today, 43),
-      entry: { kind: 'visafree' },
-      type: 'Business',
-      booked: !!startBooked,
-    },
-  )
-  const [visa, setVisa] = useState<Extract<Entry, { kind: 'visa' }>>(
-    trip.entry.kind === 'visa' ? trip.entry : { kind: 'visa', days: 90, validUntil: addDays(today, 365), multiple: true },
-  )
-  const set = (p: Partial<Trip>) => setTrip((t) => ({ ...t, ...p }))
-  const valid = toNum(trip.end) >= toNum(trip.start)
+type Step = { kind: 'form' } | { kind: 'visa' } | { kind: 'plan' } | { kind: 'stay'; index: number }
 
-  if (step === 'visa') {
+const M = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+const long = (d: Day) => { const [y, m, dd] = d.split('-').map(Number); return `${M[m - 1]} ${dd}, ${y}` }
+
+export function TripFlow({ profile, trips, today, existing, startBooked, onClose, onSave, onDelete }: Props) {
+  const [trip, setTrip] = useState<Trip>(
+    () => existing ?? { id: newId(), country: 'China', start: addDays(today, 17), end: addDays(today, 167), entry: { kind: 'visafree' }, type: 'Business', booked: !!startBooked },
+  )
+  const [step, setStep] = useState<Step>({ kind: 'form' })
+  const others = trips.filter((t) => t.id !== trip.id)
+
+  // Changing dates, country or entry brings back the suggested stays.
+  const change = (p: Partial<Trip>) => setTrip((t) => ({ ...t, ...p, stays: undefined }))
+
+  if (step.kind === 'visa') return <VisaStep entry={trip.entry} today={today} onCancel={() => setStep({ kind: 'form' })} onSave={(e) => { change({ entry: e }); setStep({ kind: 'form' }) }} />
+
+  if (step.kind === 'stay') {
     return (
-      <Sheet
-        title="Your visa"
-        left={{ label: 'Back', back: true, onClick: () => setStep('form') }}
-        right={{ label: 'Done', done: true, onClick: () => { set({ entry: visa }); setStep('form') } }}
-      >
-        <div className="body muted" style={{ lineHeight: 1.5, paddingTop: 14 }}>As printed on your visa.</div>
-        <div className="group" style={{ marginTop: 20 }}>
-          <label className="group-row" htmlFor="days">
-            <span className="k">Days per stay</span>
-            <input
-              id="days" className="num" inputMode="numeric" value={visa.days || ''}
-              onChange={(e) => setVisa({ ...visa, days: Number(e.target.value.replace(/\D/g, '')) || 0 })}
-            />
-          </label>
-          <label className="group-row">
-            <span className="k">Valid until</span>
-            <span className="v">{fmtDate(visa.validUntil, today)}</span>
-            <input type="date" aria-label="Valid until" value={visa.validUntil} onChange={(e) => e.target.value && setVisa({ ...visa, validUntil: e.target.value })} />
-          </label>
-        </div>
-        <div className="label form-label">Entries</div>
-        <Segmented label="Entries" options={['Single', 'Multiple'] as const} value={visa.multiple ? 'Multiple' : 'Single'} onChange={(v) => setVisa({ ...visa, multiple: v === 'Multiple' })} />
-      </Sheet>
+      <EditStay
+        trip={trip}
+        profile={profile}
+        index={step.index}
+        today={today}
+        onCancel={() => setStep({ kind: 'plan' })}
+        onSave={(s, e) => { setTrip((t) => editStay(t, profile, step.index, s, e)); setStep({ kind: 'plan' }) }}
+      />
     )
   }
 
-  if (step === 'plan') {
+  if (step.kind === 'plan') {
     const ls = legs(trip, profile)
-    const per = daysPerEntry(trip, profile)
+    const max = daysPerEntry(trip, profile)
+    const warns = warnings(trip, others, profile)
     const exits = ls.length - 1
-    const others = trips.filter((t) => t.id !== trip.id)
-    const warn = warnings(trip, others, profile).map((w) => w.text)
-    const answer = exits === 0 ? `Stay all ${plural(ls[0].days, 'day')}` : `Leave ${exits === 1 ? 'once' : `${exits} times`}`
-    const reason = !per
-      ? `No limit we know of for ${trip.country}`
-      : trip.entry.kind === 'visa'
-        ? `Your visa allows ${per} days per entry`
-        : `Visa free allows ${per} days per entry`
-    const isSaved = trips.some((t) => t.id === trip.id) && JSON.stringify(trip) === JSON.stringify(existing)
-
+    const suggested = ls.some((l) => !l.edited)
     return (
-      <Sheet
-        title={trip.country}
-        left={existing ? undefined : { label: 'Back', back: true, onClick: () => setStep('form') }}
-        right={{ label: 'Close', onClick: onClose }}
-      >
-        <div className="title" style={{ paddingTop: 14 }}>{answer}</div>
-        <div className="body muted" style={{ paddingTop: 6 }}>{reason}</div>
-        <div style={{ paddingTop: 18 }}>
+      <Sheet title={shortName(trip.country)} foot={<><div className="note" style={{ textAlign: 'center', padding: '0 0 12px' }}>Not legal advice.</div><Actions left="Back" right={existing ? 'Save' : 'Save trip'} onLeft={() => setStep({ kind: 'form' })} onRight={() => onSave(trip)} /></>}>
+        <div className="big">{exits === 0 ? 'No need to leave' : `Leave ${exits === 1 ? 'once' : `${exits} times`}`}</div>
+        <div className="big-sub">{max ? `${trip.entry.kind === 'visafree' ? 'Visa free' : 'Your visa'} allows ${max} days per entry` : 'No entry limit we know of'}</div>
+        <div className="card" style={{ marginTop: 20, padding: '0 16px' }}>
           {ls.map((l, i) => (
-            <div key={l.start} className="step">
-              <div className="n">{i + 1}</div>
-              <div className="r">{fmtRange(l.start, l.end, today)}</div>
-              <div className="d">{plural(l.days, 'day')}</div>
-            </div>
+            <button key={i} className="stay-row" onClick={() => setStep({ kind: 'stay', index: i })}>
+              <span className="tl" aria-hidden="true"><i className={i === 0 ? 'off' : ''} /><b /><i className={i === ls.length - 1 ? 'off' : ''} /></span>
+              <span className="in">
+                <span className="t" style={{ fontSize: 17, fontWeight: 600 }}>{fmtRange(l.start, l.end, today)}</span>
+                <span className="s" style={{ fontSize: 15, color: 'var(--muted)', display: 'flex', alignItems: 'center', gap: 6 }}>{l.edited && <Check />}{l.days} days<Chevron /></span>
+              </span>
+            </button>
           ))}
         </div>
-        <Warnings items={warn} />
-        <div className="spacer" style={{ minHeight: 24 }} />
-        {isSaved ? (
-          <div className="stack">
-            <button className="btn secondary" onClick={() => setStep('form')}>Edit trip</button>
-            <button className="btn" style={{ color: 'var(--secondary-ink)', background: 'transparent' }} onClick={() => onDelete(trip.id)}>Delete trip</button>
+        {suggested && <div className="note">Suggested dates. Tap a stay to match your flights.</div>}
+        {warns.length > 0 && (
+          <div className="warn">
+            <Alert />
+            <div>{warns.map((w, i) => (i === 0 ? <b key={w.id}>{w.text}</b> : <div key={w.id}>{w.text}</div>))}</div>
           </div>
-        ) : (
-          <button className="btn primary" onClick={() => onSave(trip)}>Save trip</button>
         )}
-        <div className="footnote">Not legal or tax advice.</div>
       </Sheet>
     )
   }
 
+  // Form
   const rule = entryRule(profile.passport, trip.country)
+  const tax = taxRule(trip.country)
+  const visa = trip.entry.kind === 'visa' ? trip.entry : undefined
+  const valid = toNum(trip.end) >= toNum(trip.start)
   return (
-    <Sheet title={existing ? 'Edit trip' : 'New trip'} left={{ label: 'Cancel', onClick: existing ? () => { setTrip(existing); setStep('plan') } : onClose }}>
+    <Sheet title={existing ? shortName(existing.country) : 'New trip'} foot={<Actions left="Cancel" right="See plan" onLeft={onClose} onRight={() => setStep({ kind: 'plan' })} disabled={!valid} />}>
       <div style={{ marginTop: 6 }}>
-        <Segmented label="Trip status" options={['Planning', 'Booked'] as const} value={trip.booked ? 'Booked' : 'Planning'} onChange={(v) => set({ booked: v === 'Booked' })} />
+        <Seg label="Status" value={trip.booked ? 'Booked' : 'Planning'} options={['Planning', 'Booked']} onChange={(v) => setTrip((t) => ({ ...t, booked: v === 'Booked' }))} />
       </div>
-      <div className="group" style={{ marginTop: 22 }}>
-        <label className="group-row">
-          <span className="k">Country</span>
-          <span className="v">{trip.country}</span>
-          <select aria-label="Country" value={trip.country} onChange={(e) => set({ country: e.target.value })}>
-            {COUNTRIES.map((c) => <option key={c}>{c}</option>)}
-          </select>
-        </label>
-        <label className="group-row">
-          <span className="k">Arrive</span>
-          <span className="v">{fmtWeekday(trip.start, today)}</span>
-          <input type="date" aria-label="Arrive" value={trip.start} onChange={(e) => e.target.value && set({ start: e.target.value })} />
-        </label>
-        <label className="group-row">
-          <span className="k">Leave</span>
-          <span className="v" style={valid ? undefined : { color: 'var(--secondary-ink)' }}>{fmtWeekday(trip.end, today)}</span>
-          <input type="date" aria-label="Leave" value={trip.end} onChange={(e) => e.target.value && set({ end: e.target.value })} />
-        </label>
+      <div className="card" style={{ marginTop: 14 }}>
+        <SelectRow k="Country" value={trip.country} options={COUNTRIES} onChange={(c) => change({ country: c })} />
+        <DateRow k="Arrive" value={trip.start} today={today} onChange={(d) => change({ start: d, end: toNum(trip.end) < toNum(d) ? d : trip.end })} />
+        <DateRow k="Leave" value={trip.end} today={today} min={trip.start} onChange={(d) => change({ end: d })} />
       </div>
-
-      <div className="label form-label">Entry</div>
-      <div className="group">
-        <button className="group-row" onClick={() => set({ entry: { kind: 'visafree' } })} aria-pressed={trip.entry.kind === 'visafree'}>
-          <span className="k">Visa free</span>
-          <span className="v">
-            {!rule.visaFreeDays && <span>Not known</span>}
-            {trip.entry.kind === 'visafree' && <Check />}
-          </span>
+      <Sec>Entry</Sec>
+      <div className="card">
+        <button className="row" onClick={() => change({ entry: { kind: 'visafree' } })}>
+          <span className="t">Visa free</span>{!visa && <Check />}
         </button>
-        <button className="group-row" onClick={() => setStep('visa')}>
-          <span className="k">With a visa</span>
-          <span className="v">
-            {trip.entry.kind === 'visa' ? <>{trip.entry.days} days <Check /></> : <ChevronRight />}
-          </span>
+        <button className="row" onClick={() => setStep({ kind: 'visa' })}>
+          <span className="t">With a visa</span>
+          <span className="s">{visa ? <>{visa.days} days, {visa.multiple ? 'multiple' : 'single'}<Check /></> : <Chevron />}</span>
         </button>
       </div>
+      <Sec>Type</Sec>
+      <Seg label="Type" value={trip.type} options={['Business', 'Personal']} onChange={(v) => setTrip((t) => ({ ...t, type: v }))} />
+      <Sec>Rules for this trip</Sec>
+      <div className="card">
+        <div className="row small"><span className="k">Stay per entry</span><span className="v">{visa ? `${visa.days} days` : rule.visaFreeDays ? `${rule.visaFreeDays} days` : 'Visa needed'}</span></div>
+        {visa ? (
+          <div className="row small"><span className="k">Visa valid until</span><span className="v">{long(visa.validUntil)}</span></div>
+        ) : rule.visaFreeUntil ? (
+          <div className="row small"><span className="k">Visa free until</span><span className="v">{long(rule.visaFreeUntil)}</span></div>
+        ) : null}
+        <div className="row small"><span className="k">Tax limit</span><span className="v">{tax.days} days {tax.window === 'calendar' ? 'a year' : 'in 12 months'}</span></div>
+      </div>
+      {existing && <button className="text-btn" style={{ marginTop: 12 }} onClick={() => { if (confirm('Delete this trip?')) onDelete(existing.id) }}>Delete trip</button>}
+    </Sheet>
+  )
+}
 
-      <div className="label form-label">Type</div>
-      <Segmented label="Type" options={['Business', 'Personal'] as const} value={trip.type} onChange={(v) => set({ type: v })} />
 
-      <div className="spacer" style={{ minHeight: 24 }} />
-      <button className="btn primary" disabled={!valid} onClick={() => setStep('plan')}>See plan</button>
+function VisaStep({ entry, today, onCancel, onSave }: { entry: Entry; today: Day; onCancel: () => void; onSave: (e: Entry) => void }) {
+  const init = entry.kind === 'visa' ? entry : { kind: 'visa' as const, days: 90, validUntil: addDays(today, 365), multiple: true }
+  const [days, setDays] = useState(String(init.days))
+  const [until, setUntil] = useState(init.validUntil)
+  const [multiple, setMultiple] = useState(init.multiple)
+  const n = parseInt(days, 10)
+  const ok = n > 0 && n < 1000
+  return (
+    <Sheet title="Your visa" foot={<Actions left="Cancel" right="Save" onLeft={onCancel} onRight={() => onSave({ kind: 'visa', days: n, validUntil: until, multiple })} disabled={!ok} />}>
+      <div className="note" style={{ padding: '16px 4px 0' }}>As printed on your visa.</div>
+      <div className="card" style={{ marginTop: 8 }}>
+        <label className="row">
+          <span className="k">Days per stay</span>
+          <input className="num" inputMode="numeric" value={days} onChange={(e) => setDays(e.target.value.replace(/\D/g, ''))} aria-label="Days per stay" />
+        </label>
+        <DateRow k="Valid until" value={until} today={today} onChange={setUntil} />
+      </div>
+      <Sec>Entries</Sec>
+      <Seg label="Entries" value={multiple ? 'Multiple' : 'Single'} options={['Single', 'Multiple']} onChange={(v) => setMultiple(v === 'Multiple')} />
+      <div className="note">
+        {multiple
+          ? `Each stay can last up to ${ok ? n : '…'} days. Leave and come back as often as you like until ${long(until)}.`
+          : `One stay of up to ${ok ? n : '…'} days, before ${fmtDate(until, today)}.`}
+      </div>
     </Sheet>
   )
 }

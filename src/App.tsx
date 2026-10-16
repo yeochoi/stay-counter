@@ -1,17 +1,19 @@
 import { useEffect, useState } from 'react'
 import { todayDay } from './lib/dates'
-import { legs, Trip } from './lib/plan'
+import { editStay, legs, Trip } from './lib/plan'
 import { sampleTrips, useStore } from './lib/store'
 import { Tab, TabBar } from './components/ui'
 import { Today } from './screens/Today'
 import { Trips } from './screens/Trips'
 import { TripFlow } from './screens/TripFlow'
+import { EditStay } from './screens/EditStay'
 import { Onboarding, Settings } from './screens/Setup'
 import { DesignSystem } from './screens/DesignSystem'
 
 type Overlay =
   | { kind: 'new'; booked: boolean }
   | { kind: 'trip'; trip: Trip }
+  | { kind: 'stay'; trip: Trip; index: number }
   | { kind: 'settings' }
   | { kind: 'design' }
   | null
@@ -20,19 +22,16 @@ export default function App() {
   const [state, setState] = useStore()
   const [tab, setTab] = useState<Tab>(() => (location.hash === '#trips' ? 'trips' : 'today'))
   const [overlay, setOverlay] = useState<Overlay>(() => (location.hash === '#design' ? { kind: 'design' } : null))
-  useEffect(() => {
-    const onHash = () => location.hash === '#design' && setOverlay({ kind: 'design' })
-    window.addEventListener('hashchange', onHash)
-    return () => window.removeEventListener('hashchange', onHash)
-  }, [])
+  useEffect(() => { window.scrollTo(0, 0) }, [tab])
   const today = state.previewDate ?? todayDay()
   const profile = state.profile
+  const closeDesign = () => { if (location.hash) history.replaceState(null, '', location.pathname); setOverlay(null) }
 
   if (!profile) {
     return (
       <div className="app">
         <Onboarding onDone={(p) => setState((s) => ({ ...s, profile: p }))} />
-        {overlay?.kind === 'design' && <DesignSystem onBack={() => { if (location.hash) history.replaceState(null, '', location.pathname); setOverlay(null) }} />}
+        {overlay?.kind === 'design' && <DesignSystem onBack={closeDesign} />}
       </div>
     )
   }
@@ -46,7 +45,7 @@ export default function App() {
     setOverlay(null)
   }
   const exportCsv = () => {
-    const rows = [['Country', 'Arrive', 'Leave', 'Days', 'Type', 'Entries']]
+    const rows = [['Country', 'Arrive', 'Leave', 'Days', 'Type', 'Stays']]
     for (const t of [...state.trips].sort((a, b) => a.start.localeCompare(b.start))) {
       const ls = legs(t, profile)
       rows.push([t.country, t.start, t.end, String(ls.reduce((n, l) => n + l.days, 0)), t.type, String(ls.length)])
@@ -68,10 +67,11 @@ export default function App() {
           today={today}
           onNew={(booked) => setOverlay({ kind: 'new', booked })}
           onOpen={(trip) => setOverlay({ kind: 'trip', trip })}
+          onEditStay={(trip, index) => setOverlay({ kind: 'stay', trip, index })}
           onSettings={() => setOverlay({ kind: 'settings' })}
         />
       ) : (
-        <Trips trips={state.trips} profile={profile} today={today} onOpen={(trip) => setOverlay({ kind: 'trip', trip })} onExport={exportCsv} />
+        <Trips trips={state.trips} profile={profile} today={today} onOpen={(trip) => setOverlay({ kind: 'trip', trip })} onExport={exportCsv} onNew={() => setOverlay({ kind: 'new', booked: false })} />
       )}
       <TabBar tab={tab} onChange={setTab} />
 
@@ -81,19 +81,30 @@ export default function App() {
       {overlay?.kind === 'trip' && (
         <TripFlow key={overlay.trip.id} profile={profile} trips={state.trips} today={today} existing={overlay.trip} onClose={() => setOverlay(null)} onSave={save} onDelete={remove} />
       )}
+      {overlay?.kind === 'stay' && (
+        <EditStay
+          trip={overlay.trip}
+          profile={profile}
+          index={overlay.index}
+          today={today}
+          onCancel={() => setOverlay(null)}
+          onSave={(s, e) => save(editStay(overlay.trip, profile, overlay.index, s, e))}
+        />
+      )}
       {overlay?.kind === 'settings' && (
         <Settings
           profile={profile}
           previewDate={state.previewDate}
           onProfile={(p) => setState((s) => ({ ...s, profile: p }))}
           onPreview={(d) => setState((s) => ({ ...s, previewDate: d }))}
-          onSample={() => { setState((s) => ({ ...s, trips: sampleTrips(), previewDate: '2026-10-15' })); setOverlay(null) }}
+          onSample={() => { setState((s) => ({ ...s, trips: sampleTrips(), previewDate: '2026-10-15' })); setOverlay(null); setTab('today') }}
           onClear={() => { setState((s) => ({ ...s, trips: [] })); setOverlay(null) }}
+          onReset={() => { setState({ trips: [] }); setOverlay(null); setTab('today') }}
           onDesign={() => setOverlay({ kind: 'design' })}
           onClose={() => setOverlay(null)}
         />
       )}
-      {overlay?.kind === 'design' && <DesignSystem onBack={() => { if (location.hash) history.replaceState(null, '', location.pathname); setOverlay(null) }} />}
+      {overlay?.kind === 'design' && <DesignSystem onBack={closeDesign} />}
     </div>
   )
 }

@@ -1,8 +1,8 @@
-import { Day, fmtRange, fmtWeekday, plural, toNum } from '../lib/dates'
+import { Day, fmtDate, fmtRange, fmtWeekday, toNum } from '../lib/dates'
 import { last12Months, Profile, status, Trip } from '../lib/plan'
 import { shortName, taxRule } from '../lib/rules'
-import { Gear, Plane, Plus } from '../components/Icons'
-import { Ring, TabHeader } from '../components/ui'
+import { Check, Chevron, Gear, Plane, Plus } from '../components/Icons'
+import { Ring, Sec } from '../components/ui'
 
 type Props = {
   trips: Trip[]
@@ -10,162 +10,183 @@ type Props = {
   today: Day
   onNew: (booked: boolean) => void
   onOpen: (t: Trip) => void
+  onEditStay: (t: Trip, i: number) => void
   onSettings: () => void
 }
 
-export function Today({ trips, profile, today, onNew, onOpen, onSettings }: Props) {
+export function Today({ trips, profile, today, onNew, onOpen, onEditStay, onSettings }: Props) {
   const t = toNum(today)
-  const sorted = [...trips].sort((a, b) => toNum(a.start) - toNum(b.start))
-  const active = sorted.find((x) => toNum(x.start) <= t && t <= toNum(x.end))
-  const future = sorted.filter((x) => toNum(x.start) > t)
-  const hero = active ?? future[0]
-  const later = future.filter((x) => x !== hero)
-  const counts = last12Months(trips, profile, today)
-  const tracked = new Set(hero ? [hero.country] : [])
+  const sorted = [...trips].sort((a, b) => a.start.localeCompare(b.start))
+  const current = sorted.find((x) => toNum(x.start) <= t && t <= toNum(x.end))
+  const upcoming = sorted.filter((x) => toNum(x.start) > t)
+  const main = current ?? upcoming[0]
+  const later = upcoming.filter((x) => x !== main)
 
-  const header = (
-    <TabHeader
-      eyebrow={fmtWeekday(today, today)}
-      title="Today"
-      action={<button className="icon-btn" aria-label="Settings" onClick={onSettings}><Gear /></button>}
-    />
+  const top = (
+    <div className="hero-top">
+      <div className="hero-date trim">{fmtWeekday(today, today)}</div>
+      <button className="round" aria-label="Settings" onClick={onSettings}><Gear /></button>
+    </div>
   )
 
-  if (!hero) {
+  if (!trips.length) {
     return (
       <>
-        <main className="screen" style={{ display: 'flex', flexDirection: 'column', paddingBottom: 30 }}>
-          {header}
-          <div className="empty">
-            <Plane />
-            <div className="title" style={{ paddingTop: 18 }}>{trips.length ? 'No trips coming up' : 'No trips yet'}</div>
-            <div className="body muted" style={{ lineHeight: 1.5, paddingTop: 6 }}>
-              See how long you can stay and<br />when to leave, before you book.
-            </div>
+        <header className="hero">{top}</header>
+        <div className="empty">
+          <div className="mid">
+            <div className="icon"><Plane /></div>
+            <h2>No trips yet</h2>
+            <p>See how long you can stay and<br />when to leave, before you book.</p>
           </div>
-          {counts.length > 0 && trips.length > 0 && <Days rows={counts} tracked={tracked} first />}
-          <div className="stack" style={{ paddingTop: 24 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             <button className="btn primary" onClick={() => onNew(false)}>Plan a stay</button>
-            <button className="btn secondary" onClick={() => onNew(true)}>Add booked trip</button>
+            <button className="btn soft" onClick={() => onNew(true)}>Add booked trip</button>
           </div>
-        </main>
+        </div>
       </>
     )
   }
 
-  const st = status(hero, profile, today)
-  const rule = taxRule(hero.country)
-  const heroCount = counts.find((c) => c.country === hero.country)?.days ?? 0
-
-  return (
-    <>
-      <main className="screen">
-        {header}
-
-        {st.phase === 'in' ? (
-          <>
-            <div className="hero">
-              <div className="ring">
-                <Ring value={st.dayOf} total={st.leg.days} coral={st.daysLeft <= 5} />
-                <div className="inside">
-                  <div className="num">{st.daysLeft}</div>
-                  <div className="unit muted">{st.daysLeft === 1 ? 'day left' : 'days left'}</div>
-                </div>
-              </div>
-              <div className="hero-text">
-                <div className="label">Leave {shortName(hero.country)} by</div>
-                <div className="title">{fmtWeekday(st.leg.end, today)}</div>
-              </div>
-            </div>
-            {st.legs.length > 1 && (
-              <section className="section">
-                <div className="label">Your plan</div>
-                {st.legs.slice(st.index, st.index + 3).map((l, i, arr) => (
-                  <button key={l.start} className="timeline-row" onClick={() => onOpen(hero)}>
-                    <div className="timeline-rail" aria-hidden="true">
-                      <div className={`seg top ${i === 0 ? 'hide' : ''}`} />
-                      <div className={`dot ${i === 0 ? 'now' : ''}`} />
-                      <div className={`seg bottom ${i === arr.length - 1 ? 'hide' : ''}`} />
-                    </div>
-                    <div className="timeline-body">
-                      <div className="row-text" style={{ fontWeight: i === 0 ? 600 : 400 }}>{fmtRange(l.start, l.end, today)}</div>
-                      <div className={`body ${i === 0 ? 'purple' : 'muted'}`} style={{ fontWeight: i === 0 ? 600 : 400 }}>
-                        {i === 0 ? 'Now' : plural(l.days, 'day')}
-                      </div>
-                    </div>
-                  </button>
-                ))}
-              </section>
-            )}
-          </>
-        ) : (
-          <button className="hero" style={{ border: 0, background: 'transparent', padding: '44px 0 0', textAlign: 'left', width: '100%' }} onClick={() => onOpen(hero)}>
-            <div className="disc">
-              <div className="num">{st.phase === 'before' || st.phase === 'out' ? st.daysToGo : 0}</div>
-              <div className="unit">days to go</div>
-            </div>
-            <div className="hero-text">
-              <div className="label">{st.phase === 'out' ? 'Next entry' : 'Next trip'}</div>
-              <div className="title">{shortName(hero.country)}</div>
-              <div className="body muted">{fmtRange(hero.start, hero.end, today)}</div>
+  let hero
+  let stays = null
+  if (main) {
+    const st = status(main, profile, today)
+    const ls = st.legs
+    const country = shortName(main.country)
+    if (st.phase === 'in') {
+      const next = ls[st.index + 1]
+      hero = (
+        <>
+          <button className="hero-main" onClick={() => onEditStay(main, st.index)}>
+            <Ring n={st.daysLeft} unit={st.daysLeft === 1 ? 'day left' : 'days left'} of={st.leg.days} value={st.dayOf} />
+            <div className="stack">
+              <div className="l">Leave {country} by</div>
+              <div className="a">{fmtWeekday(st.leg.end, today)}</div>
+              <div className="l">Stay {st.index + 1} of {ls.length}</div>
             </div>
           </button>
-        )}
+          {next && <div className="chips"><span>Next entry {fmtDate(next.start, today)}</span></div>}
+        </>
+      )
+    } else if (st.phase === 'out') {
+      const next = ls[st.next]
+      hero = (
+        <button className="hero-main" onClick={() => onEditStay(main, st.next)}>
+          <Ring n={st.daysToGo} unit={st.daysToGo === 1 ? 'day to go' : 'days to go'} />
+          <div className="stack">
+            <div className="l">Back in {country}</div>
+            <div className="a">{fmtWeekday(next.start, today)}</div>
+            <div className="l">Stay {st.next + 1} of {ls.length}</div>
+          </div>
+        </button>
+      )
+    } else {
+      const days = toNum(main.start) - t
+      hero = (
+        <>
+          <button className="hero-main" onClick={() => onOpen(main)}>
+            <Ring n={days} unit={days === 1 ? 'day to go' : 'days to go'} />
+            <div className="stack">
+              <div className="l">Next trip</div>
+              <div className="a">{country}</div>
+              <div className="l">{fmtRange(main.start, main.end, today)}</div>
+            </div>
+          </button>
+          <div className="chips">
+            <span>{main.type}</span>
+            <span>{main.entry.kind === 'visafree' ? 'Visa free' : 'Visa'}</span>
+            {ls.length > 1 && <span>{ls.length} stays</span>}
+            {!main.booked && <span>Planning</span>}
+          </div>
+        </>
+      )
+    }
+    if (current && ls.length > 1) {
+      const suggested = ls.some((l) => !l.edited)
+      const now = st.phase === 'in' ? st.index : -1
+      stays = (
+        <>
+          <Sec>{suggested ? 'Suggested stays' : 'Your stays'}</Sec>
+          <div className="card">
+            {ls.map((l, i) => (
+              <button key={i} className="row" style={{ minHeight: 54 }} onClick={() => onEditStay(main, i)}>
+                <span className="t">{fmtRange(l.start, l.end, today)}</span>
+                <span className="s">
+                  {i === now ? <span className="pill now">Now</span> : <>{l.edited && <Check />}{l.days} days</>}
+                  <Chevron />
+                </span>
+              </button>
+            ))}
+          </div>
+          {suggested && <div className="note">Tap a stay to match your flights.</div>}
+        </>
+      )
+    }
+  } else {
+    hero = (
+      <div className="hero-main">
+        <div className="stack">
+          <div className="l">Next trip</div>
+          <div className="a">None yet</div>
+          <div className="l">Tap + to plan your next stay</div>
+        </div>
+      </div>
+    )
+  }
 
+  const counts = last12Months(trips, profile, today)
+  return (
+    <>
+      <header className="hero">
+        {top}
+        {hero}
+      </header>
+      <main className="content">
+        {stays}
         {later.length > 0 && (
-          <section className="section">
-            <div className="label">Later</div>
-            <div className="rows">
+          <>
+            <Sec>Later</Sec>
+            <div className="card">
               {later.map((x) => (
-                <button key={x.id} className="list-row" onClick={() => onOpen(x)}>
-                  <span className="name">{shortName(x.country)}</span>
-                  <span className="value">{fmtRange(x.start, x.end, today)}</span>
+                <button key={x.id} className="row" onClick={() => onOpen(x)}>
+                  <span className="t">{shortName(x.country)}</span>
+                  <span className="s">{fmtRange(x.start, x.end, today)}</span>
                 </button>
               ))}
             </div>
-          </section>
+          </>
         )}
-
-        {st.phase === 'in' ? (
-          <section className={`section ${st.legs.length > 1 ? '' : 'after-plain'}`}>
-            <div className="label">Past 12 months</div>
-            <div className="rows">
-              <div className="list-row">
-                <span className="name">{shortName(hero.country)}</span>
-                <span className={`value ${rule.days - heroCount <= 30 ? 'coral' : 'purple'}`}>{heroCount} of {rule.days} days</span>
+        <Sec>Past 12 months</Sec>
+        <div className="card" style={{ padding: '0 16px' }}>
+          {counts.length === 0 && <div className="row" style={{ padding: 0 }}><span className="k">No days abroad yet</span></div>}
+          {counts.map((c) => {
+            const limit = taxRule(c.country).days
+            const showBar = c.country !== profile.home && c.days >= 60
+            const name = shortName(c.country)
+            if (!showBar) {
+              return (
+                <div key={c.country} className="row" style={{ padding: 0 }}>
+                  <span className="t">{name}</span>
+                  <span className="s">{c.days} days</span>
+                </div>
+              )
+            }
+            const close = c.days / limit >= 0.85
+            return (
+              <div key={c.country} className="row" style={{ padding: '14px 0', display: 'block' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span className="t">{name}</span>
+                  {close ? <span className="pill coral">{c.days} of {limit} days</span> : <span style={{ fontSize: 15, fontWeight: 600, color: 'var(--purple-text)' }}>{c.days} of {limit}</span>}
+                </div>
+                <div className={`bar${close ? ' coral' : ''}`} aria-hidden="true"><div style={{ width: `${Math.min(100, (c.days / limit) * 100)}%` }} /></div>
               </div>
-            </div>
-          </section>
-        ) : (
-          <Days rows={counts} tracked={tracked} first={false} afterPlain={later.length > 0} />
-        )}
+            )
+          })}
+        </div>
       </main>
       <button className="fab" aria-label="Plan a stay or add a booked trip" onClick={() => onNew(false)}><Plus /></button>
     </>
-  )
-}
-
-function Days({ rows, tracked, first, afterPlain }: { rows: { country: string; days: number }[]; tracked: Set<string>; first: boolean; afterPlain?: boolean }) {
-  if (!rows.length) return null
-  return (
-    <section className={`section ${afterPlain ? 'after-plain' : ''}`} style={first ? { paddingTop: 0 } : undefined}>
-      <div className="label">Past 12 months</div>
-      <div className="rows">
-        {[...rows].sort((a, b) => Number(tracked.has(b.country)) - Number(tracked.has(a.country)) || b.days - a.days).map((r) => {
-          const rule = taxRule(r.country)
-          const isTracked = tracked.has(r.country)
-          const close = rule.days - r.days <= 30
-          return (
-            <div key={r.country} className="list-row" style={{ minHeight: 50 }}>
-              <span className="name">{shortName(r.country)}</span>
-              <span className={`value ${isTracked ? (close ? 'coral' : 'purple') : ''}`}>
-                {isTracked ? `${r.days} of ${rule.days}` : plural(r.days, 'day')}
-              </span>
-            </div>
-          )
-        })}
-      </div>
-    </section>
   )
 }
 

@@ -1,97 +1,114 @@
 import { useState } from 'react'
+import { Day, todayDay } from '../lib/dates'
 import { Profile } from '../lib/plan'
 import { COUNTRIES, PASSPORTS } from '../lib/rules'
-import { ChevronRight, Globe } from '../components/Icons'
-import { Sheet } from '../components/ui'
+import { Chevron, Plus } from '../components/Icons'
+import { DateRow, Sec, SelectRow, Sheet } from '../components/ui'
 
 const HOMES = [...new Set([...COUNTRIES, 'Netherlands', 'South Korea'])].sort()
 
-function ProfileRows({ value, onChange }: { value: Profile; onChange: (p: Profile) => void }) {
+function PickCard({ k, value, options, onChange, extra }: { k: string; value: string; options: readonly string[]; onChange: (v: string) => void; extra?: React.ReactNode }) {
   return (
-    <div className="group">
-      <label className="group-row">
-        <span className="k">Passport</span>
-        <span className="v">{value.passport}<ChevronRight /></span>
-        <select aria-label="Passport" value={value.passport} onChange={(e) => onChange({ ...value, passport: e.target.value })}>
-          {PASSPORTS.map((c) => <option key={c}>{c}</option>)}
+    <div className="card" style={{ marginTop: 12 }}>
+      <label className="row two">
+        <span className="field"><span className="k">{k}</span><span className="t">{value}</span></span>
+        <Chevron />
+        <select aria-label={k} value={value} onChange={(e) => onChange(e.target.value)}>
+          {options.map((o) => <option key={o}>{o}</option>)}
         </select>
       </label>
-      <label className="group-row">
-        <span className="k">Home</span>
-        <span className="v">{value.home}<ChevronRight /></span>
-        <select aria-label="Home" value={value.home} onChange={(e) => onChange({ ...value, home: e.target.value })}>
-          {HOMES.map((c) => <option key={c}>{c}</option>)}
-        </select>
-      </label>
+      {extra}
     </div>
+  )
+}
+
+function PassportCard({ p, setP }: { p: Profile; setP: (p: Profile) => void }) {
+  const second = PASSPORTS.filter((x) => x !== p.passport)
+  return (
+    <PickCard
+      k="Passport"
+      value={p.passport}
+      options={PASSPORTS}
+      onChange={(v) => setP({ ...p, passport: v, passport2: p.passport2 === v ? undefined : p.passport2 })}
+      extra={
+        p.passport2 ? (
+          <label className="row two">
+            <span className="field"><span className="k">Second passport</span><span className="t">{p.passport2}</span></span>
+            <Chevron />
+            <select aria-label="Second passport" value={p.passport2} onChange={(e) => setP({ ...p, passport2: e.target.value || undefined })}>
+              <option value="">None</option>
+              {second.map((o) => <option key={o}>{o}</option>)}
+            </select>
+          </label>
+        ) : (
+          <button className="row link-row" onClick={() => setP({ ...p, passport2: second[0] })}><Plus size={18} color="#4B32B8" />Add second passport</button>
+        )
+      }
+    />
   )
 }
 
 export function Onboarding({ onDone }: { onDone: (p: Profile) => void }) {
   const [p, setP] = useState<Profile>({ passport: 'South Korea', home: 'Netherlands' })
   return (
-    <main className="screen" style={{ display: 'flex', flexDirection: 'column', paddingTop: 62, paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 34px)' }}>
-      <div className="spacer" />
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-        <Globe />
-        <h1 className="large-title" style={{ margin: 0, paddingTop: 24, lineHeight: 1.2 }}>Know your days,<br />wherever you are</h1>
-        <div className="body muted" style={{ lineHeight: 1.5, paddingTop: 10 }}>We use these to find the rules that apply to you.</div>
-      </div>
-      <div style={{ marginTop: 34 }}>
-        <ProfileRows value={p} onChange={setP} />
-      </div>
-      <div className="spacer" />
-      <button className="btn primary" onClick={() => onDone(p)}>Continue</button>
-    </main>
+    <div className="welcome" style={{ display: 'flex', flexDirection: 'column', minHeight: '100dvh' }}>
+      <header className="hero">
+        <div className="eyebrow">Stay Counter</div>
+        <h1>Know your days,<br /><span style={{ color: 'var(--hero-text)' }}>Wherever you are</span></h1>
+        <div className="chips"><span>Visa free limits</span><span>183 day rule</span><span>Leave by dates</span></div>
+      </header>
+      <main className="content">
+        <div style={{ fontSize: 15, color: 'var(--muted)' }}>We use these to find the rules that apply to you.</div>
+        <div style={{ marginTop: 2 }}><PassportCard p={p} setP={setP} /></div>
+        <PickCard k="Home" value={p.home} options={HOMES} onChange={(v) => setP({ ...p, home: v })} />
+        <div style={{ flexGrow: 1, minHeight: 24 }} />
+        <button className="btn primary" onClick={() => onDone(p)}>Continue</button>
+      </main>
+    </div>
   )
 }
 
 type SettingsProps = {
   profile: Profile
-  previewDate?: string
+  previewDate?: Day
   onProfile: (p: Profile) => void
-  onPreview: (d?: string) => void
+  onPreview: (d?: Day) => void
   onSample: () => void
   onClear: () => void
+  onReset: () => void
   onDesign: () => void
   onClose: () => void
 }
 
-export function Settings({ profile, previewDate, onProfile, onPreview, onSample, onClear, onDesign, onClose }: SettingsProps) {
+export function Settings({ profile, previewDate, onProfile, onPreview, onSample, onClear, onReset, onDesign, onClose }: SettingsProps) {
+  const real = todayDay()
   return (
-    <Sheet title="Settings" right={{ label: 'Done', done: true, onClick: onClose }}>
-      <div className="label form-label" style={{ paddingTop: 14 }}>You</div>
-      <ProfileRows value={profile} onChange={onProfile} />
-
-      <div className="label form-label">Try it out</div>
-      <div className="group">
-        <button className="group-row" onClick={onSample}>
-          <span className="k">Load example trips</span>
-          <span className="v"><ChevronRight /></span>
-        </button>
-        <label className="group-row">
-          <span className="k">Pretend today is</span>
-          <span className="v">{previewDate ?? 'Today'}</span>
-          <input type="date" aria-label="Pretend today is" value={previewDate ?? ''} onChange={(e) => onPreview(e.target.value || undefined)} />
-        </label>
-        {previewDate && (
-          <button className="group-row" onClick={() => onPreview(undefined)}>
-            <span className="k purple">Back to today</span>
-          </button>
-        )}
+    <Sheet title="Settings" foot={<button className="btn primary" onClick={onClose}>Done</button>}>
+      <Sec>You</Sec>
+      <div style={{ marginTop: -12 }}><PassportCard p={profile} setP={onProfile} /></div>
+      <div className="card" style={{ marginTop: 12 }}>
+        <SelectRow k="Home" value={profile.home} options={HOMES} onChange={(v) => onProfile({ ...profile, home: v })} />
       </div>
 
-      <div className="label form-label">About</div>
-      <div className="group">
-        <button className="group-row" onClick={onDesign}>
-          <span className="k">Design system</span>
-          <span className="v"><ChevronRight /></span>
-        </button>
-        <button className="group-row" onClick={onClear}>
-          <span className="k coral">Delete all trips</span>
-        </button>
+      <Sec>Testing</Sec>
+      <div className="card">
+        <DateRow k="Pretend today is" value={previewDate ?? real} today={previewDate ?? real} onChange={(d) => onPreview(d === real ? undefined : d)} />
+        <button className="row" onClick={() => onPreview('2026-10-15')}><span className="k">Before the China trip</span><span className="v">Oct 15<Chevron /></span></button>
+        <button className="row" onClick={() => onPreview('2026-11-22')}><span className="k">During stay 1</span><span className="v">Nov 22<Chevron /></span></button>
+        <button className="row" onClick={() => onPreview('2026-12-01')}><span className="k">Out of China</span><span className="v">Dec 1<Chevron /></span></button>
+        {previewDate && <button className="row" onClick={() => onPreview(undefined)}><span className="k">Use the real date</span><span className="v">{real.slice(5).replace('-', '/')}<Chevron /></span></button>}
       </div>
-      <div className="footnote" style={{ paddingTop: 22 }}>Trips stay on this phone. Not legal or tax advice.</div>
+      <div className="card" style={{ marginTop: 12 }}>
+        <button className="row" onClick={onSample}><span className="t" style={{ color: 'var(--purple-text)' }}>Load sample trips</span></button>
+        <button className="row" onClick={() => confirm('Remove all trips?') && onClear()}><span className="t" style={{ color: 'var(--coral-text)' }}>Remove all trips</span></button>
+        <button className="row" onClick={() => confirm('Start over from the first screen? This removes everything.') && onReset()}><span className="t" style={{ color: 'var(--coral-text)' }}>Start over</span></button>
+      </div>
+
+      <Sec>About</Sec>
+      <div className="card">
+        <button className="row" onClick={onDesign}><span className="k">Design system</span><Chevron /></button>
+      </div>
+      <div className="note">Your trips stay on this device only. General information, not legal or tax advice.</div>
     </Sheet>
   )
 }
