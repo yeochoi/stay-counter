@@ -33,10 +33,10 @@ export function EditStay({ trip, profile, index, today, onCancel, onSave }: { tr
         <DateRow k="Arrive" value={start} today={today} onChange={(d) => { setStart(d); if (toNum(end) < toNum(d)) setEnd(d) }} />
         <DateRow k="Leave" value={end} today={today} min={start} onChange={setEnd} />
       </div>
-      <div className="note">Match these to your flights.{max ? ` Each stay can last up to ${max} days.` : ''}</div>
-      {hasNext && valid && !over && (
-        <div className="note" style={{ paddingTop: 16 }}>Stay {index + 2} can start from {fmtWeekday(addDays(end, 1), today)}.</div>
-      )}
+      <div className="note">
+        Match these to your flights.
+        {hasNext && valid && !over && <><br />Stay {index + 2} can start from {fmtWeekday(addDays(end, 1), today)}.</>}
+      </div>
     </Sheet>
   )
 }
