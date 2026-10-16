@@ -93,7 +93,6 @@ export function Today({ trips, profile, today, onNew, onOpen, onEditStay, onSett
             <span>{daysIn(main, profile)} days</span>
             <span>{main.type}</span>
             <span>{main.entry.kind === 'visafree' ? 'Visa free' : 'Visa'}</span>
-            {ls.length > 1 && <span>{ls.length} stays</span>}
             {!main.booked && <span>Planning</span>}
           </div>
         </>
