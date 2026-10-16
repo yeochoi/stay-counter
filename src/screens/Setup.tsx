@@ -11,9 +11,10 @@ function PickCard({ k, value, options, onChange, extra }: { k: string; value: st
   return (
     <div className="card" style={{ marginTop: 12 }}>
       <label className="row two">
-        <span className="field"><span className="k">{k}</span><span className="t">{value}</span></span>
+        <span className="field"><span className="k">{k}</span>{value ? <span className="t">{value}</span> : <span className="t" style={{ color: 'var(--muted)', fontWeight: 400 }}>Choose</span>}</span>
         <Chevron />
         <select aria-label={k} value={value} onChange={(e) => onChange(e.target.value)}>
+          {!value && <option value="" disabled>Choose</option>}
           {options.map((o) => <option key={o}>{o}</option>)}
         </select>
       </label>
@@ -31,7 +32,7 @@ function PassportCard({ p, setP }: { p: Profile; setP: (p: Profile) => void }) {
       options={PASSPORTS}
       onChange={(v) => setP({ ...p, passport: v, passport2: p.passport2 === v ? undefined : p.passport2 })}
       extra={
-        p.passport2 ? (
+        !p.passport ? null : p.passport2 ? (
           <label className="row two">
             <span className="field"><span className="k">Second passport</span><span className="t">{p.passport2}</span></span>
             <Chevron />
@@ -49,7 +50,7 @@ function PassportCard({ p, setP }: { p: Profile; setP: (p: Profile) => void }) {
 }
 
 export function Onboarding({ onDone }: { onDone: (p: Profile) => void }) {
-  const [p, setP] = useState<Profile>({ passport: 'South Korea', home: 'Netherlands' })
+  const [p, setP] = useState<Profile>({ passport: '', home: '' })
   return (
     <div className="welcome">
       <header className="hero w-intro">
@@ -67,7 +68,7 @@ export function Onboarding({ onDone }: { onDone: (p: Profile) => void }) {
         <div style={{ marginTop: 2 }}><PassportCard p={p} setP={setP} /></div>
         <PickCard k="Home" value={p.home} options={HOMES} onChange={(v) => setP({ ...p, home: v })} />
         <div className="w-gap" />
-        <button className="btn primary" onClick={() => onDone(p)}>Continue</button>
+        <button className="btn primary" disabled={!p.passport || !p.home} onClick={() => onDone(p)}>Continue</button>
       </main>
     </div>
   )
