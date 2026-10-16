@@ -47,7 +47,7 @@ export function Trips({ trips, profile, today, onOpen, onExport, onNew }: { trip
       </div>
       <main className="content">
         {now.length > 0 && (
-          <>
+          <section>
             <Sec>Now</Sec>
             {now.map((x) => {
               const st = status(x, profile, today)
@@ -62,19 +62,19 @@ export function Trips({ trips, profile, today, onOpen, onExport, onNew }: { trip
                 </div>
               )
             })}
-          </>
+          </section>
         )}
         {upcoming.length > 0 && (
-          <>
+          <section>
             <Sec>Upcoming</Sec>
             <div className="card">{upcoming.map((x) => row(x, <span className="pill grey">{x.type}</span>))}</div>
-          </>
+          </section>
         )}
         {years.map((y) => (
-          <div key={y}>
+          <section key={y}>
             <Sec>{y}</Sec>
             <div className="card">{past.filter((x) => year(x.start) === y).map((x) => row(x, <span className="pill grey">{x.type}</span>))}</div>
-          </div>
+          </section>
         ))}
         {list.length === 0 && <div className="note" style={{ paddingTop: 24 }}>{trips.length ? `No ${filter.toLowerCase()} trips.` : 'Trips you plan or book show up here.'}</div>}
       </main>

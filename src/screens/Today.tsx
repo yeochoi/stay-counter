@@ -39,7 +39,7 @@ export function Today({ trips, profile, today, onNew, onOpen, onEditStay, onSett
             <h2>No trips yet</h2>
             <p>See how long you can stay and<br />when to leave, before you book.</p>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div className="empty-actions">
             <button className="btn primary" onClick={() => onNew(false)}>Plan a stay</button>
             <button className="btn soft" onClick={() => onNew(true)}>Add booked trip</button>
           </div>
@@ -106,7 +106,7 @@ export function Today({ trips, profile, today, onNew, onOpen, onEditStay, onSett
       const suggested = ls.some((l) => !l.edited)
       const now = st.phase === 'in' ? st.index : -1
       stays = (
-        <>
+        <section>
           <Sec>{suggested ? 'Suggested stays' : 'Your stays'}</Sec>
           <div className="card">
             {ls.map((l, i) => (
@@ -120,7 +120,7 @@ export function Today({ trips, profile, today, onNew, onOpen, onEditStay, onSett
             ))}
           </div>
           {suggested && <div className="note">Tap a stay to match your flights.</div>}
-        </>
+        </section>
       )
     }
   } else {
@@ -142,10 +142,10 @@ export function Today({ trips, profile, today, onNew, onOpen, onEditStay, onSett
         {top}
         {hero}
       </header>
-      <main className="content">
+      <main className="content today">
         {stays}
         {later.length > 0 && (
-          <>
+          <section>
             <Sec>Later</Sec>
             <div className="card">
               {later.map((x) => (
@@ -155,8 +155,9 @@ export function Today({ trips, profile, today, onNew, onOpen, onEditStay, onSett
                 </button>
               ))}
             </div>
-          </>
+          </section>
         )}
+        <section className="past">
         <Sec>Past 12 months</Sec>
         <div className="card" style={{ padding: '0 16px' }}>
           {counts.length === 0 && <div className="row" style={{ padding: 0 }}><span className="k">No days abroad yet</span></div>}
@@ -184,6 +185,7 @@ export function Today({ trips, profile, today, onNew, onOpen, onEditStay, onSett
             )
           })}
         </div>
+        </section>
       </main>
       <button className="fab" aria-label="Plan a stay or add a booked trip" onClick={() => onNew(false)}><Plus /></button>
     </>

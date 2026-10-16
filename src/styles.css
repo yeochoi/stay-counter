@@ -24,6 +24,7 @@
   --serif: 'Newsreader', Georgia, serif;
   --sans: 'Outfit', -apple-system, system-ui, sans-serif;
   --gutter: 22px;
+  --max: 1040px;
   --top: max(env(safe-area-inset-top, 0px), 20px);
   --bottom: env(safe-area-inset-bottom, 0px);
   color-scheme: light;
@@ -36,11 +37,10 @@ button { cursor: pointer; }
 .trim { text-box: trim-both cap alphabetic; }
 
 /* App column. Phone width on every screen so the layout stays the same. */
-.app { position: relative; min-height: 100vh; min-height: 100dvh; max-width: 480px; margin: 0 auto; background: var(--bg); display: flex; flex-direction: column; }
-@media (min-width: 560px) {
-  html, body { background: #e9e5f2; }
-  .app { border-left: 1px solid var(--line); border-right: 1px solid var(--line); }
-}
+.app { position: relative; min-height: 100vh; min-height: 100dvh; background: var(--bg); display: flex; flex-direction: column; }
+.content > section, .content > div { break-inside: avoid; }
+.empty-actions { display: flex; flex-direction: column; gap: 12px; }
+.nav .brand { display: none; }
 
 /* Hero */
 .hero { background: var(--hero); color: #fff; padding: calc(var(--top) + 38px) var(--gutter) 24px; }
@@ -126,11 +126,10 @@ button.row:hover, label.row:hover { background: #fbfaf8; }
 .stay-row:last-child .in { border-bottom: 0; }
 
 /* Tab bar and add button */
-.nav { position: fixed; bottom: 0; left: 0; right: 0; max-width: 480px; margin: 0 auto; border-top: 1px solid var(--line); display: grid; grid-template-columns: 1fr 1fr; padding: 9px 0 calc(var(--bottom) + 12px); background: var(--bg); z-index: 5; }
-@media (min-width: 560px) { .nav { max-width: 478px; } }
+.nav { position: fixed; bottom: 0; left: 0; right: 0; border-top: 1px solid var(--line); display: grid; grid-template-columns: 1fr 1fr; padding: 9px 0 calc(var(--bottom) + 12px); background: var(--bg); z-index: 5; }
 .nav button { display: flex; flex-direction: column; align-items: center; gap: 3px; border: 0; background: none; font-size: 11px; font-weight: 600; color: var(--muted); }
 .nav button.on { color: var(--purple-text); }
-.fab { position: fixed; bottom: calc(var(--bottom) + 82px); right: max(var(--gutter), calc(50% - 240px + var(--gutter))); width: 56px; height: 56px; border-radius: 999px; border: 0; background: var(--primary); display: flex; align-items: center; justify-content: center; z-index: 6; }
+.fab { position: fixed; bottom: calc(var(--bottom) + 82px); right: var(--gutter); width: 56px; height: 56px; border-radius: 999px; border: 0; background: var(--primary); display: flex; align-items: center; justify-content: center; z-index: 6; }
 .fab:hover { background: #4f35bf; }
 
 /* Empty state */
@@ -171,3 +170,35 @@ button.row:hover, label.row:hover { background: #fbfaf8; }
 .sw div { border-radius: 12px; border: 1px solid var(--line); overflow: hidden; font-size: 12px; background: #fff; }
 .sw div span { display: block; height: 48px; }
 .sw div p { margin: 0; padding: 6px 8px; line-height: 1.35; }
+
+/* Side padding that grows on wide screens, so content sits in a centered area like a web page. */
+.hero, .welcome .hero, .content, .welcome .content, .tabs, .empty, .nav { padding-left: max(var(--gutter), calc((100% - var(--max)) / 2 + var(--gutter))); padding-right: max(var(--gutter), calc((100% - var(--max)) / 2 + var(--gutter))); }
+
+/* Tablet and laptop. Full width hero, centered content, two columns of cards. */
+@media (min-width: 900px) {
+  .nav { position: sticky; top: 0; order: -1; display: flex; align-items: center; gap: 28px; padding-top: 0; padding-bottom: 0; height: 64px; background: var(--hero); border-top: 0; border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
+  .nav .brand { display: block; margin-right: auto; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--hero-text); }
+  .nav button { flex-direction: row; height: 64px; font-size: 15px; font-weight: 500; color: var(--hero-text); }
+  .nav button svg { display: none; }
+  .nav button.on { color: #fff; font-weight: 600; box-shadow: inset 0 -2px 0 var(--ring); }
+  .hero { padding-top: 40px; padding-bottom: 36px; }
+  .hero-main { gap: 28px; padding-top: 28px; }
+  .stack .a { font-size: 44px; }
+  .hero-title { font-size: 52px; }
+  .content { columns: 2; column-gap: 32px; padding-top: 12px; padding-bottom: 80px; }
+  .content > section { display: inline-block; width: 100%; }
+  .content.today { columns: auto; display: grid; grid-template-columns: 1fr 1fr; column-gap: 32px; align-items: start; align-content: start; }
+  .content.today > section { grid-column: 1; }
+  .content.today > section.past { grid-column: 2; grid-row: 1 / span 4; }
+  .empty { flex-grow: 0; }
+  .empty .mid { flex-grow: 0; padding: 72px 0 32px; }
+  .fab { bottom: 40px; right: max(var(--gutter), calc((100% - var(--max)) / 2 + var(--gutter))); }
+  .empty { padding-bottom: 80px; }
+  .empty-actions { flex-direction: row; justify-content: center; }
+  .empty-actions .btn { width: 240px; }
+  .welcome .hero { padding-top: 96px; padding-bottom: 48px; }
+  .welcome h1 { font-size: 56px; }
+  .welcome .content { columns: auto; padding-top: 32px; }
+  .welcome .content > * { max-width: 480px; width: 100%; }
+  .welcome { min-height: auto !important; }
+}
