@@ -166,7 +166,7 @@ export function status(trip: Trip, profile: Profile, today: Day) {
       leg,
       index,
       legs: ls,
-      daysLeft: toNum(leg.end) - t + 1,
+      daysLeft: toNum(leg.end) - t,
       dayOf: t - toNum(leg.start) + 1,
     }
   }
