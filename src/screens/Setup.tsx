@@ -57,11 +57,6 @@ export function Onboarding({ onDone }: { onDone: (p: Profile) => void }) {
         <div className="eyebrow">Stay Counter</div>
         <h1>Know your days,<br /><span style={{ color: 'var(--hero-text)' }}>Wherever you are</span></h1>
         <div className="chips"><span>Visa free limits</span><span>183 day rule</span><span>Leave by dates</span></div>
-        <div className="feat">
-          <div><b>30 days</b>Visa free limits per entry</div>
-          <div><b>183 days</b>Tax limit per year</div>
-          <div><b>Leave by</b>Dates before you book</div>
-        </div>
       </header>
       <main className="content w-form">
         <div style={{ fontSize: 15, color: 'var(--muted)' }}>We use these to find the rules that apply to you.</div>
