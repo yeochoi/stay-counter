@@ -45,7 +45,7 @@ export function Actions({ left, right, onLeft, onRight, disabled }: { left: stri
   )
 }
 
-export function Seg<T extends string>({ value, options, onChange, label }: { value: T; options: T[]; onChange: (v: T) => void; label: string }) {
+export function Seg<T extends string>({ value, options, onChange, label }: { value: T | ''; options: T[]; onChange: (v: T) => void; label: string }) {
   return (
     <div className="seg" role="radiogroup" aria-label={label}>
       {options.map((o) => (
@@ -60,8 +60,9 @@ export function SelectRow({ k, value, options, onChange }: { k: string; value: s
   return (
     <label className="row">
       <span className="k">{k}</span>
-      <span className="v">{value}<Chevron /></span>
+      <span className="v">{value || <span className="placeholder">Choose</span>}<Chevron /></span>
       <select aria-label={k} value={value} onChange={(e) => onChange(e.target.value)}>
+        {!value && <option value="" disabled>Choose</option>}
         {options.map((o) => <option key={o}>{o}</option>)}
       </select>
     </label>
@@ -73,13 +74,13 @@ export function DateRow({ k, value, today, onChange, min }: { k: string; value: 
   return (
     <label className="row">
       <span className="k">{k}</span>
-      <span className="v">{value ? fmtWeekday(value, today) : 'Choose'}<Chevron /></span>
+      <span className="v">{value ? fmtWeekday(value, today) : <span className="placeholder">Choose</span>}<Chevron /></span>
       <input
         className="overlay"
         type="date"
         aria-label={k}
         value={value}
-        min={min}
+        min={min || undefined}
         onClick={(e) => { try { (e.currentTarget as HTMLInputElement).showPicker?.() } catch { /* not supported */ } }}
         onChange={(e) => e.target.value && onChange(e.target.value)}
       />

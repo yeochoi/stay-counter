@@ -79,6 +79,7 @@ button.row:hover, label.row:hover { background: #fbfaf8; }
 .row .col { flex-grow: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .row .sub { font-size: 14px; color: var(--muted); }
 .row select, .row input.overlay { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; border: 0; }
+.row input.num::placeholder { color: var(--muted); font-weight: 400; }
 .row input.num { width: 90px; padding: 0; border: 0; outline: none; text-align: right; font-size: 17px; font-weight: 600; background: transparent; }
 .link-row { color: var(--purple-text); font-size: 15px; font-weight: 500; justify-content: flex-start; gap: 8px; min-height: 48px; }
 
@@ -92,6 +93,7 @@ button.row:hover, label.row:hover { background: #fbfaf8; }
 .bar.coral > div { background: var(--coral); }
 .note { font-size: 13px; color: var(--muted); line-height: 1.5; padding: 10px 4px 0; }
 .muted { color: var(--muted); }
+.placeholder { color: var(--muted); font-weight: 400; }
 
 /* Buttons */
 .btn { min-height: 54px; width: 100%; display: flex; align-items: center; justify-content: center; border: 0; border-radius: 999px; font-size: 17px; font-weight: 600; }
