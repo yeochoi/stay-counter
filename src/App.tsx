@@ -15,7 +15,7 @@ type Overlay =
   | { kind: 'trip'; trip: Trip }
   | { kind: 'stay'; trip: Trip; index: number }
   | { kind: 'settings' }
-  | { kind: 'design' }
+  | { kind: 'design'; from?: 'settings' }
   | null
 
 export default function App() {
@@ -31,7 +31,7 @@ export default function App() {
     return (
       <div className="app">
         <Onboarding onDone={(p) => setState((s) => ({ ...s, profile: p }))} />
-        {overlay?.kind === 'design' && <DesignSystem onBack={closeDesign} />}
+        {overlay?.kind === 'design' && <DesignSystem onClose={closeDesign} />}
       </div>
     )
   }
@@ -100,11 +100,11 @@ export default function App() {
           onSample={() => { setState((s) => ({ ...s, trips: sampleTrips(), previewDate: '2026-10-15' })); setOverlay(null); setTab('today') }}
           onClear={() => { setState((s) => ({ ...s, trips: [] })); setOverlay(null) }}
           onReset={() => { setState({ trips: [] }); setOverlay(null); setTab('today') }}
-          onDesign={() => setOverlay({ kind: 'design' })}
+          onDesign={() => setOverlay({ kind: 'design', from: 'settings' })}
           onClose={() => setOverlay(null)}
         />
       )}
-      {overlay?.kind === 'design' && <DesignSystem onBack={closeDesign} />}
+      {overlay?.kind === 'design' && (overlay.from === 'settings' ? <DesignSystem onBack={() => setOverlay({ kind: 'settings' })} /> : <DesignSystem onClose={closeDesign} />)}
     </div>
   )
 }

@@ -1,5 +1,5 @@
 import { Chevron, Check } from '../components/Icons'
-import { Actions, Ring, Seg, Sheet } from '../components/ui'
+import { Primary, Ring, Seg, Sheet } from '../components/ui'
 
 const COLORS: [string, string][] = [
   ['Hero', '#2F2360'], ['Hero text', '#CFC4FF'], ['Ring', '#B7A5FF'], ['Primary', '#5B3FD0'],
@@ -22,13 +22,14 @@ const RULES = [
   'The hero answers one question with one number and one date.',
   'Text next to the ring uses the same sizes as the ring, so tops and bottoms line up.',
   'White cards with a 1px line and radius 16. No shadows, no strong strokes.',
-  'Sheets have the title on top and one action row at the bottom, soft left and primary right.',
+  'Top left leaves a sheet. × closes it, ‹ goes back one step.',
+  'The bottom holds one forward action, like See plan or Save trip. Reading pages have none.',
   'Only show dates the person entered or the app knows. Mark suggestions as suggestions.',
 ]
 
-export function DesignSystem({ onBack }: { onBack: () => void }) {
+export function DesignSystem({ onBack, onClose }: { onBack?: () => void; onClose?: () => void }) {
   return (
-    <Sheet title="Design system" foot={<button className="btn primary" onClick={onBack}>Done</button>}>
+    <Sheet title="Design system" onBack={onBack} onClose={onClose}>
       <div className="ds">
         <h3>Color</h3>
         <div className="sw">{COLORS.map(([n, c]) => <div key={n}><span style={{ background: c }} /><p>{n}<br /><span className="muted" style={{ display: 'inline', height: 'auto' }}>{c}</span></p></div>)}</div>
@@ -64,7 +65,7 @@ export function DesignSystem({ onBack }: { onBack: () => void }) {
         <h3>Controls</h3>
         <Seg label="Example" value="Planning" options={['Planning', 'Booked']} onChange={() => {}} />
         <div style={{ height: 12 }} />
-        <Actions left="Cancel" right="Save" onLeft={() => {}} onRight={() => {}} />
+        <Primary label="Save" onClick={() => {}} />
 
         <h3>Rules</h3>
         <div className="card">

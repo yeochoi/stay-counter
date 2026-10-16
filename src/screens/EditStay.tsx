@@ -2,10 +2,10 @@ import { useState } from 'react'
 import { addDays, Day, daysInclusive, fmtDate, fmtWeekday, toNum } from '../lib/dates'
 import { daysPerEntry, legs, Profile, Trip } from '../lib/plan'
 import { shortName } from '../lib/rules'
-import { Actions, DateRow, Sheet } from '../components/ui'
+import { DateRow, Primary, Sheet } from '../components/ui'
 
 /** Change one stay to match real flights. Later stays move along. */
-export function EditStay({ trip, profile, index, today, onCancel, onSave }: { trip: Trip; profile: Profile; index: number; today: Day; onCancel: () => void; onSave: (start: Day, end: Day) => void }) {
+export function EditStay({ trip, profile, index, today, nav = 'close', onCancel, onSave }: { trip: Trip; profile: Profile; index: number; today: Day; nav?: 'close' | 'back'; onCancel: () => void; onSave: (start: Day, end: Day) => void }) {
   const ls = legs(trip, profile)
   const leg = ls[index]
   const [start, setStart] = useState(leg.start)
@@ -27,7 +27,7 @@ export function EditStay({ trip, profile, index, today, onCancel, onSave }: { tr
   }
 
   return (
-    <Sheet title={ls.length > 1 ? `Stay ${index + 1}` : shortName(trip.country)} foot={<Actions left="Cancel" right="Save" onLeft={onCancel} onRight={() => onSave(start, end)} disabled={!valid || !!tooEarly} />}>
+    <Sheet title={ls.length > 1 ? `Stay ${index + 1}` : shortName(trip.country)} {...(nav === 'back' ? { onBack: onCancel } : { onClose: onCancel })} foot={<Primary label="Save" onClick={() => onSave(start, end)} disabled={!valid || !!tooEarly} />}>
       <div className="big">{days} {days === 1 ? 'day' : 'days'}</div>
       <div className="big-sub" style={over ? { color: 'var(--coral-text)' } : undefined}>{sub}</div>
       <div className="card" style={{ marginTop: 20 }}>

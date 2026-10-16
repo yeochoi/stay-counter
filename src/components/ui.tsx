@@ -19,7 +19,8 @@ export function Sec({ children }: { children: ReactNode }) {
 }
 
 /** A bottom sheet on phones, a centered panel on desktop. Title on top, one action row at the bottom. */
-export function Sheet({ title, children, foot }: { title: string; children: ReactNode; foot?: ReactNode }) {
+/** Top left leaves the sheet. × closes it, ‹ goes back one step. The bottom holds one forward action. */
+export function Sheet({ title, children, foot, onClose, onBack }: { title: string; children: ReactNode; foot?: ReactNode; onClose?: () => void; onBack?: () => void }) {
   useEffect(() => {
     const prev = document.body.style.overflow
     document.body.style.overflow = 'hidden'
@@ -28,7 +29,15 @@ export function Sheet({ title, children, foot }: { title: string; children: Reac
   return (
     <div className="sheet-wrap" role="dialog" aria-modal="true" aria-label={title}>
       <div className="sheet">
-        <div className="sheet-head">{title}</div>
+        <div className="sheet-head">
+          {onBack ? (
+            <button className="nav-btn" aria-label="Back" onClick={onBack}><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6" /></svg></button>
+          ) : onClose ? (
+            <button className="nav-btn" aria-label="Close" onClick={onClose}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg></button>
+          ) : <span />}
+          <div className="sheet-title">{title}</div>
+          <span />
+        </div>
         <div className="sheet-body">{children}</div>
         {foot && <div className="sheet-foot">{foot}</div>}
       </div>
@@ -36,13 +45,8 @@ export function Sheet({ title, children, foot }: { title: string; children: Reac
   )
 }
 
-export function Actions({ left, right, onLeft, onRight, disabled }: { left: string; right: string; onLeft: () => void; onRight: () => void; disabled?: boolean }) {
-  return (
-    <div className="actions">
-      <button className="btn soft" onClick={onLeft}>{left}</button>
-      <button className="btn primary" onClick={onRight} disabled={disabled}>{right}</button>
-    </div>
-  )
+export function Primary({ label, onClick, disabled }: { label: string; onClick: () => void; disabled?: boolean }) {
+  return <button className="btn primary" onClick={onClick} disabled={disabled}>{label}</button>
 }
 
 export function Seg<T extends string>({ value, options, onChange, label }: { value: T | ''; options: T[]; onChange: (v: T) => void; label: string }) {

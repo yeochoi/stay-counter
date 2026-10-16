@@ -3,7 +3,7 @@ import { Day, fmtDate, fmtRange, toNum } from '../lib/dates'
 import { daysIn, daysPerEntry, editStay, Entry, legs, newId, Profile, Trip, warnings } from '../lib/plan'
 import { COUNTRIES, entryRule, shortName, taxRule } from '../lib/rules'
 import { Alert, Check, Chevron } from '../components/Icons'
-import { Actions, DateRow, Sec, Seg, SelectRow, Sheet } from '../components/ui'
+import { DateRow, Primary, Sec, Seg, SelectRow, Sheet } from '../components/ui'
 import { EditStay } from './EditStay'
 
 type Props = {
@@ -44,6 +44,7 @@ export function TripFlow({ profile, trips, today, existing, startBooked, onClose
         profile={profile}
         index={step.index}
         today={today}
+        nav="back"
         onCancel={() => setStep({ kind: 'plan' })}
         onSave={(s, e) => { setTrip((t) => editStay(t, profile, step.index, s, e)); setStep({ kind: 'plan' }) }}
       />
@@ -57,7 +58,7 @@ export function TripFlow({ profile, trips, today, existing, startBooked, onClose
     const exits = ls.length - 1
     const suggested = ls.length > 1 && ls.some((l) => !l.edited)
     return (
-      <Sheet title={shortName(trip.country)} foot={<><div className="note" style={{ textAlign: 'center', padding: '0 0 12px' }}>Not legal advice.</div><Actions left="Back" right={existing ? 'Save' : 'Save trip'} onLeft={() => setStep({ kind: 'form' })} onRight={() => onSave(trip)} /></>}>
+      <Sheet title={shortName(trip.country)} onBack={() => setStep({ kind: 'form' })} foot={<><div className="note" style={{ textAlign: 'center', padding: '0 0 12px' }}>Not legal advice.</div><Primary label={existing ? 'Save' : 'Save trip'} onClick={() => onSave(trip)} /></>}>
         <div className="big">{exits === 0 ? 'No need to leave' : `Leave ${exits === 1 ? 'once' : `${exits} times`}`}</div>
         <div className="big-sub">{(() => { const n = daysIn(trip, profile); return `${n} ${n === 1 ? 'day' : 'days'} in ${shortName(trip.country)}. ` })()}{max ? `${trip.entry.kind === 'visafree' ? 'Visa free' : 'Your visa'} allows ${max} days per entry` : 'No entry limit we know of'}</div>
         <div className="card" style={{ marginTop: 20, padding: '0 16px' }}>
@@ -88,7 +89,7 @@ export function TripFlow({ profile, trips, today, existing, startBooked, onClose
   const visa = entryPicked && trip.entry.kind === 'visa' ? trip.entry : undefined
   const valid = !!trip.country && !!trip.start && !!trip.end && toNum(trip.end) >= toNum(trip.start) && entryPicked && typePicked
   return (
-    <Sheet title={existing ? shortName(existing.country) : 'New trip'} foot={<Actions left="Cancel" right="See plan" onLeft={onClose} onRight={() => setStep({ kind: 'plan' })} disabled={!valid} />}>
+    <Sheet title={existing ? shortName(existing.country) : 'New trip'} onClose={onClose} foot={<Primary label="See plan" onClick={() => setStep({ kind: 'plan' })} disabled={!valid} />}>
       <div style={{ marginTop: 6 }}>
         <Seg label="Status" value={trip.booked ? 'Booked' : 'Planning'} options={['Planning', 'Booked']} onChange={(v) => setTrip((t) => ({ ...t, booked: v === 'Booked' }))} />
       </div>
@@ -135,7 +136,7 @@ function VisaStep({ entry, today, onCancel, onSave }: { entry: Entry; today: Day
   const n = parseInt(days, 10)
   const ok = n > 0 && n < 1000 && !!until && multiple !== undefined
   return (
-    <Sheet title="Your visa" foot={<Actions left="Cancel" right="Save" onLeft={onCancel} onRight={() => onSave({ kind: 'visa', days: n, validUntil: until, multiple: !!multiple })} disabled={!ok} />}>
+    <Sheet title="Your visa" onBack={onCancel} foot={<Primary label="Save" onClick={() => onSave({ kind: 'visa', days: n, validUntil: until, multiple: !!multiple })} disabled={!ok} />}>
       <div className="note" style={{ padding: '16px 4px 0' }}>As printed on your visa.</div>
       <div className="card" style={{ marginTop: 8 }}>
         <label className="row">

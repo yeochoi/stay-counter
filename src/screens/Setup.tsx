@@ -84,7 +84,7 @@ type SettingsProps = {
 export function Settings({ profile, previewDate, onProfile, onPreview, onSample, onClear, onReset, onDesign, onClose }: SettingsProps) {
   const real = todayDay()
   return (
-    <Sheet title="Settings" foot={<button className="btn primary" onClick={onClose}>Done</button>}>
+    <Sheet title="Settings" onClose={onClose}>
       <Sec>You</Sec>
       <div style={{ marginTop: -12 }}><PassportCard p={profile} setP={onProfile} /></div>
       <PickCard k="Home" value={profile.home} options={HOMES} onChange={(v) => onProfile({ ...profile, home: v })} />
