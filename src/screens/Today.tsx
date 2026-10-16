@@ -103,7 +103,7 @@ export function Today({ trips, profile, today, onNew, onOpen, onEditStay, onSett
       )
     }
     if (current && ls.length > 1) {
-      const suggested = ls.some((l) => !l.edited)
+      const suggested = ls.length > 1 && ls.some((l) => !l.edited)
       const now = st.phase === 'in' ? st.index : -1
       stays = (
         <section>

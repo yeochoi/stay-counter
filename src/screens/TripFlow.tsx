@@ -55,7 +55,7 @@ export function TripFlow({ profile, trips, today, existing, startBooked, onClose
     const max = daysPerEntry(trip, profile)
     const warns = warnings(trip, others, profile)
     const exits = ls.length - 1
-    const suggested = ls.some((l) => !l.edited)
+    const suggested = ls.length > 1 && ls.some((l) => !l.edited)
     return (
       <Sheet title={shortName(trip.country)} foot={<><div className="note" style={{ textAlign: 'center', padding: '0 0 12px' }}>Not legal advice.</div><Actions left="Back" right={existing ? 'Save' : 'Save trip'} onLeft={() => setStep({ kind: 'form' })} onRight={() => onSave(trip)} /></>}>
         <div className="big">{exits === 0 ? 'No need to leave' : `Leave ${exits === 1 ? 'once' : `${exits} times`}`}</div>
