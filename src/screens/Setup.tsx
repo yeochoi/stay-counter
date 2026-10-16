@@ -3,7 +3,7 @@ import { Day, todayDay } from '../lib/dates'
 import { Profile } from '../lib/plan'
 import { COUNTRIES, PASSPORTS } from '../lib/rules'
 import { Chevron, Plus } from '../components/Icons'
-import { DateRow, Sec, SelectRow, Sheet } from '../components/ui'
+import { DateRow, Sec, Sheet } from '../components/ui'
 
 const HOMES = [...new Set([...COUNTRIES, 'Netherlands', 'South Korea'])].sort()
 
@@ -87,9 +87,7 @@ export function Settings({ profile, previewDate, onProfile, onPreview, onSample,
     <Sheet title="Settings" foot={<button className="btn primary" onClick={onClose}>Done</button>}>
       <Sec>You</Sec>
       <div style={{ marginTop: -12 }}><PassportCard p={profile} setP={onProfile} /></div>
-      <div className="card" style={{ marginTop: 12 }}>
-        <SelectRow k="Home" value={profile.home} options={HOMES} onChange={(v) => onProfile({ ...profile, home: v })} />
-      </div>
+      <PickCard k="Home" value={profile.home} options={HOMES} onChange={(v) => onProfile({ ...profile, home: v })} />
 
       <Sec>Testing</Sec>
       <div className="card">
