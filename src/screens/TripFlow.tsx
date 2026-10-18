@@ -89,7 +89,7 @@ export function TripFlow({ profile, trips, today, existing, startBooked, onClose
   const visa = entryPicked && trip.entry.kind === 'visa' ? trip.entry : undefined
   const valid = !!trip.country && !!trip.start && !!trip.end && toNum(trip.end) >= toNum(trip.start) && entryPicked && typePicked
   return (
-    <Sheet title={existing ? shortName(existing.country) : 'New trip'} onClose={onClose} foot={<Primary label="See plan" onClick={() => setStep({ kind: 'plan' })} disabled={!valid} />}>
+    <Sheet title={existing ? shortName(existing.country) : 'New trip'} onClose={onClose} foot={<Primary label="See stays" onClick={() => setStep({ kind: 'plan' })} disabled={!valid} />}>
       <div style={{ marginTop: 6 }}>
         <Seg label="Status" value={trip.booked ? 'Booked' : 'Planning'} options={['Planning', 'Booked']} onChange={(v) => setTrip((t) => ({ ...t, booked: v === 'Booked' }))} />
       </div>
