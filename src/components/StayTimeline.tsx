@@ -23,6 +23,7 @@ export function StayTimeline({ trip, profile, today, onStay, head, foot }: { tri
           kind === 'now' && st.phase === 'in' ? `Now · ${plural(st.daysLeft)} left`
           : kind === 'past' ? 'Done'
           : i === nextIdx && st.phase === 'out' ? `Back in ${plural(st.daysToGo)}`
+          : ls.length === 1 ? (trip.booked ? 'Booked' : 'Planning')
           : l.edited ? 'Matched to flights' : 'Suggested'
         const late = ends && toNum(l.end) > toNum(ends)
         return (
