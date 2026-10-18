@@ -4,7 +4,7 @@ import { editStay, legs, Trip } from './lib/plan'
 import { sampleTrips, useStore } from './lib/store'
 import { Tab, TabBar } from './components/ui'
 import { Today } from './screens/Today'
-import { Trips } from './screens/Trips'
+import { ExportKind, Trips } from './screens/Trips'
 import { TripFlow } from './screens/TripFlow'
 import { EditStay } from './screens/EditStay'
 import { Onboarding, Settings } from './screens/Setup'
@@ -45,9 +45,9 @@ export default function App() {
     setState((s) => ({ ...s, trips: s.trips.filter((x) => x.id !== id) }))
     setOverlay(null)
   }
-  const exportCsv = () => {
+  const exportCsv = (kind: ExportKind = 'All') => {
     const rows = [['Country', 'Arrive', 'Leave', 'Days', 'Type', 'Stays']]
-    for (const t of [...state.trips].sort((a, b) => a.start.localeCompare(b.start))) {
+    for (const t of [...state.trips].filter((x) => kind === 'All' || x.type === kind).sort((a, b) => a.start.localeCompare(b.start))) {
       const ls = legs(t, profile)
       rows.push([t.country, t.start, t.end, String(ls.reduce((n, l) => n + l.days, 0)), t.type, String(ls.length)])
     }

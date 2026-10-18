@@ -234,7 +234,7 @@ function RulesCard({ trip, profile, visa, others }: { trip: Trip; profile: Profi
     why ? (
       <div className="row rule-bad">
         <div className="top"><span className="k">{k}</span><span className="v">{v}</span></div>
-        <div className="why"><AlertSmall />{why}</div>
+        <div className="why">{why}</div>
       </div>
     ) : (
       <div className="row small"><span className="k">{k}</span><span className="v">{v}</span></div>

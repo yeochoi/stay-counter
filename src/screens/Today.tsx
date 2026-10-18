@@ -146,7 +146,7 @@ export function Today({ trips, profile, today, onNew, onOpen, onEditStay, onSett
         {stays}
         {later.length > 0 && (
           <section>
-            <Sec>Later</Sec>
+            <Sec>Upcoming</Sec>
             <div className="card">
               {later.map((x) => (
                 <button key={x.id} className="row" onClick={() => onOpen(x)}>
