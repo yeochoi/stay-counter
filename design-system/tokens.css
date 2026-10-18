@@ -1,0 +1,11 @@
+/* Stay Counter, generated from tokens.json */
+:root{--hero:#2F2360;--hero-text:#CFC4FF;--ring:#B7A5FF;--primary:#5B3FD0;--purple-text:#4B32B8;--soft:#EEEAFB;--current:#F1EDFD;--current-line:#E2DBFA;--bg:#F7F5F2;--surface:#FFFFFF;--ink:#1E1B2E;--muted:#6B6778;--line:#ECE9E4;--chip:#EFECE7;--chip-text:#5E5A6B;--chevron:#A9A5B4;--done-dot:#C9C4D6;--coral:#E2683C;--coral-text:#A83C18;--coral-soft:#FCEEE8;--coral-track:#F6E1D8;--backdrop:#3A3550;--space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:20px;--gutter:22px;--max-width:1040px;--radius-note:12px;--radius-card:16px;--radius-sheet:18px;--radius-pill:999px;--shadow-segment:0 1px 2px rgba(30,27,46,0.1);--size-button:54px;--size-row:50px;--size-ring:112px;--size-fab:56px;--size-nav-button:36px;--size-round:44px;--font-sans:Outfit, -apple-system, system-ui, sans-serif;}
+.welcome{font-family:var(--font-sans);font-size:38px;line-height:42px;font-weight:600;letter-spacing:-0.02em;}
+.page-title{font-family:var(--font-sans);font-size:38px;line-height:38px;font-weight:600;letter-spacing:-0.02em;}
+.answer{font-family:var(--font-sans);font-size:34px;line-height:34px;font-weight:600;letter-spacing:-0.02em;}
+.headline{font-family:var(--font-sans);font-size:17px;line-height:22px;font-weight:600;}
+.body{font-family:var(--font-sans);font-size:15px;line-height:20px;font-weight:400;}
+.subline{font-family:var(--font-sans);font-size:14px;line-height:18px;font-weight:400;}
+.note{font-family:var(--font-sans);font-size:13px;line-height:19px;font-weight:400;}
+.section{font-family:var(--font-sans);font-size:12px;line-height:16px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;}
+.caption{font-family:var(--font-sans);font-size:11px;line-height:13px;font-weight:600;}

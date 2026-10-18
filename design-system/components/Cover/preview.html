@@ -1,28 +1,27 @@
 <!-- @dsCard height=300 -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&display=swap">
 <style>
 .cv{position:relative;width:960px;height:300px;background:var(--bg);overflow:hidden;font-family:var(--font-sans)}
 .cv svg{position:absolute;left:480px;top:0}
-.p{fill:var(--primary)}.ps{fill:var(--primary-soft)}.c{fill:var(--secondary)}.ink{fill:var(--ink)}
-.trk{fill:none;stroke:var(--ring-track);stroke-width:22}.arc{fill:none;stroke:var(--surface);stroke-width:22;stroke-linecap:round}
-.arc2{fill:none;stroke:var(--secondary);stroke-width:22;stroke-linecap:round}
 .txt{position:absolute;left:40px;bottom:34px;max-width:440px}
-.nm{font-size:96px;line-height:.95;font-weight:700;letter-spacing:-0.03em;color:var(--ink);margin:0}
+.nm{font-size:96px;line-height:.95;font-weight:600;letter-spacing:-0.03em;color:var(--ink);margin:0}
 .tg{font-size:14px;line-height:20px;color:var(--muted);margin:14px 0 0}
 </style>
 <div class="cv">
 <svg width="480" height="300" viewBox="0 0 480 300" aria-hidden="true">
 <!--
-blocks: primary 248x300 slab, primary-soft pill 168x84 (radius-pill), secondary disc r 42, ink pill 120x44
-arrangement: one tall slab bleeding off the top with satellites, slab carries the countdown ring
-pattern row: literal motif, the countdown ring, because the app's hero is a ring that fills day by day
-steps and radii: space-5 22 for ring stroke and gaps, space-6 34 margins, radius-pill for pills and disc
+blocks: hero 260x320 slab bleeding off the top, soft pill 168x84, current pill 120x44, coral disc r 30
+arrangement: one tall slab with satellites, like the dark hero over light cards
+pattern row: literal motif, the countdown ring on the slab, because the app answers with a ring that empties day by day
+steps and radii: gutter 22 for ring stroke spacing, radius-card 16 on the slab, radius-pill on pills and disc
 -->
-<rect class="p" x="34" y="-20" width="248" height="320" rx="28"/>
-<circle cx="158" cy="150" r="78" class="arc" stroke-dasharray="360 490" transform="rotate(-90 158 150)" opacity="0.95"/>
-<circle cx="158" cy="150" r="78" class="arc2" stroke-dasharray="70 490" stroke-dashoffset="-380" transform="rotate(-90 158 150)"/>
-<rect class="ps" x="304" y="34" width="168" height="84" rx="42"/>
-<circle class="c" cx="346" cy="196" r="42"/>
-<rect class="ink" x="400" y="232" width="120" height="44" rx="22"/>
+<rect x="22" y="-20" width="260" height="320" rx="16" fill="var(--hero)"/>
+<circle cx="152" cy="150" r="80" fill="none" stroke="rgba(255,255,255,0.14)" stroke-width="16"/>
+<circle cx="152" cy="150" r="80" fill="none" stroke="var(--ring)" stroke-width="16" stroke-linecap="round" stroke-dasharray="335 503" transform="rotate(-90 152 150)"/>
+<rect x="304" y="34" width="168" height="84" rx="42" fill="var(--soft)"/>
+<rect x="304" y="140" width="120" height="44" rx="22" fill="var(--current-line)"/>
+<circle cx="350" cy="236" r="30" fill="var(--coral)"/>
+<rect x="398" y="214" width="74" height="44" rx="22" fill="var(--primary)"/>
 </svg>
 <div class="txt"><p class="nm">Stay<br>Counter</p><p class="tg">Know your days, wherever you are.</p></div>
 </div>

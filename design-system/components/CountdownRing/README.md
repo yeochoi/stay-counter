@@ -1,8 +1,9 @@
 # CountdownRing
 
-The hero of Home. Shows how much of a stay is used, or how long until a trip starts.
+The hero of Today. One number in a ring, one labelled date beside it.
 
-- Size `size-ring`. Number in the large title style with a label under it in the footnote style.
-- During a stay the ring fills with `primary` on a `ring-track`. In the last 5 days it fills with `secondary`.
-- Before a trip it is a solid `primary-soft` disc with days to go, so it never looks like a countdown.
-- Always sits next to a labelled date, like Leave by Mon, Nov 30.
+- `size-ring` circle on `hero`. A faint white track always shows, so every state looks like the same component.
+- During a stay the arc fills in `ring`, showing how much of the stay is left. The number is days left, counted from tomorrow.
+- Before a trip, or on a day between stays, there is no arc, only the track, with days to go.
+- The number and the date both use `answer`, the unit and the label both use `body`, so the tops and bottoms line up.
+- Nothing else in the hero during a stay. No stay count, no next entry chip.

@@ -1,8 +1,9 @@
 # Button
 
-Full width pill button for the main action at the bottom of a screen.
+The one forward action at the bottom of a sheet or screen, full width.
 
-- Primary uses `primary` with white text. Only one per screen.
-- Secondary uses `primary-soft` with `primary-pressed` text.
-- Height `size-button`, corner `radius-pill`, label in the headline style.
-- Labels say exactly what happens, like Save trip or Plan a stay.
+- Primary fills `primary` with white `headline` text, `size-button` tall, `radius-pill`.
+- Soft fills `soft` with `purple-text`. Only used as the second choice on the empty Today screen, like Add booked trip.
+- One primary per screen. No Cancel or Back buttons at the bottom, leaving lives at the top left.
+- Disabled is the primary at 45 percent opacity.
+- Labels say what happens, like See stays, Save trip or Save.

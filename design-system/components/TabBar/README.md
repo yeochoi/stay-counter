@@ -1,6 +1,6 @@
 # TabBar
 
-Two tabs, Today and Trips, on `bg` with a `line` hairline on top.
+Today and Trips.
 
-- Selected tab uses a filled icon and `primary`. The other uses an outline icon in `muted`.
-- Labels in the caption style.
+- Phones. A bottom bar on `bg` with a `line` on top. The selected tab has a filled icon in `primary` and a `caption` label in `purple-text`. The other is an outline icon in `muted`.
+- Laptops. The tabs move to a top bar on `hero`, text only, with Stay Counter in `section` caps on the left. The selected tab is white with a `ring` underline.

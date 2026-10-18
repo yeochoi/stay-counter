@@ -1,145 +1,103 @@
 # Stay Counter
 
-Know your days, wherever you are. A calm iOS app that tells people living between countries how long they can stay and when to leave.
+Know your days, wherever you are. A calm travel days counter that tells people living between countries how long they can stay, when to leave, and how close they are to a tax limit. It runs as a responsive web app on phones and laptops.
 
 ## Principles
 
-1. **One answer per screen.** Every screen leads with one big thing, a date or a number. Everything else is quiet.
-2. **Lists, not cards.** Content sits in plain lists with hairline dividers, like Todoist. Grouped white rows appear only inside forms.
-3. **Purple acts, coral warns.** Purple is for actions and progress. Coral only appears when something needs attention. Everything else is ink and grey.
-4. **Every number has a label.** A date or count never stands alone. 17 days to go, Leave by Mon, Nov 30.
-5. **Native first.** System font, iOS sheets, tab bar and controls, so the app feels at home on an iPhone.
+1. **One answer per screen.** The hero answers one question with one number and one date, like 20 days left and Leave China by Sat, Nov 7. Everything else waits below.
+2. **Dark hero, light content.** A deep purple hero carries the answer. Content sits below on a warm off white in white cards.
+3. **Purple acts, coral warns.** Purple is for actions, progress and the stay you are in. Coral only appears when something needs checking.
+4. **Never guess for the person.** Show only dates the person entered or the app knows. A date the app proposes says Suggested until the person matches it to a flight.
+5. **One way to do each thing.** Top left always leaves a sheet, the bottom always moves forward, the same warning always looks the same.
 
 ## Color
 
-| Role | Token | Use it for |
+| Role | Tokens | Use |
 | --- | --- | --- |
-| Brand | `primary` | Main button, ring, add button, selected tab, the one key phrase |
-| Soft brand | `primary-soft` with `primary-pressed` text | Secondary button, next trip circle |
-| Attention | `secondary` and `secondary-ink` | Last 5 days of a stay, limits getting close |
-| Ground | `bg`, `surface` | Screens and grouped rows |
-| Text | `ink`, `muted` | Content and supporting text |
-| Lines | `line`, `control-off` | Dividers and empty circles |
-
-Text uses five colors, each with one job.
-
-| Text color | Token | For | Contrast on bg |
-| --- | --- | --- | --- |
-| Ink | `ink` | Names, titles, body | 16.1 to 1 |
-| Grey | `muted` | Section headers, values on the right, notes | 5.0 to 1 |
-| Purple | `primary-pressed` | Links and the one key phrase | 7.7 to 1 |
-| Coral | `secondary-ink` | A value close to its limit | 4.9 to 1 |
-| White | white | Text on purple buttons | 5.4 to 1 |
+| Hero | `hero`, `hero-text`, `ring` | Top of Today and Trips, the laptop top bar, the first open screen |
+| Action | `primary`, `purple-text`, `soft` | Buttons, Now, dots, bars, links, Edit |
+| Current | `current`, `current-line` | The stay or trip you are in now |
+| Ground | `bg`, `surface`, `line` | Screens, cards, dividers |
+| Text | `ink`, `muted` | Content and labels |
+| Quiet | `chip`, `chip-text`, `chevron`, `done-dot` | Notes, round buttons, chevrons, finished stays |
+| Attention | `coral`, `coral-text`, `coral-soft`, `coral-track` | Rules to check, stays after an entry ends, tax limits close by |
 
 Rules
-- Brand purple `primary` is for fills and graphics. Purple text always uses `primary-pressed`.
-- In every row, the name is `row`, 17 semibold ink, and the value is `body`, 15 regular grey. Plan timelines keep dates at 17 regular, with only the current stay in semibold. The difference in both size and color makes label and detail easy to tell apart, like Prayminder's title and time.
-- Names are ink, values are grey. Past trips are not dimmed further, the year heading already says they are done.
-- Use purple at most three times on a screen.
-- Coral never decorates. If nothing needs attention, there is no coral.
-- Grey text always uses `muted`, which passes contrast. Never lighter.
-- `control-off` empty circles are decorative and always sit next to a text label.
+- `primary` is a fill. Purple text always uses `purple-text`.
+- Coral text always uses `coral-text`. `coral` is only for bars.
+- Text passes 4.5 to 1 everywhere it sits. The token notes list each pair.
 
 ## Typography
 
-SF Pro, Apple's system font. Six sizes, three weights, nothing in between.
+One typeface, Outfit, from Google Fonts. No serif anywhere.
 
 | Style | Size | Weight | For |
 | --- | --- | --- | --- |
-| `large-title` | 30 | Bold | Screen title, big numbers |
-| `title` | 24 | Bold | The key answer, like Mon, Nov 30 |
-| `headline` | 17 | Semibold | Buttons, sheet titles |
-| `row` | 17 | Regular | The name on the left of every row |
-| `body` | 15 | Regular | Values on the right of rows, short text, switches |
-| `footnote` | 13 | Regular | Lines under a row, section labels |
-| `caption` | 11 | Semibold | Tab bar only |
+| `welcome` | 38, 56 on laptop | Semibold | First open headline |
+| `page-title` | 38, 52 on laptop | Semibold | Trips title |
+| `answer` | 34, 44 on laptop | Semibold | The answer and the ring number |
+| `headline` | 17 | Semibold | Country, stay dates, values, buttons, sheet titles |
+| `body` | 15 | Regular | Row labels, secondary values, hero labels |
+| `subline` | 14 | Regular | Second line of a trip row on phones |
+| `note` | 13 | Regular | Notes, chips, timeline status, warnings |
+| `section` | 12 caps | Semibold | Section labels |
+| `caption` | 11 | Semibold | Phone tab bar |
 
 Rules
-- Weights are Regular for reading, Semibold for actions, Bold for the few big things.
-- Titles use a slight negative letter spacing of minus 0.02em. Nothing else is tracked.
-- In SwiftUI these map to largeTitle, title2, headline, subheadline, footnote and caption2, so Dynamic Type works.
+- Bold only for primary content. Chips use regular weight, their fill already stands out.
+- Large text uses minus 0.02em letter spacing.
+- Text next to the ring uses the same sizes as the ring. The number and the date share `answer`, the unit and the label share `body`, so tops and bottoms line up.
 
 ## Layout
 
-- Screens are 390 wide with one side margin, `space-5` of 22, on every screen and sheet.
-- Edges align, content insets. Text, labels, buttons and the edges of boxes all start at 22. Text inside a box, like grouped rows or the warning, is inset by `space-4` of 16.
-- The only things that cross the margin are full width bands, like the current trip on Trips and the warnings on the plan. Their content still starts at 22, so it lines up with the list around it.
-
-Headers on tab screens
-- One structure on every tab. A small grey line of 18, a gap of 2, then a 44 tall row with the large title on the left and one icon button on the right, centered on the title line.
-- Screens without a date keep the 18 line empty, so titles sit at the same height on every tab.
-- Icon buttons are 44 square with the icon's right edge on the 22 margin.
-
-Sheet bars
-- A 44 tall row with three columns, left action, centered title, right action, all centered on one line.
-- Order from the top. Large title with one grey line under it, then the hero, then lists, then actions at the bottom.
-- Sections start with a header in 12 semibold `muted`, uppercase with 0.08em letter spacing. No line under it. Gaps between sections are measured from the last thing you can see, always 44. After a band, a line or the hero that is 44 of padding. After a plain row with no line, the row already carries 16 of empty space, so the header gets 28. The caps shape keeps it apart from grey values.
-- Every label uses the same small grey caps, in lists and in the hero, like NEXT TRIP and LEAVE CHINA BY. The date above the Today title uses it too, like THU, OCT 15.
-- Three text levels in lists, each different in two ways. Header small grey caps. Country 17 semibold ink. Value 15 regular muted.
-- Rows are separated by a hairline under each row. No line above the first row.
-- Never show the same trip twice on one screen. If it is the hero, it does not also appear in the list below.
-- Primary actions sit at the bottom within thumb reach.
+- Phones use a 22 side margin on every screen and sheet.
+- Laptops keep the hero colour full width and place content inside `max-width` of 1040, all on one left edge.
+- Sections start with a `section` label 20 above the card. Cards are white with a 1px `line` border and `radius-card`. No shadows.
+- The add button floats bottom right and never covers content, the page leaves room under the last card.
 
 ## Navigation
 
-- **Root screens** are Today and Trips in a two tab bar. Settings is a gear at the top right of Today.
-- The large title always names the tab you are on, matching its tab label. The app name never appears as a title.
-- **Tasks** like a new trip open as a sheet. Left is Cancel or Back, right is Done or Close.
-- **Done** confirms a step. **Save trip** is the only save, at the end.
+- Phones have a bottom tab bar with Today and Trips. Laptops move them to a top bar on `hero` with Stay Counter on the left.
+- Settings sits behind the gear on Today.
+- Sheets have one rule. Top left leaves, × closes a first screen, ‹ goes back one step. The bottom holds one forward action, like See stays, Save trip or Save. Reading pages, like Settings, have no bottom button.
+- A saved trip opens on its overview first. Edit at the top right opens Edit trip. Viewing never needs the form.
 
-## Components
+## Screens
 
-- **Button.** Full width pill, 54 tall. Primary is purple with white text. Secondary is soft purple with purple text. One primary per screen.
-- **Add button.** 56 round purple button with a plus, bottom right, above the tab bar. Only on Home.
-- **Segmented switch.** Pill track in `line` with a white pill thumb. For two choices, like Planning or Booked.
-- **Grouped rows.** White rows with a `radius-group` corner, label left and value right in muted.
-- **List row.** One line. Name on the left, one value on the right. No leading circle. Stays in a sequence use a thin timeline with small dots, the current one in purple.
-- **Countdown ring.** 104 circle. During a stay a ring fills with purple, coral in the last 5 days. Before a trip it is a soft purple disc with days to go.
-- **Warning.** One group under a single coral icon, ink text, one line per warning, on a very light tint. No dividers.
+- **Today.** Hero with the answer. Below it the current trip as a timeline, then Upcoming, then Tax days.
+- **Trips.** Tabs Upcoming and Past. Upcoming shows Now first. Past groups by year. On laptops each trip is one table row with country, dates, days and type.
+- **Trip overview.** The answer, the stays, Rules for this trip, then Details.
+- **New trip.** Starts empty. Country, dates, entry and type, then See stays, then Save trip.
 
-## Shape
+## Warnings
 
-- No drop shadows on buttons, including the round add button. Flat fills only. The one soft shadow left is the selected thumb in a segmented switch.
+- One icon per screen, in a coral chip under the answer, like 2 rules to check. See below.
+- Every other warning is one small `coral-text` line under the thing it is about, like After visa free ends under a stay or You reach it on Dec 12 under the tax limit.
+- Values keep their normal style. Only the line under them is coral.
+- A new trip's plan, before it is saved, shows its warnings in one coral box, since it has no rules card.
 
-- Things you tap are round, with `radius-pill`.
-- Things you read are softly square, with `radius-group`.
+## Stays
 
-## Data
+- A long trip splits into stays, one per entry. The app suggests where to leave and come back.
+- Each stay says what it is. Done, Now with days left, Back in N days, Suggested, or Matched to flights.
+- Dots show the same thing. Grey for done, filled with a halo for now, empty for next.
+- Editing a stay moves the stays after it. The edit screen says when the next stay can start.
+- Finished stays can still be corrected. A grey note says so.
 
-- Time at home is not a trip. Home days count only in the 12 month totals, never in the Trips list.
+## Counting
+
+- Days count both arrival and leave days.
+- Days left count from tomorrow, so the number matches a calendar.
+- Tax days follow each country's own rule, the calendar year for China, the past 12 months elsewhere. Home is not listed.
 
 ## Writing
 
-- Plain words, sentence case, short.
-- Same phrase for the same idea everywhere. Deadlines always say Leave by.
-- Short dates in lists, like Dec 31.
-- When a weekday is shown, it is always the short form with a comma, like Mon, Nov 30. Never the full Monday. Weekdays appear only on single dates people act on, like the leave by date, the arrive and leave fields, and today's date above the title.
-- No colons, semicolons or dashes in UI text, with one exception below.
-
-Date ranges
-- Ranges use a spaced en dash, like Nov 1 – 30. This is the only dash in the app.
-- Same month, say it once. Nov 1 – 30.
-- Different months, say both. Dec 2 – Jan 31.
-- Show the year whenever a date is not in the current year. Apr 3 – 10, 2027.
-- A range that crosses into a new year shows both years. Nov 1, 2026 – Mar 31, 2027.
-- Past trips sit under a year heading, so their rows skip the year.
-- Exports always show full dates with the year.
-- Labels over questions when the options explain themselves.
+- Plain words, sentence case, short. No colons, semicolons or dashes in UI text.
+- Date ranges are the one exception and use a spaced en dash, like Nov 1 – 30. A range into the next year names the year once, like Nov 1 – Mar 31, 2027.
+- Weekdays only on single dates people act on, like Sat, Nov 7.
+- Calm words for problems, like rules to check, never broken.
 - Keep Not legal advice on any screen that shows rules.
 
-## Icons
+## Files
 
-Apple SF Symbols in the app, at the outline weight that matches the text. Filled only for the selected tab. No emoji.
-
-Large icons on intro and empty screens follow one style. 64 wide, thin outline, in a light purple, with no tile or fill behind them. They set the mood and stay quiet, so the purple button below is always the strongest thing on the screen.
-
-## Hierarchy
-
-Every screen has three levels and only three.
-1. The answer. Large title or title, bold. One per screen.
-2. Section headers. Small, semibold, grey.
-3. Rows. One line of body text, with one value on the right. Only the one value that needs attention gets purple or coral.
-
-## Less text
-
-If a detail is not needed to decide or act on this screen, leave it for the next tap. Prefer one line per row, and avoid a grey second line unless it changes what the user does.
+This folder is a copy of the Stay Counter design system artifact. `tokens.json` holds every colour, type style, spacing, radius and size. `tokens.css` is generated from it for use in code. Each folder in `components` has a guide and a live preview. The same content renders as one page at `/stay-counter/design-system/` on the published site.
