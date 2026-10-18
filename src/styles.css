@@ -184,6 +184,7 @@ button.row:hover, label.row:hover { background: #fbfaf8; }
 .sheet-body > * { flex-shrink: 0; }
 .sheet-foot { padding: 12px var(--gutter) calc(var(--bottom) + 24px); flex-shrink: 0; }
 .big { font-weight: 600; font-size: 34px; letter-spacing: -0.02em; line-height: 1.1; padding-top: 16px; }
+.done-note { margin-top: 16px; padding: 12px 14px; border-radius: 12px; background: var(--chip); color: var(--chip-text); font-size: 13px; line-height: 1.5; }
 .big-sub { font-size: 15px; color: var(--muted); padding-top: 6px; }
 @keyframes fade { from { opacity: 0; } }
 @keyframes up { from { transform: translateY(24px); opacity: 0.6; } }

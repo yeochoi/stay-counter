@@ -8,6 +8,8 @@ import { DateRow, Primary, Sheet } from '../components/ui'
 export function EditStay({ trip, profile, index, today, nav = 'close', onCancel, onSave }: { trip: Trip; profile: Profile; index: number; today: Day; nav?: 'close' | 'back'; onCancel: () => void; onSave: (start: Day, end: Day) => void }) {
   const ls = legs(trip, profile)
   const leg = ls[index]
+  // A finished stay can still be corrected, for example if you left earlier than planned.
+  const done = toNum(leg.end) < toNum(today)
   const [start, setStart] = useState(leg.start)
   const [end, setEnd] = useState(leg.end)
   const max = daysPerEntry(trip, profile)
@@ -30,14 +32,17 @@ export function EditStay({ trip, profile, index, today, nav = 'close', onCancel,
     <Sheet title={ls.length > 1 ? `Stay ${index + 1}` : shortName(trip.country)} {...(nav === 'back' ? { onBack: onCancel } : { onClose: onCancel })} foot={<Primary label="Save" onClick={() => onSave(start, end)} disabled={!valid || !!tooEarly} />}>
       <div className="big">{days} {days === 1 ? 'day' : 'days'}</div>
       <div className="big-sub" style={over ? { color: 'var(--coral-text)' } : undefined}>{sub}</div>
+      {done && <div className="done-note">This stay is done. Change the dates only if you arrived or left on a different day.</div>}
       <div className="card" style={{ marginTop: 20 }}>
         <DateRow k="Arrive" value={start} today={today} onChange={(d) => { setStart(d); if (toNum(end) < toNum(d)) setEnd(d) }} />
         <DateRow k="Leave" value={end} today={today} min={start} onChange={setEnd} />
       </div>
-      <div className="note">
-        Match these to your flights.
-        {hasNext && valid && !over && <><br />Stay {index + 2} can start from {fmtWeekday(addDays(end, 1), today)}.</>}
-      </div>
+      {!done && (
+        <div className="note">
+          Match these to your flights.
+          {hasNext && valid && !over && <><br />Stay {index + 2} can start from {fmtWeekday(addDays(end, 1), today)}.</>}
+        </div>
+      )}
     </Sheet>
   )
 }
