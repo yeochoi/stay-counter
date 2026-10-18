@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Day, fmtDate, fmtRange, toNum } from '../lib/dates'
-import { daysIn, daysPerEntry, editStay, Entry, legs, newId, Profile, Trip, warnings } from '../lib/plan'
+import { daysIn, daysPerEntry, editStay, Entry, legs, newId, Profile, taxHit, Trip, warnings } from '../lib/plan'
 import { COUNTRIES, entryRule, shortName, taxRule } from '../lib/rules'
 import { Alert, Check, Chevron } from '../components/Icons'
 import { DateRow, Primary, Sec, Seg, SelectRow, Sheet } from '../components/ui'
@@ -64,11 +64,11 @@ export function TripFlow({ profile, trips, today, existing, startBooked, onClose
     const max = daysPerEntry(trip, profile)
     return (
       <Sheet title={shortName(trip.country)} onClose={onClose} action={{ label: 'Edit', onClick: () => setStep({ kind: 'form' }) }}>
-        <Summary trip={trip} profile={profile} max={max} />
-        <Sec>Rules for this trip</Sec>
-        <RulesCard trip={trip} profile={profile} visa={trip.entry.kind === 'visa' ? trip.entry : undefined} />
+        <Summary trip={trip} profile={profile} max={max} broken={warnings(trip, others, profile).length} />
         <Sec>Stays</Sec>
-        <StayList trip={trip} profile={profile} today={today} others={others} onStay={(i) => setStep({ kind: 'stay', index: i, from: 'overview' })} />
+        <StayList trip={trip} profile={profile} today={today} others={others} showWarnings={false} onStay={(i) => setStep({ kind: 'stay', index: i, from: 'overview' })} />
+        <Sec>Rules for this trip</Sec>
+        <RulesCard trip={trip} profile={profile} visa={trip.entry.kind === 'visa' ? trip.entry : undefined} others={others} />
         <Sec>Details</Sec>
         <div className="card">
           <div className="row small"><span className="k">Dates</span><span className="v">{fmtRange(trip.start, trip.end, today)}</span></div>
@@ -163,18 +163,33 @@ function VisaStep({ entry, today, onCancel, onSave }: { entry: Entry; today: Day
   )
 }
 
-function Summary({ trip, profile, max }: { trip: Trip; profile: Profile; max?: number }) {
+/** broken is set on the overview, where the rules card below explains each problem. */
+function Summary({ trip, profile, max, broken }: { trip: Trip; profile: Profile; max?: number; broken?: number }) {
   const exits = legs(trip, profile).length - 1
   const n = daysIn(trip, profile)
+  const days = `${n} ${n === 1 ? 'day' : 'days'} in ${shortName(trip.country)}`
   return (
     <>
       <div className="big">{exits === 0 ? 'No need to leave' : `Leave ${exits === 1 ? 'once' : `${exits} times`}`}</div>
-      <div className="big-sub">{`${n} ${n === 1 ? 'day' : 'days'} in ${shortName(trip.country)}. `}{max ? `${trip.entry.kind === 'visafree' ? 'Visa free' : 'Your visa'} allows ${max} days per entry` : 'No entry limit we know of'}</div>
+      {broken === undefined ? (
+        <div className="big-sub">{`${days}. `}{max ? `${trip.entry.kind === 'visafree' ? 'Visa free' : 'Your visa'} allows ${max} days per entry` : 'No entry limit we know of'}</div>
+      ) : (
+        <>
+          <div className="big-sub">{days}</div>
+          {broken > 0 && <div className="alert-chip"><AlertSmall />{broken} {broken === 1 ? 'rule' : 'rules'} broken. See below</div>}
+        </>
+      )}
     </>
   )
 }
 
-function StayList({ trip, profile, today, others, onStay }: { trip: Trip; profile: Profile; today: Day; others: Trip[]; onStay: (i: number) => void }) {
+const AlertSmall = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C4502A" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true" style={{ flexShrink: 0 }}>
+    <path d="M12 8v5M12 16.5v.5M10.3 3.9L2.5 18a2 2 0 001.7 3h15.6a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z" />
+  </svg>
+)
+
+function StayList({ trip, profile, today, others, onStay, showWarnings = true }: { trip: Trip; profile: Profile; today: Day; others: Trip[]; onStay: (i: number) => void; showWarnings?: boolean }) {
   const ls = legs(trip, profile)
   const warns = warnings(trip, others, profile)
   const suggested = ls.length > 1 && ls.some((l) => !l.edited)
@@ -192,7 +207,7 @@ function StayList({ trip, profile, today, others, onStay }: { trip: Trip; profil
         ))}
       </div>
       {suggested && <div className="note">Suggested dates. Tap a stay to match your flights.</div>}
-      {warns.length > 0 && (
+      {showWarnings && warns.length > 0 && (
         <div className="warn">
           <Alert />
           <div>{warns.map((w, i) => (i === 0 ? <b key={w.id}>{w.text}</b> : <div key={w.id}>{w.text}</div>))}</div>
@@ -202,18 +217,31 @@ function StayList({ trip, profile, today, others, onStay }: { trip: Trip; profil
   )
 }
 
-function RulesCard({ trip, profile, visa }: { trip: Trip; profile: Profile; visa?: Extract<Entry, { kind: 'visa' }> }) {
+/** The rules that apply. With others given, a rule this trip breaks turns coral with one line on why. */
+function RulesCard({ trip, profile, visa, others }: { trip: Trip; profile: Profile; visa?: Extract<Entry, { kind: 'visa' }>; others?: Trip[] }) {
   const rule = entryRule(profile.passport, trip.country)
   const tax = taxRule(trip.country)
+  const ids = new Set(others ? warnings(trip, others, profile).map((w) => w.id) : [])
+  const hit = others && ids.has('tax') ? taxHit(trip, others, profile) : undefined
+  const Row = ({ k, v, why }: { k: string; v: string; why?: string }) =>
+    why ? (
+      <div className="row rule-bad">
+        <div className="top"><span className="k">{k}</span><span className="v">{v}</span></div>
+        <div className="why"><AlertSmall />{why}</div>
+      </div>
+    ) : (
+      <div className="row small"><span className="k">{k}</span><span className="v">{v}</span></div>
+    )
+  const perEntryWhy = ids.has('norule') ? 'Check if you need a visa' : ids.has('single') ? 'Your visa allows one entry only' : undefined
   return (
     <div className="card">
-      <div className="row small"><span className="k">Stay per entry</span><span className="v">{visa ? `${visa.days} days` : rule.visaFreeDays ? `${rule.visaFreeDays} days` : 'Visa needed'}</span></div>
+      <Row k="Stay per entry" v={visa ? `${visa.days} days` : rule.visaFreeDays ? `${rule.visaFreeDays} days` : 'Visa needed'} why={perEntryWhy} />
       {visa ? (
-        <div className="row small"><span className="k">Visa valid until</span><span className="v">{long(visa.validUntil)}</span></div>
+        <Row k="Visa valid until" v={long(visa.validUntil)} why={ids.has('visaend') ? 'Your trip goes past this date' : undefined} />
       ) : rule.visaFreeUntil ? (
-        <div className="row small"><span className="k">Visa free until</span><span className="v">{long(rule.visaFreeUntil)}</span></div>
+        <Row k="Visa free until" v={long(rule.visaFreeUntil)} why={ids.has('vfend') ? 'Your trip goes past this date' : undefined} />
       ) : null}
-      <div className="row small"><span className="k">Tax limit</span><span className="v">{tax.days} days {tax.window === 'calendar' ? 'a year' : 'in 12 months'}</span></div>
+      <Row k="Tax limit" v={`${tax.days} days ${tax.window === 'calendar' ? 'a year' : 'in 12 months'}`} why={hit ? `You reach it on ${fmtDate(hit, trip.start)}` : undefined} />
     </div>
   )
 }
