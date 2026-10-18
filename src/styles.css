@@ -30,7 +30,10 @@
 }
 
 * { box-sizing: border-box; }
-html, body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); -webkit-font-smoothing: antialiased; -webkit-text-size-adjust: 100%; }
+/* The page behind everything is hero purple, so Safari tints the status bar area solid purple with no fade.
+   The app column keeps the light background for content. */
+html { background: var(--hero); }
+html, body { margin: 0; color: var(--ink); font-family: var(--sans); -webkit-font-smoothing: antialiased; -webkit-text-size-adjust: 100%; }
 button, input, select { font-family: inherit; color: inherit; }
 button { cursor: pointer; }
 .trim { text-box: trim-both cap alphabetic; }
