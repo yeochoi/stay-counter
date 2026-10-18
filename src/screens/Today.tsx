@@ -1,5 +1,5 @@
 import { Day, fmtRange, fmtWeekday, toNum } from '../lib/dates'
-import { daysIn, Profile, status, taxCounts, Trip } from '../lib/plan'
+import { daysIn, Profile, status, taxCounts, Trip, warnings } from '../lib/plan'
 import { shortName } from '../lib/rules'
 import { Chevron, Gear, Plane, Plus } from '../components/Icons'
 import { Ring, Sec } from '../components/ui'
@@ -103,8 +103,26 @@ export function Today({ trips, profile, today, onNew, onOpen, onEditStay, onSett
       const anySuggested = ls.some((l) => !l.edited && toNum(l.start) > toNum(today))
       stays = (
         <section>
-          <div className="sec sec-row"><span>{shortName(main.country)} trip</span><span className="sec-aside">{fmtRange(main.start, main.end, today)} · {daysIn(main, profile)} days</span></div>
-          <StayTimeline trip={main} profile={profile} today={today} onStay={(i) => onEditStay(main, i)} />
+          <Sec>Your trip</Sec>
+          <StayTimeline
+            trip={main}
+            profile={profile}
+            today={today}
+            onStay={(i) => onEditStay(main, i)}
+            head={(() => {
+              const n = warnings(main, trips.filter((x) => x.id !== main.id), profile).length
+              return (
+                <button className="row two trip-head" onClick={() => onOpen(main)}>
+                  <span className="col">
+                    <span className="t">{shortName(main.country)} trip</span>
+                    <span className="sub">{fmtRange(main.start, main.end, today)} · {daysIn(main, profile)} days</span>
+                    {n > 0 && <span className="sub bad">{n} {n === 1 ? 'rule' : 'rules'} to check</span>}
+                  </span>
+                  <span className="s"><span className="see">See trip</span><Chevron /></span>
+                </button>
+              )
+            })()}
+          />
           {anySuggested && <div className="note">Tap a stay to match your flights.</div>}
         </section>
       )

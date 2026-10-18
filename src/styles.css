@@ -137,6 +137,8 @@ button.row:hover, label.row:hover { background: #fbfaf8; }
 .sec-aside { text-transform: none; letter-spacing: 0; font-weight: 400; font-size: 13px; }
 .timeline { padding: 0; }
 .timeline .stay-row { padding: 0 16px; }
+.trip-head { border-bottom: 1px solid var(--line) !important; }
+.trip-head .see { font-size: 15px; color: var(--purple-text); }
 .timeline .tl { width: 14px; }
 .timeline .tl i:first-child { height: 24px; }
 .timeline .in { padding: 10px 0; }

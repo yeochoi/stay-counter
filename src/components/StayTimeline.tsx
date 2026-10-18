@@ -6,7 +6,7 @@ import { Chevron } from './Icons'
  * The stays of one trip as a timeline. Each stay says what it is under its dates,
  * the right side is always the days, so every row lines up.
  */
-export function StayTimeline({ trip, profile, today, onStay }: { trip: Trip; profile: Profile; today: Day; onStay: (i: number) => void }) {
+export function StayTimeline({ trip, profile, today, onStay, head }: { trip: Trip; profile: Profile; today: Day; onStay: (i: number) => void; head?: React.ReactNode }) {
   const ls = legs(trip, profile)
   const st = status(trip, profile, today)
   const now = st.phase === 'in' ? st.index : -1
@@ -16,6 +16,7 @@ export function StayTimeline({ trip, profile, today, onStay }: { trip: Trip; pro
   const plural = (n: number) => `${n} ${n === 1 ? 'day' : 'days'}`
   return (
     <div className="card timeline">
+      {head}
       {ls.map((l, i) => {
         const kind = i === now ? 'now' : toNum(l.end) < t ? 'past' : 'next'
         const label =
