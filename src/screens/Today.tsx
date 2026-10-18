@@ -1,7 +1,7 @@
 import { Day, fmtRange, fmtWeekday, toNum } from '../lib/dates'
 import { daysIn, entryEnds, Profile, status, taxCounts, Trip } from '../lib/plan'
 import { shortName } from '../lib/rules'
-import { Check, Chevron, Gear, Plane, Plus } from '../components/Icons'
+import { Chevron, Gear, Plane, Plus } from '../components/Icons'
 import { Ring, Sec } from '../components/ui'
 
 type Props = {
@@ -99,27 +99,38 @@ export function Today({ trips, profile, today, onNew, onOpen, onEditStay, onSett
       )
     }
     if (current && ls.length > 1) {
-      const suggested = ls.length > 1 && ls.some((l) => !l.edited)
       const now = st.phase === 'in' ? st.index : -1
+      const nextIdx = st.phase === 'out' ? st.next : -1
       const ends = entryEnds(main, profile)
+      const anySuggested = ls.some((l) => !l.edited && toNum(l.start) > toNum(today))
       stays = (
         <section>
-          <Sec>{suggested ? 'Suggested stays' : 'Your stays'}</Sec>
-          <div className="card">
-            {ls.map((l, i) => (
-              <button key={i} className="row" style={{ minHeight: 54 }} onClick={() => onEditStay(main, i)}>
-                <span className="col">
-                  <span className="t">{fmtRange(l.start, l.end, today)}</span>
-                  {ends && toNum(l.end) > toNum(ends) && <span className="sub bad">{main.entry.kind === 'visa' ? 'After your visa ends' : 'After visa free ends'}</span>}
-                </span>
-                <span className="s">
-                  {i === now ? <span className="pill now">Now</span> : <>{l.edited && <Check />}{l.days} {l.days === 1 ? 'day' : 'days'}</>}
-                  <Chevron />
-                </span>
-              </button>
-            ))}
+          <div className="sec sec-row"><span>{shortName(main.country)} trip</span><span className="sec-aside">{fmtRange(main.start, main.end, today)} · {daysIn(main, profile)} days</span></div>
+          <div className="card timeline">
+            {ls.map((l, i) => {
+              const kind = i === now ? 'now' : toNum(l.end) < toNum(today) ? 'past' : 'next'
+              const label =
+                kind === 'now' ? `Now · ${st.phase === 'in' ? st.daysLeft : 0} ${st.phase === 'in' && st.daysLeft === 1 ? 'day' : 'days'} left`
+                : kind === 'past' ? 'Done'
+                : i === nextIdx ? `Back in ${st.phase === 'out' ? st.daysToGo : 0} ${st.phase === 'out' && st.daysToGo === 1 ? 'day' : 'days'}`
+                : l.edited ? 'Matched to flights' : 'Suggested'
+              const late = ends && toNum(l.end) > toNum(ends)
+              return (
+                <button key={i} className={`stay-row ${kind}`} onClick={() => onEditStay(main, i)}>
+                  <span className="tl" aria-hidden="true"><i className={i === 0 ? 'off' : ''} /><b /><i className={i === ls.length - 1 ? 'off' : ''} /></span>
+                  <span className="in">
+                    <span className="what">
+                      <span className="t">{fmtRange(l.start, l.end, today)}</span>
+                      <span className="state">{label}</span>
+                      {late && <span className="sub bad">{main.entry.kind === 'visa' ? 'After your visa ends' : 'After visa free ends'}</span>}
+                    </span>
+                    <span className="s">{l.days} {l.days === 1 ? 'day' : 'days'}<Chevron /></span>
+                  </span>
+                </button>
+              )
+            })}
           </div>
-          {suggested && <div className="note">Tap a stay to match your flights.</div>}
+          {anySuggested && <div className="note">Tap a stay to match your flights.</div>}
         </section>
       )
     }
