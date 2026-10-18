@@ -20,7 +20,7 @@ export function Sec({ children }: { children: ReactNode }) {
 
 /** A bottom sheet on phones, a centered panel on desktop. Title on top, one action row at the bottom. */
 /** Top left leaves the sheet. × closes it, ‹ goes back one step. The bottom holds one forward action. */
-export function Sheet({ title, children, foot, onClose, onBack }: { title: string; children: ReactNode; foot?: ReactNode; onClose?: () => void; onBack?: () => void }) {
+export function Sheet({ title, children, foot, onClose, onBack, action }: { title: string; children: ReactNode; foot?: ReactNode; onClose?: () => void; onBack?: () => void; action?: { label: string; onClick: () => void } }) {
   useEffect(() => {
     const prev = document.body.style.overflow
     document.body.style.overflow = 'hidden'
@@ -36,7 +36,7 @@ export function Sheet({ title, children, foot, onClose, onBack }: { title: strin
             <button className="nav-btn" aria-label="Close" onClick={onClose}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg></button>
           ) : <span />}
           <div className="sheet-title">{title}</div>
-          <span />
+          {action ? <button className="head-action" onClick={action.onClick}>{action.label}</button> : <span />}
         </div>
         <div className="sheet-body">{children}</div>
         {foot && <div className="sheet-foot">{foot}</div>}

@@ -40,6 +40,7 @@ export default function App() {
     setState((s) => ({ ...s, trips: [...s.trips.filter((x) => x.id !== t.id), t] }))
     setOverlay(null)
   }
+  const update = (t: Trip) => setState((s) => ({ ...s, trips: [...s.trips.filter((x) => x.id !== t.id), t] }))
   const remove = (id: string) => {
     setState((s) => ({ ...s, trips: s.trips.filter((x) => x.id !== id) }))
     setOverlay(null)
@@ -76,10 +77,10 @@ export default function App() {
       <TabBar tab={tab} onChange={setTab} />
 
       {overlay?.kind === 'new' && (
-        <TripFlow profile={profile} trips={state.trips} today={today} startBooked={overlay.booked} onClose={() => setOverlay(null)} onSave={save} onDelete={remove} />
+        <TripFlow profile={profile} trips={state.trips} today={today} startBooked={overlay.booked} onClose={() => setOverlay(null)} onSave={save} onUpdate={update} onDelete={remove} />
       )}
       {overlay?.kind === 'trip' && (
-        <TripFlow key={overlay.trip.id} profile={profile} trips={state.trips} today={today} existing={overlay.trip} onClose={() => setOverlay(null)} onSave={save} onDelete={remove} />
+        <TripFlow key={overlay.trip.id} profile={profile} trips={state.trips} today={today} existing={overlay.trip} onClose={() => setOverlay(null)} onSave={save} onUpdate={update} onDelete={remove} />
       )}
       {overlay?.kind === 'stay' && (
         <EditStay
