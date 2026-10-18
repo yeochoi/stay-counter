@@ -5,7 +5,7 @@ import { shortName } from '../lib/rules'
 import { DateRow, Primary, Sheet } from '../components/ui'
 
 /** Change one stay to match real flights. Later stays move along. */
-export function EditStay({ trip, profile, index, today, nav = 'close', onCancel, onSave }: { trip: Trip; profile: Profile; index: number; today: Day; nav?: 'close' | 'back'; onCancel: () => void; onSave: (start: Day, end: Day) => void }) {
+export function EditStay({ trip, profile, index, today, nav = 'close', onCancel, onSave, onDismiss }: { trip: Trip; profile: Profile; index: number; today: Day; nav?: 'close' | 'back'; onCancel: () => void; onSave: (start: Day, end: Day) => void; onDismiss?: () => void }) {
   const ls = legs(trip, profile)
   const leg = ls[index]
   // A finished stay can still be corrected, for example if you left earlier than planned.
@@ -29,7 +29,7 @@ export function EditStay({ trip, profile, index, today, nav = 'close', onCancel,
   }
 
   return (
-    <Sheet title={ls.length > 1 ? `Stay ${index + 1} of ${ls.length}` : shortName(trip.country)} {...(nav === 'back' ? { onBack: onCancel } : { onClose: onCancel })} foot={<Primary label="Save" onClick={() => onSave(start, end)} disabled={!valid || !!tooEarly} />}>
+    <Sheet title={ls.length > 1 ? `Stay ${index + 1} of ${ls.length}` : shortName(trip.country)} {...(nav === 'back' ? { onBack: onCancel } : { onClose: onCancel })} onDismiss={onDismiss ?? onCancel} foot={<Primary label="Save" onClick={() => onSave(start, end)} disabled={!valid || !!tooEarly} />}>
       <div className="big">{days} {days === 1 ? 'day' : 'days'}</div>
       <div className="big-sub" style={over ? { color: 'var(--coral-text)' } : undefined}>{sub}</div>
       {done && <div className="done-note">This stay is done. Change the dates only if you arrived or left on a different day.</div>}

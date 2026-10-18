@@ -37,9 +37,9 @@ const Bar = ({ icon, title, action }: { icon: JSX.Element; title: string; action
   </div>
 )
 
-export function DesignSystem({ onBack, onClose }: { onBack?: () => void; onClose?: () => void }) {
+export function DesignSystem({ onBack, onClose, onDismiss }: { onBack?: () => void; onClose?: () => void; onDismiss?: () => void }) {
   return (
-    <Sheet title="Design system" onBack={onBack} onClose={onClose}>
+    <Sheet title="Design system" onBack={onBack} onClose={onClose} onDismiss={onDismiss}>
       <div className="ds">
         <h3>Color</h3>
         <div className="sw">{COLORS.map(([n, c]) => <div key={n}><span style={{ background: c }} /><p>{n}<br /><span className="muted" style={{ display: 'inline', height: 'auto' }}>{c}</span></p></div>)}</div>

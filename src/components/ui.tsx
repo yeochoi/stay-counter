@@ -20,14 +20,22 @@ export function Sec({ children }: { children: ReactNode }) {
 
 /** A bottom sheet on phones, a centered panel on desktop. Title on top, one action row at the bottom. */
 /** Top left leaves the sheet. × closes it, ‹ goes back one step. The bottom holds one forward action. */
-export function Sheet({ title, children, foot, onClose, onBack, action }: { title: string; children: ReactNode; foot?: ReactNode; onClose?: () => void; onBack?: () => void; action?: { label: string; onClick: () => void } }) {
+/** onDismiss runs when you tap outside the sheet or press Escape. It closes the whole sheet, like ×. Defaults to onClose. */
+export function Sheet({ title, children, foot, onClose, onBack, onDismiss, action }: { title: string; children: ReactNode; foot?: ReactNode; onClose?: () => void; onBack?: () => void; onDismiss?: () => void; action?: { label: string; onClick: () => void } }) {
+  const dismiss = onDismiss ?? onClose
+  useEffect(() => {
+    if (!dismiss) return
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') dismiss() }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [dismiss])
   useEffect(() => {
     const prev = document.body.style.overflow
     document.body.style.overflow = 'hidden'
     return () => { document.body.style.overflow = prev }
   }, [])
   return (
-    <div className="sheet-wrap" role="dialog" aria-modal="true" aria-label={title}>
+    <div className="sheet-wrap" role="dialog" aria-modal="true" aria-label={title} onClick={(e) => { if (e.target === e.currentTarget) dismiss?.() }}>
       <div className="sheet">
         <div className="sheet-head">
           {onBack ? (

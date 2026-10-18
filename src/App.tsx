@@ -105,7 +105,7 @@ export default function App() {
           onClose={() => setOverlay(null)}
         />
       )}
-      {overlay?.kind === 'design' && (overlay.from === 'settings' ? <DesignSystem onBack={() => setOverlay({ kind: 'settings' })} /> : <DesignSystem onClose={closeDesign} />)}
+      {overlay?.kind === 'design' && (overlay.from === 'settings' ? <DesignSystem onBack={() => setOverlay({ kind: 'settings' })} onDismiss={() => setOverlay(null)} /> : <DesignSystem onClose={closeDesign} />)}
     </div>
   )
 }

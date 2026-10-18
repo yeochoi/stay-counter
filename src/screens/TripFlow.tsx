@@ -39,7 +39,7 @@ export function TripFlow({ profile, trips, today, existing, startBooked, onClose
   // Changing dates, country or entry brings back the suggested stays.
   const change = (p: Partial<Trip>) => setTrip((t) => ({ ...t, ...p, stays: undefined }))
 
-  if (step.kind === 'visa') return <VisaStep entry={trip.entry} today={today} onCancel={() => setStep({ kind: 'form' })} onSave={(e) => { change({ entry: e }); setEntryPicked(true); setStep({ kind: 'form' }) }} />
+  if (step.kind === 'visa') return <VisaStep entry={trip.entry} today={today} onDismiss={onClose} onCancel={() => setStep({ kind: 'form' })} onSave={(e) => { change({ entry: e }); setEntryPicked(true); setStep({ kind: 'form' }) }} />
 
   if (step.kind === 'stay') {
     return (
@@ -49,6 +49,7 @@ export function TripFlow({ profile, trips, today, existing, startBooked, onClose
         index={step.index}
         today={today}
         nav="back"
+        onDismiss={onClose}
         onCancel={() => setStep({ kind: step.from })}
         onSave={(s, e) => {
           const next = editStay(trip, profile, step.index, s, e)
@@ -84,7 +85,7 @@ export function TripFlow({ profile, trips, today, existing, startBooked, onClose
   if (step.kind === 'plan') {
     const max = daysPerEntry(trip, profile)
     return (
-      <Sheet title={shortName(trip.country)} onBack={() => setStep({ kind: 'form' })} foot={<><div className="note" style={{ textAlign: 'center', padding: '0 0 12px' }}>Not legal advice.</div><Primary label="Save trip" onClick={() => onSave(trip)} /></>}>
+      <Sheet title={shortName(trip.country)} onBack={() => setStep({ kind: 'form' })} onDismiss={onClose} foot={<><div className="note" style={{ textAlign: 'center', padding: '0 0 12px' }}>Not legal advice.</div><Primary label="Save trip" onClick={() => onSave(trip)} /></>}>
         <Summary trip={trip} profile={profile} max={max} />
         <div style={{ height: 20 }} />
         <StayList trip={trip} profile={profile} today={today} others={others} onStay={(i) => setStep({ kind: 'stay', index: i, from: 'plan' })} />
@@ -99,6 +100,7 @@ export function TripFlow({ profile, trips, today, existing, startBooked, onClose
     <Sheet
       title={saved ? 'Edit trip' : 'New trip'}
       {...(saved ? { onBack: () => { setTrip(saved); setStep({ kind: 'overview' }) } } : { onClose })}
+      onDismiss={onClose}
       foot={saved
         ? <Primary label="Save" onClick={() => { setSaved(trip); onUpdate(trip); setStep({ kind: 'overview' }) }} disabled={!valid} />
         : <Primary label="See stays" onClick={() => setStep({ kind: 'plan' })} disabled={!valid} />}
@@ -133,7 +135,7 @@ export function TripFlow({ profile, trips, today, existing, startBooked, onClose
 }
 
 
-function VisaStep({ entry, today, onCancel, onSave }: { entry: Entry; today: Day; onCancel: () => void; onSave: (e: Entry) => void }) {
+function VisaStep({ entry, today, onCancel, onSave, onDismiss }: { entry: Entry; today: Day; onCancel: () => void; onSave: (e: Entry) => void; onDismiss: () => void }) {
   const init = entry.kind === 'visa' ? entry : undefined
   const [days, setDays] = useState(init ? String(init.days) : '')
   const [until, setUntil] = useState<Day>(init?.validUntil ?? '')
@@ -141,7 +143,7 @@ function VisaStep({ entry, today, onCancel, onSave }: { entry: Entry; today: Day
   const n = parseInt(days, 10)
   const ok = n > 0 && n < 1000 && !!until && multiple !== undefined
   return (
-    <Sheet title="Your visa" onBack={onCancel} foot={<Primary label="Save" onClick={() => onSave({ kind: 'visa', days: n, validUntil: until, multiple: !!multiple })} disabled={!ok} />}>
+    <Sheet title="Your visa" onBack={onCancel} onDismiss={onDismiss} foot={<Primary label="Save" onClick={() => onSave({ kind: 'visa', days: n, validUntil: until, multiple: !!multiple })} disabled={!ok} />}>
       <div className="note" style={{ padding: '16px 4px 0' }}>As printed on your visa.</div>
       <div className="card" style={{ marginTop: 8 }}>
         <label className="row">
