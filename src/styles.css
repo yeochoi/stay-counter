@@ -82,7 +82,7 @@ button.row:hover, label.row:hover { background: #fbfaf8; }
 .row input.num { width: 90px; padding: 0; border: 0; outline: none; text-align: right; font-size: 17px; font-weight: 600; background: transparent; }
 .link-row { color: var(--purple-text); font-size: 15px; font-weight: 500; justify-content: flex-start; gap: 8px; min-height: 48px; }
 
-.pill { font-size: 13px; font-weight: 600; padding: 4px 10px; border-radius: 999px; white-space: nowrap; }
+.pill { font-size: 13px; font-weight: 400; padding: 4px 10px; border-radius: 999px; white-space: nowrap; }
 .pill.now { color: #fff; background: var(--primary); }
 .pill.grey { color: var(--chip-text); background: var(--chip); font-weight: 400; }
 .pill.coral { color: var(--coral-text); background: var(--coral-soft); }
@@ -112,7 +112,7 @@ button.row:hover, label.row:hover { background: #fbfaf8; }
 .tabs button.on { font-weight: 600; color: var(--purple-text); box-shadow: inset 0 -2px 0 var(--primary); }
 
 .warn { display: flex; gap: 12px; margin-top: 16px; padding: 14px 16px; background: var(--coral-soft); border-radius: 16px; font-size: 15px; line-height: 1.5; }
-.alert-chip { display: inline-flex; align-self: flex-start; gap: 6px; align-items: center; margin-top: 12px; padding: 6px 12px; border-radius: 999px; background: var(--coral-soft); color: var(--coral-text); font-size: 13px; font-weight: 600; }
+.alert-chip { display: inline-flex; align-self: flex-start; gap: 6px; align-items: center; margin-top: 12px; padding: 6px 12px; border-radius: 999px; background: var(--coral-soft); color: var(--coral-text); font-size: 13px; font-weight: 400; }
 .row.rule-bad { display: block; padding-top: 12px; padding-bottom: 12px; }
 .rule-bad .top { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
 .rule-bad .v { font-size: 15px; font-weight: 600; color: var(--coral-text); }

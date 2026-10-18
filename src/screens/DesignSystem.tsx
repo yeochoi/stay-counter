@@ -18,7 +18,7 @@ const TYPE: [string, React.CSSProperties, string][] = [
 
 const RULES = [
   'One typeface, Outfit, everywhere.',
-  'Bold only for primary content. Status chips stay semibold.',
+  'Bold only for primary content. Chips use regular weight, their fill already stands out.',
   'The hero answers one question with one number and one date.',
   'Text next to the ring uses the same sizes as the ring, so tops and bottoms line up.',
   'White cards with a 1px line and radius 16. No shadows, no strong strokes.',
