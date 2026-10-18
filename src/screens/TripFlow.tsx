@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Day, fmtDate, fmtRange, toNum } from '../lib/dates'
-import { daysIn, daysPerEntry, editStay, Entry, legs, newId, Profile, taxHit, Trip, warnings } from '../lib/plan'
+import { daysIn, daysPerEntry, editStay, entryEnds, Entry, legs, newId, Profile, taxHit, Trip, tripStatus, warnings } from '../lib/plan'
 import { COUNTRIES, entryRule, shortName, taxRule } from '../lib/rules'
 import { Alert, Check, Chevron } from '../components/Icons'
 import { DateRow, Primary, Sec, Seg, SelectRow, Sheet } from '../components/ui'
@@ -72,7 +72,7 @@ export function TripFlow({ profile, trips, today, existing, startBooked, onClose
         <Sec>Details</Sec>
         <div className="card">
           <div className="row small"><span className="k">Dates</span><span className="v">{fmtRange(trip.start, trip.end, today)}</span></div>
-          <div className="row small"><span className="k">Status</span><span className="v">{trip.booked ? 'Booked' : 'Planning'}</span></div>
+          <div className="row small"><span className="k">Status</span><span className="v">{tripStatus(trip, today)}</span></div>
           <div className="row small"><span className="k">Entry</span><span className="v">{trip.entry.kind === 'visafree' ? 'Visa free' : `Visa, ${trip.entry.days} days`}</span></div>
           <div className="row small"><span className="k">Type</span><span className="v">{trip.type}</span></div>
         </div>
@@ -146,7 +146,10 @@ function VisaStep({ entry, today, onCancel, onSave }: { entry: Entry; today: Day
       <div className="card" style={{ marginTop: 8 }}>
         <label className="row">
           <span className="k">Days per stay</span>
-          <input className="num" inputMode="numeric" placeholder="Enter" value={days} onChange={(e) => setDays(e.target.value.replace(/\D/g, ''))} aria-label="Days per stay" />
+          <span className="v" style={{ gap: 4 }}>
+            <input className="num" inputMode="numeric" placeholder="0" value={days} onChange={(e) => setDays(e.target.value.replace(/\D/g, ''))} aria-label="Days per stay" style={{ width: 48 }} />
+            <span style={{ fontWeight: 400, color: 'var(--muted)' }}>days</span>
+          </span>
         </label>
         <DateRow k="Valid until" value={until} today={today} onChange={setUntil} />
       </div>
@@ -176,7 +179,7 @@ function Summary({ trip, profile, max, broken }: { trip: Trip; profile: Profile;
       ) : (
         <>
           <div className="big-sub">{days}</div>
-          {broken > 0 && <div className="alert-chip"><AlertSmall />{broken} {broken === 1 ? 'rule' : 'rules'} broken. See below</div>}
+          {broken > 0 && <div className="alert-chip"><AlertSmall />{broken} {broken === 1 ? 'rule' : 'rules'} to check. See below</div>}
         </>
       )}
     </>
@@ -193,6 +196,7 @@ function StayList({ trip, profile, today, others, onStay, showWarnings = true }:
   const ls = legs(trip, profile)
   const warns = warnings(trip, others, profile)
   const suggested = ls.length > 1 && ls.some((l) => !l.edited)
+  const ends = entryEnds(trip, profile)
   return (
     <>
       <div className="card" style={{ padding: '0 16px' }}>
@@ -200,7 +204,10 @@ function StayList({ trip, profile, today, others, onStay, showWarnings = true }:
           <button key={i} className="stay-row" onClick={() => onStay(i)}>
             <span className="tl" aria-hidden="true"><i className={i === 0 ? 'off' : ''} /><b /><i className={i === ls.length - 1 ? 'off' : ''} /></span>
             <span className="in">
-              <span className="t" style={{ fontSize: 17, fontWeight: 600 }}>{fmtRange(l.start, l.end, today)}</span>
+              <span className="col" style={{ display: 'flex', flexDirection: 'column', gap: 2, padding: '8px 0' }}>
+                <span className="t" style={{ fontSize: 17, fontWeight: 600 }}>{fmtRange(l.start, l.end, today)}</span>
+                {ends && toNum(l.end) > toNum(ends) && <span style={{ fontSize: 13, color: 'var(--coral-text)' }}>{trip.entry.kind === 'visa' ? 'After your visa ends' : 'After visa free ends'}</span>}
+              </span>
               <span className="s" style={{ fontSize: 15, color: 'var(--muted)', display: 'flex', alignItems: 'center', gap: 6 }}>{l.edited && <Check />}{l.days} {l.days === 1 ? 'day' : 'days'}<Chevron /></span>
             </span>
           </button>

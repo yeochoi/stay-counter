@@ -1,6 +1,6 @@
 import { Day, fmtRange, fmtWeekday, toNum } from '../lib/dates'
-import { daysIn, last12Months, Profile, status, Trip } from '../lib/plan'
-import { shortName, taxRule } from '../lib/rules'
+import { daysIn, entryEnds, Profile, status, taxCounts, Trip } from '../lib/plan'
+import { shortName } from '../lib/rules'
 import { Check, Chevron, Gear, Plane, Plus } from '../components/Icons'
 import { Ring, Sec } from '../components/ui'
 
@@ -101,13 +101,17 @@ export function Today({ trips, profile, today, onNew, onOpen, onEditStay, onSett
     if (current && ls.length > 1) {
       const suggested = ls.length > 1 && ls.some((l) => !l.edited)
       const now = st.phase === 'in' ? st.index : -1
+      const ends = entryEnds(main, profile)
       stays = (
         <section>
           <Sec>{suggested ? 'Suggested stays' : 'Your stays'}</Sec>
           <div className="card">
             {ls.map((l, i) => (
               <button key={i} className="row" style={{ minHeight: 54 }} onClick={() => onEditStay(main, i)}>
-                <span className="t">{fmtRange(l.start, l.end, today)}</span>
+                <span className="col">
+                  <span className="t">{fmtRange(l.start, l.end, today)}</span>
+                  {ends && toNum(l.end) > toNum(ends) && <span className="sub bad">{main.entry.kind === 'visa' ? 'After your visa ends' : 'After visa free ends'}</span>}
+                </span>
                 <span className="s">
                   {i === now ? <span className="pill now">Now</span> : <>{l.edited && <Check />}{l.days} {l.days === 1 ? 'day' : 'days'}</>}
                   <Chevron />
@@ -131,7 +135,7 @@ export function Today({ trips, profile, today, onNew, onOpen, onEditStay, onSett
     )
   }
 
-  const counts = last12Months(trips, profile, today)
+  const counts = taxCounts(trips, profile, today)
   return (
     <>
       <header className="hero">
@@ -154,33 +158,23 @@ export function Today({ trips, profile, today, onNew, onOpen, onEditStay, onSett
           </section>
         )}
         <section className="past">
-        <Sec>Past 12 months</Sec>
-        <div className="card" style={{ padding: '0 16px' }}>
-          {counts.length === 0 && <div className="row" style={{ padding: 0 }}><span className="k">No days abroad yet</span></div>}
-          {counts.map((c) => {
-            const limit = taxRule(c.country).days
-            const showBar = c.country !== profile.home && c.days >= 60
-            const name = shortName(c.country)
-            if (!showBar) {
+          <Sec>Tax days</Sec>
+          <div className="card" style={{ padding: '0 16px' }}>
+            {counts.length === 0 && <div className="row" style={{ padding: 0 }}><span className="k">No days abroad yet</span></div>}
+            {counts.map((c) => {
+              const close = c.days / c.limit >= 0.85
+              const when = c.window === 'calendar' ? `In ${today.slice(0, 4)}` : 'Past 12 months'
               return (
-                <div key={c.country} className="row" style={{ padding: 0 }}>
-                  <span className="t">{name}</span>
-                  <span className="s">{c.days} days</span>
+                <div key={c.country} className="row" style={{ padding: '14px 0', display: 'block' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
+                    <span className="col"><span className="t">{shortName(c.country)}</span><span className="sub">{when}</span></span>
+                    {close ? <span className="pill coral">{c.days} of {c.limit} days</span> : <span className="s">{c.days >= 60 ? `${c.days} of ${c.limit} days` : `${c.days} ${c.days === 1 ? 'day' : 'days'}`}</span>}
+                  </div>
+                  {c.days >= 60 && <div className={`bar${close ? ' coral' : ''}`} aria-hidden="true"><div style={{ width: `${Math.min(100, (c.days / c.limit) * 100)}%` }} /></div>}
                 </div>
               )
-            }
-            const close = c.days / limit >= 0.85
-            return (
-              <div key={c.country} className="row" style={{ padding: '14px 0', display: 'block' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span className="t">{name}</span>
-                  {close ? <span className="pill coral">{c.days} of {limit} days</span> : <span style={{ fontSize: 15, fontWeight: 600, color: 'var(--purple-text)' }}>{c.days} of {limit}</span>}
-                </div>
-                <div className={`bar${close ? ' coral' : ''}`} aria-hidden="true"><div style={{ width: `${Math.min(100, (c.days / limit) * 100)}%` }} /></div>
-              </div>
-            )
-          })}
-        </div>
+            })}
+          </div>
         </section>
       </main>
       <button className="fab" aria-label="Plan a stay or add a booked trip" onClick={() => onNew(false)}><Plus /></button>

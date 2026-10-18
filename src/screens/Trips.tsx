@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Day, fmtRange, toNum, year } from '../lib/dates'
 import { daysIn, Profile, status, Trip } from '../lib/plan'
 import { shortName } from '../lib/rules'
-import { Export, Plus } from '../components/Icons'
+import { Chevron, Export, Plus } from '../components/Icons'
 import { Sec } from '../components/ui'
 
 const plural = (n: number) => `${n} ${n === 1 ? 'day' : 'days'}`
@@ -25,7 +25,7 @@ export function Trips({ trips, profile, today, onOpen, onExport, onNew }: { trip
     <button key={x.id} className="row two" onClick={() => onOpen(x)}>
       <span className="col">
         <span className="t">{shortName(x.country)}</span>
-        <span className="sub">{fmtRange(x.start, x.end, today)} · {plural(daysIn(x, profile))}{!x.booked ? ' · Planning' : ''}</span>
+        <span className="sub">{fmtRange(x.start, x.end, today)} · {plural(daysIn(x, profile))}{!x.booked && toNum(x.start) > t ? ' · Planning' : ''}</span>
       </span>
       {chip}
     </button>
@@ -47,7 +47,7 @@ export function Trips({ trips, profile, today, onOpen, onExport, onNew }: { trip
           <button key={f} role="tab" aria-selected={f === filter} className={f === filter ? 'on' : ''} onClick={() => setFilter(f)}>{f}</button>
         ))}
       </div>
-      <main className="content">
+      <main className="content trips">
         {now.length > 0 && (
           <section>
             <Sec>Now</Sec>
@@ -69,13 +69,13 @@ export function Trips({ trips, profile, today, onOpen, onExport, onNew }: { trip
         {upcoming.length > 0 && (
           <section>
             <Sec>Upcoming</Sec>
-            <div className="card">{upcoming.map((x) => row(x, <span className="pill grey">{x.type}</span>))}</div>
+            <div className="card">{upcoming.map((x) => row(x, <Chevron />))}</div>
           </section>
         )}
         {years.map((y) => (
-          <section key={y}>
+          <section key={y} className="year">
             <Sec>{y}</Sec>
-            <div className="card">{past.filter((x) => year(x.start) === y).map((x) => row(x, <span className="pill grey">{x.type}</span>))}</div>
+            <div className="card">{past.filter((x) => year(x.start) === y).map((x) => row(x, <Chevron />))}</div>
           </section>
         ))}
         {list.length === 0 && <div className="note" style={{ paddingTop: 24 }}>{trips.length ? `No ${filter.toLowerCase()} trips.` : 'Trips you plan or book show up here.'}</div>}

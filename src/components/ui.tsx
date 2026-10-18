@@ -97,13 +97,11 @@ export function Ring({ n, unit, of, value }: { n: number; unit: string; of?: num
   const c = 2 * Math.PI * r
   const frac = of && value !== undefined ? Math.max(0, Math.min(1, value / of)) : 0
   return (
-    <div className="disc" style={of ? { background: 'none' } : undefined}>
-      {of && (
-        <svg width="112" height="112" viewBox="0 0 112 112" aria-hidden="true">
-          <circle cx="56" cy="56" r={r} fill="rgba(255,255,255,0.09)" stroke="rgba(255,255,255,0.12)" strokeWidth="4" />
-          <circle cx="56" cy="56" r={r} fill="none" stroke="#B7A5FF" strokeWidth="4" strokeLinecap="round" strokeDasharray={`${(c * frac).toFixed(1)} ${c.toFixed(1)}`} transform="rotate(-90 56 56)" />
-        </svg>
-      )}
+    <div className="disc" style={{ background: 'none' }}>
+      <svg width="112" height="112" viewBox="0 0 112 112" aria-hidden="true">
+        <circle cx="56" cy="56" r={r} fill="rgba(255,255,255,0.09)" stroke="rgba(255,255,255,0.12)" strokeWidth="4" />
+        {of && <circle cx="56" cy="56" r={r} fill="none" stroke="#B7A5FF" strokeWidth="4" strokeLinecap="round" strokeDasharray={`${(c * frac).toFixed(1)} ${c.toFixed(1)}`} transform="rotate(-90 56 56)" />}
+      </svg>
       <div className="n">{n}</div>
       <div className="u">{unit}</div>
     </div>

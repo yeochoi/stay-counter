@@ -159,6 +159,40 @@ export function last12Months(trips: Trip[], profile: Profile, today: Day) {
   return rows.sort((a, b) => b.days - a.days)
 }
 
+/** Days in a country counted the way its tax rule counts: this calendar year, or the past 12 months. Up to today. */
+export function taxCount(trips: Trip[], profile: Profile, country: string, today: Day) {
+  const rule = taxRule(country)
+  const to = toNum(today)
+  const from = rule.window === 'calendar' ? toNum(`${year(today)}-01-01`) : to - 364
+  const days = presence(trips, profile, country)
+  let n = 0
+  for (const d of days) if (d >= from && d <= to) n++
+  return { days: n, limit: rule.days, window: rule.window }
+}
+
+/** Countries to show tax days for. Every country you visited except home, counted by its own rule. */
+export function taxCounts(trips: Trip[], profile: Profile, today: Day) {
+  const countries = [...new Set(trips.map((t) => t.country))].filter((c) => c !== profile.home)
+  return countries
+    .map((country) => ({ country, ...taxCount(trips, profile, country, today) }))
+    .filter((r) => r.days > 0)
+    .sort((a, b) => b.days - a.days)
+}
+
+/** The last day you can be in the country on this entry type, if there is one. */
+export function entryEnds(trip: Trip, profile: Profile): Day | undefined {
+  if (trip.entry.kind === 'visa') return trip.entry.validUntil
+  return entryRule(profile.passport, trip.country).visaFreeUntil
+}
+
+/** Status in words. A trip that has started can no longer be Planning. */
+export function tripStatus(trip: Trip, today: Day): 'Planning' | 'Booked' | 'Now' | 'Done' {
+  const t = toNum(today)
+  if (toNum(trip.end) < t) return 'Done'
+  if (toNum(trip.start) <= t) return 'Now'
+  return trip.booked ? 'Booked' : 'Planning'
+}
+
 /** Where the trip stands today. */
 export function status(trip: Trip, profile: Profile, today: Day) {
   const t = toNum(today)
