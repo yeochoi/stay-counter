@@ -100,4 +100,4 @@ Rules
 
 ## Files
 
-This folder is a copy of the Stay Counter design system artifact. `tokens.json` holds every colour, type style, spacing, radius and size. `tokens.css` is generated from it for use in code. Each folder in `components` has a guide and a live preview. The same content renders as one page at `/stay-counter/design-system/` on the published site.
+This folder is a copy of the Stay Counter design system artifact. `tokens.json` holds every colour, type style, spacing, radius and size. `tokens.css` is generated from it for use in code. Each folder in `components` has a guide and a live preview. `scripts/build-design-system.mjs` turns this folder into the page at `/stay-counter/design-system/` on every build, so the page always matches these files.
