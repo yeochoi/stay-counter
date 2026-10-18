@@ -65,14 +65,17 @@ export function TripFlow({ profile, trips, today, existing, startBooked, onClose
     return (
       <Sheet title={shortName(trip.country)} onClose={onClose} action={{ label: 'Edit', onClick: () => setStep({ kind: 'form' }) }}>
         <Summary trip={trip} profile={profile} max={max} />
-        <div className="card" style={{ marginTop: 20 }}>
+        <Sec>Rules for this trip</Sec>
+        <RulesCard trip={trip} profile={profile} visa={trip.entry.kind === 'visa' ? trip.entry : undefined} />
+        <Sec>Stays</Sec>
+        <StayList trip={trip} profile={profile} today={today} others={others} onStay={(i) => setStep({ kind: 'stay', index: i, from: 'overview' })} />
+        <Sec>Details</Sec>
+        <div className="card">
           <div className="row small"><span className="k">Dates</span><span className="v">{fmtRange(trip.start, trip.end, today)}</span></div>
           <div className="row small"><span className="k">Status</span><span className="v">{trip.booked ? 'Booked' : 'Planning'}</span></div>
           <div className="row small"><span className="k">Entry</span><span className="v">{trip.entry.kind === 'visafree' ? 'Visa free' : `Visa, ${trip.entry.days} days`}</span></div>
           <div className="row small"><span className="k">Type</span><span className="v">{trip.type}</span></div>
         </div>
-        <Sec>Stays</Sec>
-        <StayList trip={trip} profile={profile} today={today} others={others} onStay={(i) => setStep({ kind: 'stay', index: i, from: 'overview' })} />
         <div className="note" style={{ textAlign: 'center', paddingTop: 20 }}>Not legal advice.</div>
       </Sheet>
     )
@@ -90,8 +93,6 @@ export function TripFlow({ profile, trips, today, existing, startBooked, onClose
   }
 
   // Form
-  const rule = entryRule(profile.passport, trip.country)
-  const tax = taxRule(trip.country)
   const visa = entryPicked && trip.entry.kind === 'visa' ? trip.entry : undefined
   const valid = !!trip.country && !!trip.start && !!trip.end && toNum(trip.end) >= toNum(trip.start) && entryPicked && typePicked
   return (
@@ -124,15 +125,7 @@ export function TripFlow({ profile, trips, today, existing, startBooked, onClose
       <Seg label="Type" value={typePicked ? trip.type : ''} options={['Business', 'Personal']} onChange={(v) => { setTrip((t) => ({ ...t, type: v })); setTypePicked(true) }} />
       {trip.country && <>
       <Sec>Rules for this trip</Sec>
-      <div className="card">
-        <div className="row small"><span className="k">Stay per entry</span><span className="v">{visa ? `${visa.days} days` : rule.visaFreeDays ? `${rule.visaFreeDays} days` : 'Visa needed'}</span></div>
-        {visa ? (
-          <div className="row small"><span className="k">Visa valid until</span><span className="v">{long(visa.validUntil)}</span></div>
-        ) : rule.visaFreeUntil ? (
-          <div className="row small"><span className="k">Visa free until</span><span className="v">{long(rule.visaFreeUntil)}</span></div>
-        ) : null}
-        <div className="row small"><span className="k">Tax limit</span><span className="v">{tax.days} days {tax.window === 'calendar' ? 'a year' : 'in 12 months'}</span></div>
-      </div>
+      <RulesCard trip={trip} profile={profile} visa={visa} />
       </>}
       {saved && <button className="text-btn" style={{ marginTop: 20, alignSelf: 'center' }} onClick={() => { if (confirm('Delete this trip?')) onDelete(saved.id) }}>Delete trip</button>}
     </Sheet>
@@ -206,5 +199,21 @@ function StayList({ trip, profile, today, others, onStay }: { trip: Trip; profil
         </div>
       )}
     </>
+  )
+}
+
+function RulesCard({ trip, profile, visa }: { trip: Trip; profile: Profile; visa?: Extract<Entry, { kind: 'visa' }> }) {
+  const rule = entryRule(profile.passport, trip.country)
+  const tax = taxRule(trip.country)
+  return (
+    <div className="card">
+      <div className="row small"><span className="k">Stay per entry</span><span className="v">{visa ? `${visa.days} days` : rule.visaFreeDays ? `${rule.visaFreeDays} days` : 'Visa needed'}</span></div>
+      {visa ? (
+        <div className="row small"><span className="k">Visa valid until</span><span className="v">{long(visa.validUntil)}</span></div>
+      ) : rule.visaFreeUntil ? (
+        <div className="row small"><span className="k">Visa free until</span><span className="v">{long(rule.visaFreeUntil)}</span></div>
+      ) : null}
+      <div className="row small"><span className="k">Tax limit</span><span className="v">{tax.days} days {tax.window === 'calendar' ? 'a year' : 'in 12 months'}</span></div>
+    </div>
   )
 }
