@@ -23,7 +23,7 @@ const RULES = [
   'Text next to the ring uses the same sizes as the ring, so tops and bottoms line up.',
   'White cards with a 1px line and radius 16. No shadows, no strong strokes.',
   'Top left leaves a sheet. × closes it, ‹ goes back one step.',
-  'The bottom holds one forward action, like See plan or Save trip. Reading pages have none.',
+  'The bottom holds one forward action, like See stays or Save trip. Reading pages have none.',
   'Only show dates the person entered or the app knows. Mark suggestions as suggestions.',
 ]
 
