@@ -59,6 +59,7 @@ Rules
 
 - Phones have a bottom tab bar with Today and Trips. Laptops move them to a top bar on `hero` with Stay Counter on the left.
 - Settings sits behind the gear on Today.
+- A chevron means a row opens something. Rows without one only show information. On laptops only rows with a chevron react to the mouse.
 - Sheets have one rule. Top left leaves, × closes a first screen, ‹ goes back one step. The bottom holds one forward action, like See stays, Save trip or Save. Reading pages, like Settings, have no bottom button.
 - A saved trip opens on its overview first. Edit at the top right opens Edit trip. Viewing never needs the form.
 

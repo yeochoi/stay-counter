@@ -24,6 +24,7 @@ const RULES = [
   'Top left leaves a sheet. × closes it, ‹ goes back one step. The bottom holds one forward action.',
   'One warning icon per screen, in the chip. Every other warning is one small coral line under its item.',
   'Only show dates the person entered or the app knows. Mark suggestions as suggestions.',
+  'A chevron means a row opens something. Rows without one only show information.',
   'White cards with a 1px line and radius 16. No shadows.',
 ]
 

@@ -162,7 +162,7 @@ export function Today({ trips, profile, today, onNew, onOpen, onEditStay, onSett
               {later.map((x) => (
                 <button key={x.id} className="row" onClick={() => onOpen(x)}>
                   <span className="t">{shortName(x.country)}</span>
-                  <span className="s">{fmtRange(x.start, x.end, today)}</span>
+                  <span className="s">{fmtRange(x.start, x.end, today)}<Chevron /></span>
                 </button>
               ))}
             </div>
