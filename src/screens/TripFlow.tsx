@@ -1,10 +1,11 @@
 import { useState } from 'react'
 import { Day, fmtDate, fmtRange, toNum } from '../lib/dates'
-import { daysIn, daysPerEntry, editStay, entryEnds, Entry, legs, newId, Profile, taxHit, Trip, tripStatus, warnings } from '../lib/plan'
+import { daysIn, daysPerEntry, editStay, Entry, legs, newId, Profile, taxHit, Trip, tripStatus, warnings } from '../lib/plan'
 import { COUNTRIES, entryRule, shortName, taxRule } from '../lib/rules'
 import { Alert, Check, Chevron } from '../components/Icons'
 import { DateRow, Primary, Sec, Seg, SelectRow, Sheet } from '../components/ui'
 import { EditStay } from './EditStay'
+import { StayTimeline } from '../components/StayTimeline'
 
 type Props = {
   profile: Profile
@@ -198,23 +199,9 @@ function StayList({ trip, profile, today, others, onStay, showWarnings = true }:
   const ls = legs(trip, profile)
   const warns = warnings(trip, others, profile)
   const suggested = ls.length > 1 && ls.some((l) => !l.edited)
-  const ends = entryEnds(trip, profile)
   return (
     <>
-      <div className="card" style={{ padding: '0 16px' }}>
-        {ls.map((l, i) => (
-          <button key={i} className="stay-row" onClick={() => onStay(i)}>
-            <span className="tl" aria-hidden="true"><i className={i === 0 ? 'off' : ''} /><b /><i className={i === ls.length - 1 ? 'off' : ''} /></span>
-            <span className="in">
-              <span className="col" style={{ display: 'flex', flexDirection: 'column', gap: 2, padding: '8px 0' }}>
-                <span className="t" style={{ fontSize: 17, fontWeight: 600 }}>{fmtRange(l.start, l.end, today)}</span>
-                {ends && toNum(l.end) > toNum(ends) && <span style={{ fontSize: 13, color: 'var(--coral-text)' }}>{trip.entry.kind === 'visa' ? 'After your visa ends' : 'After visa free ends'}</span>}
-              </span>
-              <span className="s" style={{ fontSize: 15, color: 'var(--muted)', display: 'flex', alignItems: 'center', gap: 6 }}>{l.edited && <Check />}{l.days} {l.days === 1 ? 'day' : 'days'}<Chevron /></span>
-            </span>
-          </button>
-        ))}
-      </div>
+      <StayTimeline trip={trip} profile={profile} today={today} onStay={onStay} />
       {suggested && <div className="note">Suggested dates. Tap a stay to match your flights.</div>}
       {showWarnings && warns.length > 0 && (
         <div className="warn">
