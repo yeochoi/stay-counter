@@ -137,8 +137,6 @@ button.row:hover, label.row:hover { background: #fbfaf8; }
 .sec-aside { text-transform: none; letter-spacing: 0; font-weight: 400; font-size: 13px; }
 .timeline { padding: 0; }
 .timeline .stay-row { padding: 0 16px; }
-.trip-head { border-bottom: 1px solid var(--line) !important; }
-.trip-head .see { font-size: 15px; color: var(--purple-text); }
 .timeline .tl { width: 14px; }
 .timeline .tl i:first-child { height: 24px; }
 .timeline .in { padding: 10px 0; }
@@ -246,3 +244,4 @@ button.row:hover, label.row:hover { background: #fbfaf8; }
   .welcome .w-form { flex: 0 0 420px; columns: auto; display: flex; flex-direction: column; background: var(--bg); border-radius: 20px; padding: 28px; }
   .welcome .w-gap { flex-grow: 0; min-height: 24px; }
 }
+.trip-foot .body-text { font-size: 15px; } .trip-foot .s { font-size: 15px; color: var(--muted); display: flex; align-items: center; gap: 6px; } .bad-note { font-size: 13px; color: var(--coral-text); }
