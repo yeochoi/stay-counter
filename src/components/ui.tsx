@@ -7,7 +7,7 @@ export type Tab = 'today' | 'trips'
 export function TabBar({ tab, onChange }: { tab: Tab; onChange: (t: Tab) => void }) {
   return (
     <nav className="nav">
-      <span className="brand">Stay Counter</span>
+      <button className="brand" onClick={() => onChange('today')}>Stay Counter</button>
       <button className={tab === 'today' ? 'on' : ''} onClick={() => onChange('today')}><HomeIcon on={tab === 'today'} />Today</button>
       <button className={tab === 'trips' ? 'on' : ''} onClick={() => onChange('trips')}><TripsIcon on={tab === 'trips'} />Trips</button>
     </nav>
