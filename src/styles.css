@@ -52,7 +52,7 @@ button { cursor: pointer; }
 .round { width: 44px; height: 44px; border-radius: 999px; border: 0; background: rgba(255, 255, 255, 0.1); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #fff; }
 .round:hover { background: rgba(255, 255, 255, 0.16); }
 .hero-main { display: flex; align-items: center; gap: 20px; padding-top: 18px; color: #fff; background: none; border: 0; padding-left: 0; padding-right: 0; text-align: left; width: 100%; }
-.disc { position: relative; width: 112px; height: 112px; flex-shrink: 0; border-radius: 999px; background: rgba(255, 255, 255, 0.09); display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.disc { position: relative; width: 112px; height: 112px; flex-shrink: 0; border-radius: 999px; background: none; display: flex; flex-direction: column; align-items: center; justify-content: center; }
 .disc svg { position: absolute; inset: 0; }
 .disc .n { font-weight: 600; letter-spacing: -0.02em; font-size: 28px; line-height: 1; text-box: trim-both cap alphabetic; position: relative; }
 .disc .u { font-size: 13px; line-height: 18px; color: var(--hero-text); padding-top: 10px; text-box: trim-both cap alphabetic; position: relative; }
