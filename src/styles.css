@@ -145,10 +145,11 @@ button { cursor: pointer; }
 .timeline .state { font-size: 13px; color: var(--muted); }
 .timeline .s { font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 6px; white-space: nowrap; }
 /* Grey means done, purple means ahead. The line is grey between finished stays and into the stay you are in now.
-   From now on it is primary, solid into a booked stay and dashed into one not booked. No dividers between stays, the line separates them. */
+   From now on it is primary, solid into a booked stay and dashed into one not booked. Dividers sit between stays, except next to Now, where the purple edge already separates it. */
 .tl i.dash { background: none; border-left: 2px dashed var(--stay-line); width: 0; }
 .timeline .past .tl i:not(.off), .timeline .now .tl i:first-child:not(.off) { background: var(--done-dot, #c9c4d6); }
-.timeline .in { border-bottom: 0 !important; }
+.timeline .in { border-bottom: 1px solid var(--line) !important; }
+.timeline .stay-row:last-of-type .in, .timeline .stay-row:has(+ .trip-foot) .in, .timeline .now .in, .timeline .stay-row:has(+ .now) .in { border-bottom: 0 !important; }
 .trip-foot { border-top: 1px solid var(--line); }
 .timeline .booked .tl b { background: var(--primary); }
 .timeline .booked .state { color: var(--purple-text); }

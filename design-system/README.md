@@ -79,7 +79,7 @@ Rules
 ## Stays
 
 - A long trip splits into stays, one per entry. The app suggests where to leave and come back.
-- One line joins the stays so they read as one trip. Grey means done, purple means ahead. The line is `done-dot` grey between finished stays and into the stay you are in now, then `stay-line` purple, solid into a booked stay and dashed into one not booked. No dividers between stays.
+- One line joins the stays so they read as one trip. Grey means done, purple means ahead. The line is `done-dot` grey between finished stays and into the stay you are in now, then `stay-line` purple, solid into a booked stay and dashed into one not booked. Dividers sit between stays, except next to Now.
 - Each stay says what it is. Done, Now, Back in N days, Booked or Not booked.
 - Booked is only what the person says. The stay screen has one switch, Booked. It never names flights, people also travel by train, ferry or car.
 - Dots and line show the same thing. Grey dot for done, large dot with a halo for now, filled dot for booked, hollow dot for not booked. The line into a stay is dashed while it is not booked and solid once it is booked, done or now.
