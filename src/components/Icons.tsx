@@ -20,7 +20,7 @@ export const Plus = ({ size = 24, color = '#fff' }: P) => (
 )
 
 export const Chevron = () => (
-  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#A9A5B4" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true">
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#878394" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true">
     <path d="M9 6l6 6-6 6" />
   </svg>
 )

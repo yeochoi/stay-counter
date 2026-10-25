@@ -54,11 +54,13 @@ export function Trips({ trips, profile, today, onOpen, onExport, onNew }: { trip
           <button className="round" style={{ marginBottom: -9 }} aria-label="Export for tax or HR" onClick={() => setExporting(true)}><Export /></button>
         </div>
       </header>
-      <div className="tabs" role="tablist" aria-label="Trips">
-        {(['Upcoming', 'Past'] as Tab[]).map((f) => (
-          <button key={f} role="tab" aria-selected={f === tab} className={f === tab ? 'on' : ''} onClick={() => setTab(f)}>{f}</button>
-        ))}
-      </div>
+      <section aria-label="Trip filter">
+        <div className="tabs" role="tablist" aria-label="Trips">
+          {(['Upcoming', 'Past'] as Tab[]).map((f) => (
+            <button key={f} role="tab" aria-selected={f === tab} className={f === tab ? 'on' : ''} onClick={() => setTab(f)}>{f}</button>
+          ))}
+        </div>
+      </section>
       <main className="content trips">
         {tab === 'Upcoming' && (
           <>

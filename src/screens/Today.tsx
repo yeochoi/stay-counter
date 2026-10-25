@@ -139,6 +139,7 @@ export function Today({ trips, profile, today, onNew, onOpen, onEditStay, onSett
   return (
     <>
       <header className="hero">
+        <h1 className="sr-only">Today</h1>
         {top}
         {hero}
       </header>
