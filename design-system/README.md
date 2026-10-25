@@ -31,20 +31,20 @@ Rules
 
 One typeface, Outfit, from Google Fonts. No serif anywhere.
 
+Four sizes, two weights. The same scale runs across Stay Counter, Shuo and Manna.
+
 | Style | Size | Weight | For |
 | --- | --- | --- | --- |
-| `welcome` | 38, 56 on laptop | Semibold | First open headline |
-| `page-title` | 38, 52 on laptop | Semibold | Trips title |
-| `answer` | 34, 44 on laptop | Semibold | The answer and the ring number |
-| `headline` | 17 | Semibold | Country, stay dates, values, buttons, sheet titles |
-| `body` | 15 | Regular | Row labels, secondary values, hero labels |
-| `subline` | 14 | Regular | Second line of a trip row on phones |
-| `note` | 13 | Regular | Notes, chips, timeline status, warnings |
-| `section` | 12 caps | Semibold | Section labels |
-| `caption` | 11 | Semibold | Phone tab bar |
+| `display` | 34, 44 on laptop | Semibold | The answer, the ring number, page titles, first open headline |
+| `title` | 17 | Semibold | Stay dates, country names, buttons, sheet titles |
+| `body` | 15 | Regular | Row labels, values, hero labels, tabs, links |
+| `label` | 13 | Semibold | Section labels, eyebrows, phone tab bar |
+| `small` | 13 | Regular | Notes, chips, status, warnings, second lines |
+
+Text inputs use 16 so iOS does not zoom. That is the only other size.
 
 Rules
-- Bold only for primary content. Chips use regular weight, their fill already stands out.
+- Only 400 and 600. Bold only for titles and labels. Chips use regular weight, their fill already stands out.
 - Large text uses minus 0.02em letter spacing.
 - Text next to the ring uses the same sizes as the ring. The number and the date share `answer`, the unit and the label share `body`, so tops and bottoms line up.
 

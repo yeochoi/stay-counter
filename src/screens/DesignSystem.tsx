@@ -10,10 +10,10 @@ const COLORS: [string, string][] = [
 
 const TYPE: [string, React.CSSProperties, string][] = [
   ['Mon, Nov 30', { fontSize: 34, fontWeight: 600, letterSpacing: '-0.02em' }, '34 semibold. Answers and the ring number'],
-  ['China', { fontSize: 17, fontWeight: 600 }, '17 semibold. Primary content'],
-  ['Leave China by', { fontSize: 15, color: 'var(--muted)' }, '15 regular. Labels and secondary values'],
+  ['China', { fontSize: 17, fontWeight: 600 }, '17 semibold. Titles, dates, buttons'],
+  ['Leave China by', { fontSize: 15, color: 'var(--muted)' }, '15 regular. Body, labels and values'],
   ['Tap a stay to match your flights.', { fontSize: 13, color: 'var(--muted)' }, '13 regular. Notes, chips, status, warnings'],
-  ['SECTION LABEL', { fontSize: 12, fontWeight: 600, letterSpacing: '0.08em', color: 'var(--muted)' }, '12 semibold caps. Section labels'],
+  ['Section label', { fontSize: 13, fontWeight: 600, color: 'var(--muted)' }, '13 semibold. Section labels, tabs, eyebrows'],
 ]
 
 const RULES = [
@@ -50,7 +50,7 @@ export function DesignSystem({ onBack, onClose, onDismiss }: { onBack?: () => vo
           {TYPE.map(([t, st, note]) => (
             <div key={note} className="row two" style={{ display: 'block' }}>
               <div style={st}>{t}</div>
-              <div style={{ fontSize: 12, color: 'var(--muted)', paddingTop: 6 }}>{note}</div>
+              <div style={{ fontSize: 13, color: 'var(--muted)', paddingTop: 6 }}>{note}</div>
             </div>
           ))}
         </div>

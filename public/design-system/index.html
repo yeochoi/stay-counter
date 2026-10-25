@@ -50,15 +50,11 @@
   --size-round: 44px;
   --font-sans: Outfit, -apple-system, system-ui, sans-serif;
 }
-.welcome { font-family: var(--font-sans); font-size: 38px; line-height: 42px; font-weight: 600; letter-spacing: -0.02em; }
-.page-title { font-family: var(--font-sans); font-size: 38px; line-height: 38px; font-weight: 600; letter-spacing: -0.02em; }
-.answer { font-family: var(--font-sans); font-size: 34px; line-height: 34px; font-weight: 600; letter-spacing: -0.02em; }
-.headline { font-family: var(--font-sans); font-size: 17px; line-height: 22px; font-weight: 600; }
+.display { font-family: var(--font-sans); font-size: 34px; line-height: 34px; font-weight: 600; letter-spacing: -0.02em; }
+.title { font-family: var(--font-sans); font-size: 17px; line-height: 22px; font-weight: 600; }
 .body { font-family: var(--font-sans); font-size: 15px; line-height: 20px; font-weight: 400; }
-.subline { font-family: var(--font-sans); font-size: 14px; line-height: 18px; font-weight: 400; }
-.note { font-family: var(--font-sans); font-size: 13px; line-height: 19px; font-weight: 400; }
-.section { font-family: var(--font-sans); font-size: 12px; line-height: 16px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; }
-.caption { font-family: var(--font-sans); font-size: 11px; line-height: 13px; font-weight: 600; }
+.label { font-family: var(--font-sans); font-size: 13px; line-height: 18px; font-weight: 600; }
+.small { font-family: var(--font-sans); font-size: 13px; line-height: 19px; font-weight: 400; }
 
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; scroll-padding-top: 24px; }
@@ -141,7 +137,7 @@ footer a, .prose a { color: var(--purple-text); }
 .cv svg{position:absolute;left:480px;top:0}
 .txt{position:absolute;left:40px;bottom:34px;max-width:440px}
 .nm{font-size:96px;line-height:.95;font-weight:600;letter-spacing:-0.03em;color:var(--ink);margin:0}
-.tg{font-size:14px;line-height:20px;color:var(--muted);margin:14px 0 0}
+.tg{font-size:15px;line-height:20px;color:var(--muted);margin:14px 0 0}
 </style>
 <div class="cv">
 <svg width="480" height="300" viewBox="0 0 480 300" aria-hidden="true">
@@ -172,7 +168,7 @@ steps and radii: gutter 22 for ring stroke spacing, radius-card 16 on the slab, 
 
   <h2 class="sec" id="type">Type</h2>
   <p class="lead">One typeface, Outfit. Sizes shown at real size.</p>
-  <div class="specimens"><div class="spec"><div class="info"><b>welcome</b>38px · 600 · -0.02em<br>First open headline only. 56 on laptops.</div><div class="sample welcome">Know your days,</div></div><div class="spec"><div class="info"><b>page-title</b>38px · 600 · -0.02em<br>The Trips title on hero. 52 on laptops.</div><div class="sample page-title">Trips</div></div><div class="spec"><div class="info"><b>answer</b>34px · 600 · -0.02em<br>The one answer on a screen and the number in the ring, like Mon, Nov 30, 17 or Leave 4 times. 44 on laptops.</div><div class="sample answer">Mon, Nov 30</div></div><div class="spec"><div class="info"><b>headline</b>17px · 600<br>Primary content. Country names, stay dates, values, buttons, sheet titles.</div><div class="sample headline">China</div></div><div class="spec"><div class="info"><b>body</b>15px · 400<br>Labels on the left of rows, secondary values, labels on hero.</div><div class="sample body">Leave China by</div></div><div class="spec"><div class="info"><b>subline</b>14px · 400<br>The second line of a trip row on phones.</div><div class="sample subline">Sep 26 – Oct 2 · 7 days · Personal</div></div><div class="spec"><div class="info"><b>note</b>13px · 400<br>Notes, chips, timeline status and every warning line.</div><div class="sample note">Tap a stay to match your flights.</div></div><div class="spec"><div class="info"><b>section</b>12px · 600 · 0.08em<br>Section labels above cards, in muted.</div><div class="sample section">RULES FOR THIS TRIP</div></div><div class="spec"><div class="info"><b>caption</b>11px · 600<br>Phone tab bar labels only.</div><div class="sample caption">Today</div></div></div>
+  <div class="specimens"><div class="spec"><div class="info"><b>display</b>34px · 600 · -0.02em<br>The one big line on a screen. The answer, the ring number, the Trips title, the first open headline and empty states. 44 on laptops.</div><div class="sample display">Mon, Nov 30</div></div><div class="spec"><div class="info"><b>title</b>17px · 600<br>Stay dates, country names, buttons, sheet titles and the laptop brand.</div><div class="sample title">Oct 16 – Nov 28</div></div><div class="spec"><div class="info"><b>body</b>15px · 400<br>Row labels, values, hero labels, tabs and links.</div><div class="sample body">Leave China by</div></div><div class="spec"><div class="info"><b>label</b>13px · 600<br>Section labels above cards, eyebrows and phone tab bar labels. Sentence case, no caps.</div><div class="sample label">Rules for this trip</div></div><div class="spec"><div class="info"><b>small</b>13px · 400<br>Notes, chips, status, warnings and the second line of a trip row.</div><div class="sample small">Tap a stay to match your flights.</div></div></div>
 
   <h2 class="sec" id="scale">Spacing and shape</h2>
   <div class="scales">
