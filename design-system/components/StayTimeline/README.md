@@ -5,7 +5,8 @@ The stays of the trip you are on, on Today, and of any trip on its overview. Sho
 - A header with the country, like China trip, and nothing else. Each stay already says whether it is booked.
 - One row per stay. Dates in `title`, a status in `small` under them, days in `small` on the right, then a chevron.
 - Status says what each stay is. Done, Now, Back in N days, Booked or Not booked.
-- One line in `stay-line` joins the stays so they read as one trip. The line into a stay is solid when it is booked, done or now, and dashed while it is not booked.
+- One line joins the stays so they read as one trip. Grey means done, purple means ahead. The line is `done-dot` grey between finished stays and into the stay you are in now, then `stay-line` purple, solid into a booked stay and dashed into one not booked.
+- No dividers between stays. The line and the spacing separate them. The only divider in the card is above Trip details.
 - Dots match. `done-dot` for done, a large `primary` dot with a `current-line` halo for now, a filled `primary` dot for booked, a hollow `primary` ring for not booked. The now row sits on `current`.
 - A stay past the end of visa free or a visa gets a small coral warning icon after its dates. The row's screen reader label says the reason. Opening the stay explains it in one sentence.
 - Tapping a stay opens Stay N of M. You can change its dates and turn on Booked. Later stays move along.

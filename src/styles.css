@@ -13,7 +13,8 @@
   --soft: #eeeafb;
   --current: #f1edfd;
   --current-line: #e2dbfa;
-  --stay-line: #8270dd;
+  --stay-line: var(--primary);
+  --done-dot: #c9c4d6;
   --chip: #efece7;
   --chip-text: #5e5a6b;
   --coral-text: #a83c18;
@@ -50,7 +51,6 @@ button { cursor: pointer; }
 .hero-top { display: flex; justify-content: space-between; align-items: center; }
 .hero-date { font-size: 15px; line-height: 20px; color: var(--hero-text); }
 .round { width: 44px; height: 44px; border-radius: 999px; border: 0; background: rgba(255, 255, 255, 0.1); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #fff; }
-.round:hover { background: rgba(255, 255, 255, 0.16); }
 .hero-main { display: flex; align-items: center; gap: 20px; padding-top: 18px; color: #fff; background: none; border: 0; padding-left: 0; padding-right: 0; text-align: left; width: 100%; }
 .disc { position: relative; width: 112px; height: 112px; flex-shrink: 0; border-radius: 999px; background: none; display: flex; flex-direction: column; align-items: center; justify-content: center; }
 .disc svg { position: absolute; inset: 0; }
@@ -70,8 +70,6 @@ button { cursor: pointer; }
 .card.current { background: var(--current); border-color: var(--current-line); }
 .row { position: relative; width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 50px; padding: 0 16px; border: 0; border-bottom: 1px solid var(--line); background: transparent; text-align: left; color: var(--ink); text-decoration: none; }
 .row:last-child { border-bottom: 0; }
-button.row:hover, label.row:hover { background: #fbfaf8; }
-.card.current button.row:hover { background: #ebe5fc; }
 .row .k { font-size: 15px; color: var(--muted); }
 .row .v { font-size: 15px; font-weight: 400; display: flex; align-items: center; gap: 6px; white-space: nowrap; }
 .row .t { font-size: 15px; font-weight: 600; }
@@ -105,9 +103,7 @@ button.row:hover, label.row:hover { background: #fbfaf8; }
 /* Buttons */
 .btn { min-height: 54px; width: 100%; display: flex; align-items: center; justify-content: center; border: 0; border-radius: 999px; font-size: 15px; font-weight: 600; }
 .btn.primary { background: var(--primary); color: #fff; }
-.btn.primary:hover { background: #4f35bf; }
 .btn.soft { background: var(--soft); color: var(--purple-text); }
-.btn.soft:hover { background: #e4def8; }
 .btn:disabled { opacity: 0.45; cursor: default; }
 .text-btn { border: 0; background: none; font-size: 15px; font-weight: 600; color: var(--coral-text); padding: 12px; }
 
@@ -148,27 +144,28 @@ button.row:hover, label.row:hover { background: #fbfaf8; }
 .timeline .t { font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
 .timeline .state { font-size: 13px; color: var(--muted); }
 .timeline .s { font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 6px; white-space: nowrap; }
-/* The line into a stay is dashed while that stay is not booked, solid once it is booked, done or now. */
+/* Grey means done, purple means ahead. The line is grey between finished stays and into the stay you are in now.
+   From now on it is primary, solid into a booked stay and dashed into one not booked. No dividers between stays, the line separates them. */
 .tl i.dash { background: none; border-left: 2px dashed var(--stay-line); width: 0; }
+.timeline .past .tl i:not(.off), .timeline .now .tl i:first-child:not(.off) { background: var(--done-dot, #c9c4d6); }
+.timeline .in { border-bottom: 0 !important; }
+.trip-foot { border-top: 1px solid var(--line); }
 .timeline .booked .tl b { background: var(--primary); }
 .timeline .booked .state { color: var(--purple-text); }
 .alert-small { flex-shrink: 0; }
 .timeline .sub.bad { font-size: 13px; color: var(--coral-text); }
 .timeline .past .t { color: var(--muted); }
-.timeline .past .tl b { background: #c9c4d6; }
+.timeline .past .tl b { background: var(--done-dot, #c9c4d6); }
 .timeline .now { background: var(--current); }
 .timeline .now .state { color: var(--purple-text); }
 .timeline .now .tl b { width: 14px; height: 14px; box-shadow: 0 0 0 4px var(--current-line); }
 .timeline .open .tl b { background: #fff; border: 2px solid var(--primary); box-sizing: border-box; }
-.timeline button.stay-row:hover { background: #fbfaf8; }
-.timeline button.stay-row.now:hover { background: #ebe5fc; }
 
 /* Tab bar and add button */
 .nav { position: fixed; bottom: 0; left: 0; right: 0; border-top: 1px solid var(--line); display: grid; grid-template-columns: 1fr 1fr; padding: 9px 0 calc(var(--bottom) + 12px); background: var(--bg); z-index: 5; }
 .nav button { display: flex; flex-direction: column; align-items: center; gap: 3px; border: 0; background: none; font-size: 13px; font-weight: 400; color: var(--muted); }
 .nav button.on { color: var(--purple-text); }
 .fab { position: fixed; bottom: calc(var(--bottom) + 82px); right: var(--gutter); width: 56px; height: 56px; border-radius: 999px; border: 0; background: var(--primary); display: flex; align-items: center; justify-content: center; z-index: 6; }
-.fab:hover { background: #4f35bf; }
 
 /* Empty state */
 .empty { flex-grow: 1; display: flex; flex-direction: column; padding: 0 var(--gutter) calc(var(--bottom) + 90px); }
@@ -187,7 +184,6 @@ button.row:hover, label.row:hover { background: #fbfaf8; }
 .sheet-head { height: 60px; padding: 12px 16px 0; display: grid; grid-template-columns: 64px 1fr 64px; align-items: center; font-size: 15px; font-weight: 600; flex-shrink: 0; }
 .sheet-title { text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .nav-btn { width: 36px; height: 36px; border-radius: 999px; border: 0; background: var(--line); color: var(--ink); display: flex; align-items: center; justify-content: center; }
-.nav-btn:hover { background: #e2ded8; }
 .head-action { justify-self: end; border: 0; background: none; padding: 8px 0; font-size: 15px; font-weight: 600; color: var(--purple-text); }
 .sheet-body { flex-grow: 1; overflow-y: auto; padding: 0 var(--gutter) 16px; display: flex; flex-direction: column; }
 .sheet-body > * { flex-shrink: 0; }
@@ -270,3 +266,16 @@ button.row:hover, label.row:hover { background: #fbfaf8; }
 }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 .row input.num:focus-visible { outline: 2px solid var(--primary); outline-offset: 4px; border-radius: 4px; }
+
+/* Hover only where there is a real pointer, so a tap on a phone never leaves a row highlighted. */
+@media (hover: hover) {
+  .round:hover { background: rgba(255, 255, 255, 0.16); }
+  button.row:hover, label.row:hover { background: #fbfaf8; }
+  .card.current button.row:hover { background: #ebe5fc; }
+  .btn.primary:hover { background: #4f35bf; }
+  .btn.soft:hover { background: #e4def8; }
+  .timeline button.stay-row:hover { background: #fbfaf8; }
+  .timeline button.stay-row.now:hover { background: #ebe5fc; }
+  .fab:hover { background: #4f35bf; }
+  .nav-btn:hover { background: #e2ded8; }
+}

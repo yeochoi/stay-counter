@@ -24,7 +24,7 @@ const RULES = [
   'Top left leaves a sheet. × closes it, ‹ goes back one step. The bottom holds one forward action.',
   'Show each problem once, where it lives. A problem with a stay is an icon on that stay, the reason is inside it. A problem with the whole trip is a count on Trip details.',
   'Booked is only what the person says. Each stay has its own switch, the trip is booked when every stay is.',
-  'One line joins the stays of a trip. Dashed into a stay not booked yet, solid once it is booked, done or now.',
+  'One line joins the stays of a trip. Grey between finished stays, purple from now on, dashed into a stay not booked yet. No dividers between stays.',
   'A chevron means a row opens something. Rows without one only show information.',
   'White cards with a 1px line and radius 16. No shadows.',
 ]
