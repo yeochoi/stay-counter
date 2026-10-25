@@ -57,6 +57,12 @@ export function fmtDate(d: Day, today: Day): string {
   return p.y === year(today) ? base : `${base}, ${p.y}`
 }
 
+/** Nov 30, 2026. Always with the year, for sentences and screen readers. */
+export function fmtLong(d: Day): string {
+  const p = parts(d)
+  return `${MONTHS[p.m - 1]} ${p.d}, ${p.y}`
+}
+
 /** Mon, Nov 30. Used only for single dates people act on. */
 export function fmtWeekday(d: Day, today: Day): string {
   return `${WEEKDAYS[parts(d).wd]}, ${fmtDate(d, today)}`

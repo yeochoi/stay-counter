@@ -68,6 +68,16 @@ export function Seg<T extends string>({ value, options, onChange, label }: { val
 }
 
 /** Row that opens a native list picker. */
+/** A row with an on and off switch. The track has an outline when off, so it passes 3 to 1. */
+export function Switch({ label, on, onChange }: { label: string; on: boolean; onChange: (v: boolean) => void }) {
+  return (
+    <button type="button" className="row switch-row" role="switch" aria-checked={on} onClick={() => onChange(!on)}>
+      <span className="body-text">{label}</span>
+      <span className={`switch${on ? ' on' : ''}`} aria-hidden="true"><i /></span>
+    </button>
+  )
+}
+
 export function SelectRow({ k, value, options, onChange }: { k: string; value: string; options: readonly string[]; onChange: (v: string) => void }) {
   return (
     <label className="row">

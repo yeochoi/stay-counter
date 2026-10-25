@@ -52,8 +52,8 @@ export function TripFlow({ profile, trips, today, existing, startBooked, onClose
         nav="back"
         onDismiss={onClose}
         onCancel={() => setStep({ kind: step.from })}
-        onSave={(s, e) => {
-          const next = editStay(trip, profile, step.index, s, e)
+        onSave={(s, e, b) => {
+          const next = editStay(trip, profile, step.index, s, e, b)
           setTrip(next)
           if (step.from === 'overview') { setSaved(next); onUpdate(next) }
           setStep({ kind: step.from })
@@ -74,7 +74,7 @@ export function TripFlow({ profile, trips, today, existing, startBooked, onClose
         <Sec>Details</Sec>
         <div className="card">
           <div className="row small"><span className="k">Dates</span><span className="v">{fmtRange(trip.start, trip.end, today)}</span></div>
-          <div className="row small"><span className="k">Status</span><span className="v">{tripStatus(trip, today)}</span></div>
+          <div className="row small"><span className="k">Status</span><span className="v">{tripStatus(trip, profile, today)}</span></div>
           <div className="row small"><span className="k">Entry</span><span className="v">{trip.entry.kind === 'visafree' ? 'Visa free' : `Visa, ${trip.entry.days} days`}</span></div>
           <div className="row small"><span className="k">Type</span><span className="v">{trip.type}</span></div>
         </div>
@@ -97,6 +97,8 @@ export function TripFlow({ profile, trips, today, existing, startBooked, onClose
   // Form
   const visa = entryPicked && trip.entry.kind === 'visa' ? trip.entry : undefined
   const valid = !!trip.country && !!trip.start && !!trip.end && toNum(trip.end) >= toNum(trip.start) && entryPicked && typePicked
+  // Booked belongs to each stay. Only a trip with one stay asks here.
+  const single = !trip.start || !trip.end || toNum(trip.end) < toNum(trip.start) || legs(trip, profile).length === 1
   return (
     <Sheet
       title={saved ? 'Edit trip' : 'New trip'}
@@ -106,10 +108,12 @@ export function TripFlow({ profile, trips, today, existing, startBooked, onClose
         ? <Primary label="Save" onClick={() => { setSaved(trip); onUpdate(trip); setStep({ kind: 'overview' }) }} disabled={!valid} />
         : <Primary label="See stays" onClick={() => setStep({ kind: 'plan' })} disabled={!valid} />}
     >
-      <div style={{ marginTop: 6 }}>
-        <Seg label="Status" value={trip.booked ? 'Booked' : 'Planning'} options={['Planning', 'Booked']} onChange={(v) => setTrip((t) => ({ ...t, booked: v === 'Booked' }))} />
-      </div>
-      <div className="card" style={{ marginTop: 14 }}>
+      {single && (
+        <div style={{ marginTop: 6 }}>
+          <Seg label="Status" value={trip.booked ? 'Booked' : 'Planning'} options={['Planning', 'Booked']} onChange={(v) => setTrip((t) => ({ ...t, booked: v === 'Booked', stays: t.stays?.length === 1 ? [{ ...t.stays[0], booked: v === 'Booked' }] : t.stays }))} />
+        </div>
+      )}
+      <div className="card" style={{ marginTop: single ? 14 : 6 }}>
         <SelectRow k="Country" value={trip.country} options={COUNTRIES} onChange={(c) => change({ country: c })} />
         <DateRow k="Arrive" value={trip.start} today={today} onChange={(d) => change({ start: d, end: trip.end && toNum(trip.end) < toNum(d) ? d : trip.end })} />
         <DateRow k="Leave" value={trip.end} today={today} min={trip.start} onChange={(d) => change({ end: d })} />
@@ -198,11 +202,11 @@ const AlertSmall = () => (
 function StayList({ trip, profile, today, others, onStay, showWarnings = true }: { trip: Trip; profile: Profile; today: Day; others: Trip[]; onStay: (i: number) => void; showWarnings?: boolean }) {
   const ls = legs(trip, profile)
   const warns = warnings(trip, others, profile)
-  const suggested = ls.length > 1 && ls.some((l) => !l.edited)
+  const open = ls.length > 1 && ls.some((l) => !l.booked)
   return (
     <>
       <StayTimeline trip={trip} profile={profile} today={today} onStay={onStay} />
-      {suggested && <div className="note">Suggested dates. Tap a stay to match your flights.</div>}
+      {open && showWarnings && <div className="note">Tap a stay when you book travel for it.</div>}
       {showWarnings && warns.length > 0 && (
         <div className="warn">
           <Alert />

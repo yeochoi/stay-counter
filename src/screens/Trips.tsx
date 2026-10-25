@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Day, fmtRange, toNum, year } from '../lib/dates'
-import { daysIn, Profile, status, Trip } from '../lib/plan'
+import { bookingNote, daysIn, Profile, status, Trip } from '../lib/plan'
 import { shortName } from '../lib/rules'
 import { Chevron, Export, Plus } from '../components/Icons'
 import { Sec, Sheet } from '../components/ui'
@@ -27,7 +27,7 @@ export function Trips({ trips, profile, today, onOpen, onExport, onNew }: { trip
   const row = (x: Trip, chip?: React.ReactNode) => {
     const dates = fmtRange(x.start, x.end, today)
     const days = plural(daysIn(x, profile))
-    const extra = !x.booked && toNum(x.start) > t ? 'Planning' : ''
+    const extra = toNum(x.end) >= t ? bookingNote(x, profile, today) : ''
     return (
       <button key={x.id} className="row two trip-row" onClick={() => onOpen(x)}>
         <span className="col m-only">

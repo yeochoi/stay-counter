@@ -12,12 +12,14 @@ export type Trip = {
   end: Day
   entry: Entry
   type: 'Business' | 'Personal'
+  /** For a trip with one stay, whether it is booked. A trip with several stays keeps this on each stay. */
   booked: boolean
-  /** Stays the person set to match real flights. Missing means we suggest them. */
+  /** Stays the person changed or booked. Missing means we suggest them. */
   stays?: Stay[]
 }
 
-export type Stay = { start: Day; end: Day; edited?: boolean }
+/** edited keeps a stay in place when an earlier one moves. booked is only ever set by the person. */
+export type Stay = { start: Day; end: Day; edited?: boolean; booked?: boolean }
 
 export type Profile = {
   passport: string
@@ -25,7 +27,7 @@ export type Profile = {
   home: string
 }
 
-export type Leg = { start: Day; end: Day; days: number; edited?: boolean }
+export type Leg = { start: Day; end: Day; days: number; edited?: boolean; booked?: boolean }
 
 /** Days allowed per entry for this trip, or undefined when there is no limit we know. */
 export function daysPerEntry(trip: Trip, profile: Profile): number | undefined {
@@ -56,22 +58,46 @@ export function suggest(start: Day, end: Day, max?: number): Leg[] {
   return out
 }
 
+/** Whether a stay is booked. A trip with one stay keeps the answer on the trip itself. */
+export function isBooked(trip: Trip, ls: Leg[], i: number): boolean {
+  return ls.length === 1 ? trip.booked : !!ls[i].booked
+}
+
+/** Stays still ahead, and how many of them are not booked yet. Stays you are in or finished do not count. */
+export function booking(trip: Trip, profile: Profile, today: Day) {
+  const ls = legs(trip, profile)
+  const t = toNum(today)
+  const ahead = ls.map((l, i) => ({ l, i })).filter(({ l }) => toNum(l.start) > t)
+  const open = ahead.filter(({ i }) => !isBooked(trip, ls, i)).length
+  return { stays: ls.length, ahead: ahead.length, open, booked: ahead.length - open }
+}
+
+/** A short booking note for lists, like Planning or 1 of 2 booked. Empty when nothing is left to book. */
+export function bookingNote(trip: Trip, profile: Profile, today: Day): string {
+  const b = booking(trip, profile, today)
+  if (!b.open) return ''
+  if (b.stays === 1) return 'Planning'
+  return b.booked > 0 ? `${b.booked} of ${b.ahead} booked` : 'Not booked'
+}
+
 /**
- * Change one stay to match real flights. Earlier stays stay put.
+ * Change one stay. Earlier stays stay put.
  * Later stays move to start the day after this one ends, unless you already set them.
+ * booked is what the person said for this stay. It is never guessed.
  */
-export function editStay(trip: Trip, profile: Profile, i: number, start: Day, end: Day): Trip {
+export function editStay(trip: Trip, profile: Profile, i: number, start: Day, end: Day, booked?: boolean): Trip {
   const cur = legs(trip, profile)
-  const strip = (l: Leg): Stay => ({ start: l.start, end: l.end, edited: l.edited })
+  const strip = (l: Leg): Stay => ({ start: l.start, end: l.end, edited: l.edited, booked: l.booked })
   const head = cur.slice(0, i).map(strip)
-  const me: Stay = { start, end, edited: true }
+  const was = isBooked(trip, cur, i)
+  const me: Stay = { start, end, edited: true, booked: booked ?? was }
   const tripEnd = toNum(end) > toNum(trip.end) ? end : trip.end
   const later = cur.slice(i + 1)
   let tail: Stay[]
   if (later.length && later[0].edited && toNum(later[0].start) > toNum(end)) tail = later.map(strip)
   else tail = toNum(end) + 1 <= toNum(tripEnd) ? suggest(addDays(end, 1), tripEnd, daysPerEntry(trip, profile)).map(strip) : []
   const stays = [...head, me, ...tail]
-  return { ...trip, start: stays[0].start, end: stays[stays.length - 1].end, stays }
+  return { ...trip, start: stays[0].start, end: stays[stays.length - 1].end, stays, booked: stays.every((s) => !!s.booked) }
 }
 
 /** Days you are inside the country on this trip, leaving out the days between stays. */
@@ -92,6 +118,9 @@ export function presence(trips: Trip[], profile: Profile, country: string): Set<
 }
 
 export type Warning = { id: string; text: string }
+
+/** Warnings that belong to a stay. They show as an icon on that stay instead of a count for the trip. */
+export const STAY_WARNINGS = ['vfend', 'visaend']
 
 /** Warnings for a trip, checked against the rest of the saved trips. */
 export function warnings(trip: Trip, others: Trip[], profile: Profile): Warning[] {
@@ -185,12 +214,14 @@ export function entryEnds(trip: Trip, profile: Profile): Day | undefined {
   return entryRule(profile.passport, trip.country).visaFreeUntil
 }
 
-/** Status in words. A trip that has started can no longer be Planning. */
-export function tripStatus(trip: Trip, today: Day): 'Planning' | 'Booked' | 'Now' | 'Done' {
+/** Status in words. A trip that has started can no longer be Planning. Booked only when every stay is. */
+export function tripStatus(trip: Trip, profile: Profile, today: Day): string {
   const t = toNum(today)
   if (toNum(trip.end) < t) return 'Done'
   if (toNum(trip.start) <= t) return 'Now'
-  return trip.booked ? 'Booked' : 'Planning'
+  const b = booking(trip, profile, today)
+  if (!b.open) return 'Booked'
+  return b.booked > 0 ? `${b.booked} of ${b.ahead} booked` : 'Planning'
 }
 
 /** Where the trip stands today. */

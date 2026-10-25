@@ -1,5 +1,6 @@
-import { Chevron } from '../components/Icons'
-import { Primary, Ring, Seg, Sheet } from '../components/ui'
+import { useState } from 'react'
+import { AlertSmall, Chevron } from '../components/Icons'
+import { Primary, Ring, Seg, Sheet, Switch } from '../components/ui'
 
 const COLORS: [string, string][] = [
   ['Hero', '#2F2360'], ['Hero text', '#CFC4FF'], ['Ring', '#B7A5FF'], ['Primary', '#5B3FD0'],
@@ -9,21 +10,21 @@ const COLORS: [string, string][] = [
 ]
 
 const TYPE: [string, React.CSSProperties, string][] = [
-  ['Mon, Nov 30', { fontSize: 34, fontWeight: 600, letterSpacing: '-0.02em' }, '34 semibold. Answers and the ring number'],
-  ['China', { fontSize: 17, fontWeight: 600 }, '17 semibold. Titles, dates, buttons'],
-  ['Leave China by', { fontSize: 15, color: 'var(--muted)' }, '15 regular. Body, labels and values'],
-  ['Tap a stay to match your flights.', { fontSize: 13, color: 'var(--muted)' }, '13 regular. Notes, chips, status, warnings'],
-  ['Section label', { fontSize: 13, fontWeight: 600, color: 'var(--muted)' }, '13 semibold. Section labels, tabs, eyebrows'],
+  ['Sat, Nov 28', { fontSize: 34, fontWeight: 600, letterSpacing: '-0.02em' }, '34 semibold. The one answer and page titles. 44 on laptops'],
+  ['China trip', { fontSize: 15, fontWeight: 600 }, '15 semibold. Section headers, stay dates, buttons, sheet titles'],
+  ['Leave China by', { fontSize: 15, color: 'var(--muted)' }, '15 regular. Everything you read, labels and values'],
+  ['Not booked', { fontSize: 13, color: 'var(--muted)' }, '13 regular. Status, days, notes, chips, tab labels'],
 ]
 
 const RULES = [
   'One typeface, Outfit, everywhere.',
   'The hero answers one question with one number and one date.',
-  'Text next to the ring uses the same sizes as the ring, so tops and bottoms line up.',
-  'Bold only for primary content. Chips use regular weight, their fill already stands out.',
+  'Four text styles. 34 semibold, 15 semibold, 15 regular, 13 regular. Inputs use 16.',
+  'Headers differ from text by weight only, never by size.',
   'Top left leaves a sheet. × closes it, ‹ goes back one step. The bottom holds one forward action.',
-  'One warning icon per screen, in the chip. Every other warning is one small coral line under its item.',
-  'Only show dates the person entered or the app knows. Mark suggestions as suggestions.',
+  'Show each problem once, where it lives. A problem with a stay is an icon on that stay, the reason is inside it. A problem with the whole trip is a count on Trip details.',
+  'Booked is only what the person says. Each stay has its own switch, the trip is booked when every stay is.',
+  'One line joins the stays of a trip. Dashed into a stay not booked yet, solid once it is booked, done or now.',
   'A chevron means a row opens something. Rows without one only show information.',
   'White cards with a 1px line and radius 16. No shadows.',
 ]
@@ -68,17 +69,23 @@ export function DesignSystem({ onBack, onClose, onDismiss }: { onBack?: () => vo
         </div>
 
         <h3>Stay timeline</h3>
+        <div className="sec sec-row" style={{ paddingTop: 0 }}><span>China trip</span><span className="sec-aside">4 stays · 2 not booked</span></div>
         <div className="card timeline">
-          {[['Sep 8 – Oct 7', 'Done', 'past', false], ['Oct 9 – Nov 7', 'Now · 20 days left', 'now', false], ['Jan 2 – 31, 2027', 'Suggested', 'next', true]].map(([d, label, kind, late], i) => (
+          {([['Sep 8 – Oct 7', 'Done', 'past', false, 'off', 'solid'], ['Oct 9 – Nov 7', 'Now', 'now', false, 'solid', 'solid'], ['Nov 9 – Dec 8', 'Booked', 'booked', false, 'solid', 'dash'], ['Jan 2 – 31, 2027', 'Not booked', 'open', true, 'dash', 'off']] as const).map(([d, label, kind, late, a, b], i) => (
             <div key={i} className={`stay-row ${kind}`}>
-              <span className="tl" aria-hidden="true"><i className={i === 0 ? 'off' : ''} /><b /><i className={i === 2 ? 'off' : ''} /></span>
+              <span className="tl" aria-hidden="true"><i className={a} /><b /><i className={b} /></span>
               <span className="in">
-                <span className="what"><span className="t">{d as string}</span><span className="state">{label as string}</span>{late && <span className="sub bad">After visa free ends</span>}</span>
+                <span className="what"><span className="t">{d}{late && <AlertSmall />}</span><span className="state">{label}</span></span>
                 <span className="s">30 days<Chevron /></span>
               </span>
             </div>
           ))}
+          <div className="row trip-foot"><span className="body-text">Trip details</span><span className="s"><span>120 days in total</span><Chevron /></span></div>
         </div>
+        <div className="note">Grey dot done, large dot now, filled dot booked, hollow dot not booked. The coral icon marks a stay with something to check.</div>
+
+        <h3>Booking a stay</h3>
+        <BookDemo />
 
         <h3>Warnings</h3>
         <div className="alert-chip" style={{ marginTop: 0 }}>
@@ -118,7 +125,7 @@ export function DesignSystem({ onBack, onClose, onDismiss }: { onBack?: () => vo
         <div className="done-note">This stay is done. Change the dates only if you arrived or left on a different day.</div>
 
         <h3>Controls</h3>
-        <Seg label="Example" value="Planning" options={['Planning', 'Booked']} onChange={() => {}} />
+        <Seg label="Example" value="Business" options={['Business', 'Personal']} onChange={() => {}} />
         <div style={{ height: 12 }} />
         <Primary label="Save trip" onClick={() => {}} />
 
@@ -128,5 +135,16 @@ export function DesignSystem({ onBack, onClose, onDismiss }: { onBack?: () => vo
         </div>
       </div>
     </Sheet>
+  )
+}
+
+function BookDemo() {
+  const [on, setOn] = useState(false)
+  return (
+    <div className="card">
+      <div className="row"><span className="k">Arrive</span><span className="v">Wed, Feb 3<Chevron /></span></div>
+      <div className="row"><span className="k">Leave</span><span className="v">Thu, Mar 4<Chevron /></span></div>
+      <Switch label="I booked travel for this stay" on={on} onChange={setOn} />
+    </div>
   )
 }

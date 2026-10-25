@@ -7,7 +7,7 @@ Know your days, wherever you are. A calm travel days counter that tells people l
 1. **One answer per screen.** The hero answers one question with one number and one date, like 20 days left and Leave China by Sat, Nov 7. Everything else waits below.
 2. **Dark hero, light content.** A deep purple hero carries the answer. Content sits below on a warm off white in white cards.
 3. **Purple acts, coral warns.** Purple is for actions, progress and the stay you are in. Coral only appears when something needs checking.
-4. **Never guess for the person.** Show only dates the person entered or the app knows. A date the app proposes says Suggested until the person matches it to a flight.
+4. **Never guess for the person.** Show only dates the person entered or the app knows. A stay is Booked only when the person says so, never because they saved it.
 5. **One way to do each thing.** Top left always leaves a sheet, the bottom always moves forward, the same warning always looks the same.
 
 ## Color
@@ -31,28 +31,26 @@ Rules
 
 One typeface, Outfit, from Google Fonts. No serif anywhere.
 
-Four sizes, two weights. The same scale runs across Stay Counter, Shuo and Manna.
+Four styles, three sizes, two weights. The same scale runs across Stay Counter, Shuo and Manna.
 
 | Style | Size | Weight | For |
 | --- | --- | --- | --- |
-| `display` | 34, 44 on laptop | Semibold | The answer, the ring number, page titles, first open headline |
-| `title` | 17 | Semibold | Stay dates, country names, buttons, sheet titles |
-| `body` | 15 | Regular | Row labels, values, hero labels, tabs, links |
-| `label` | 13 | Semibold | Section labels, eyebrows, phone tab bar |
-| `small` | 13 | Regular | Notes, chips, status, warnings, second lines |
+| `display` | 34, 44 on laptop | Semibold | The one answer, page titles, first open headline |
+| `title` | 15 | Semibold | Section headers, stay dates, country names, buttons, sheet titles |
+| `body` | 15 | Regular | Everything you read, row labels, values, hero labels |
+| `small` | 13 | Regular | Status, days, notes, chips, warnings, tab labels |
 
-Text inputs use 16 so iOS does not zoom. That is the only other size.
+Text inputs use 16 so iOS does not zoom. The ring number is 28, 34 on laptop, so the date beside it leads.
 
 Rules
-- Only 400 and 600. Bold only for titles and labels. Chips use regular weight, their fill already stands out.
+- Only 400 and 600. A header differs from text by weight only, never by size. Chips use regular weight, their fill already stands out.
 - Large text uses minus 0.02em letter spacing.
-- Text next to the ring uses the same sizes as the ring. The number and the date share `display`, the unit and the label share `body`, so tops and bottoms line up.
 
 ## Layout
 
 - Phones use a 22 side margin on every screen and sheet.
 - Laptops keep the hero colour full width and place content inside `max-width` of 1040, all on one left edge.
-- Sections start with a `label` 20 above the card. Cards are white with a 1px `line` border and `radius-card`. No shadows.
+- Sections start with a `title` header in ink 22 above the card. A count or note can sit on the right in `small`. Cards are white with a 1px `line` border and `radius-card`. No shadows.
 - The add button floats bottom right and never covers content, the page leaves room under the last card.
 
 ## Navigation
@@ -72,16 +70,20 @@ Rules
 
 ## Warnings
 
-- One icon per screen, in a coral chip under the answer, like 2 rules to check. See below.
-- Every other warning is one small `coral-text` line under the thing it is about, like After visa free ends under a stay or You reach it on Dec 12 under the tax limit.
-- Values keep their normal style. Only the line under them is coral.
+- Show each problem once, where it lives.
+- A problem with one stay is a small coral icon next to that stay's dates. The row's screen reader label says the reason, and the stay screen explains it in one sentence.
+- A problem with the whole trip, like a tax limit or a single entry visa, is a count on Trip details, like 1 to check. Without one, Trip details shows the total days.
+- On the trip overview, the rules card says each problem in a small `coral-text` line under its rule, with one chip under the answer.
 - A new trip's plan, before it is saved, shows its warnings in one coral box, since it has no rules card.
 
 ## Stays
 
 - A long trip splits into stays, one per entry. The app suggests where to leave and come back.
-- Each stay says what it is. Done, Now with days left, Back in N days, Suggested, or Matched to flights.
-- Dots show the same thing. Grey for done, filled with a halo for now, empty for next.
+- One line in `stay-line` joins the stays so they read as one trip. The header beside the trip name counts them, like 6 stays · 4 not booked.
+- Each stay says what it is. Done, Now, Back in N days, Booked or Not booked.
+- Booked is only what the person says. The stay screen has one switch, I booked travel for this stay. It never names flights, people also travel by train, ferry or car.
+- Dots and line show the same thing. Grey dot for done, large dot with a halo for now, filled dot for booked, hollow dot for not booked. The line into a stay is dashed while it is not booked and solid once it is booked, done or now.
+- A trip is Booked when every stay ahead is booked. Otherwise lists say Planning, Not booked or 1 of 2 booked. Only a trip with one stay asks Planning or Booked on Edit trip.
 - Editing a stay moves the stays after it. The edit screen says when the next stay can start.
 - Finished stays can still be corrected. A grey note says so.
 

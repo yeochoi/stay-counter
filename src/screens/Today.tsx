@@ -1,5 +1,5 @@
 import { Day, fmtRange, fmtWeekday, toNum } from '../lib/dates'
-import { daysIn, Profile, status, taxCounts, Trip, warnings } from '../lib/plan'
+import { booking, bookingNote, daysIn, Profile, status, STAY_WARNINGS, taxCounts, Trip, warnings } from '../lib/plan'
 import { shortName } from '../lib/rules'
 import { Chevron, Gear, Plane, Plus } from '../components/Icons'
 import { Ring, Sec } from '../components/ui'
@@ -94,32 +94,33 @@ export function Today({ trips, profile, today, onNew, onOpen, onEditStay, onSett
             <span>{daysIn(main, profile)} days</span>
             <span>{main.type}</span>
             <span>{main.entry.kind === 'visafree' ? 'Visa free' : 'Visa'}</span>
-            {!main.booked && <span>Planning</span>}
+            {bookingNote(main, profile, today) && <span>{bookingNote(main, profile, today)}</span>}
           </div>
         </>
       )
     }
     if (current && ls.length > 1) {
-      const anySuggested = ls.some((l) => !l.edited && toNum(l.start) > toNum(today))
+      const b = booking(main, profile, today)
       stays = (
         <section>
-          <Sec>{shortName(main.country)} trip</Sec>
+          <div className="sec sec-row"><span>{shortName(main.country)} trip</span><span className="sec-aside">{ls.length} stays{b.open ? ` · ${b.open} not booked` : ''}</span></div>
           <StayTimeline
             trip={main}
             profile={profile}
             today={today}
             onStay={(i) => onEditStay(main, i)}
             foot={(() => {
-              const n = warnings(main, trips.filter((x) => x.id !== main.id), profile).length
+              // Problems with one stay show as an icon on that stay. Only problems with the whole trip count here.
+              const n = warnings(main, trips.filter((x) => x.id !== main.id), profile).filter((w) => !STAY_WARNINGS.includes(w.id)).length
+              const total = daysIn(main, profile)
               return (
                 <button className="row trip-foot" onClick={() => onOpen(main)}>
                   <span className="body-text">Trip details</span>
-                  <span className="s">{n > 0 && <span className="bad-note">{n} to check</span>}<Chevron /></span>
+                  <span className="s">{n > 0 ? <span className="bad-note">{n} to check</span> : <span className="foot-total">{total} days in total</span>}<Chevron /></span>
                 </button>
               )
             })()}
           />
-          {anySuggested && <div className="note">Tap a stay to match your flights.</div>}
         </section>
       )
     }

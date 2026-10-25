@@ -89,7 +89,7 @@ export default function App() {
           index={overlay.index}
           today={today}
           onCancel={() => setOverlay(null)}
-          onSave={(s, e) => save(editStay(overlay.trip, profile, overlay.index, s, e))}
+          onSave={(s, e, b) => save(editStay(overlay.trip, profile, overlay.index, s, e, b))}
         />
       )}
       {overlay?.kind === 'settings' && (
