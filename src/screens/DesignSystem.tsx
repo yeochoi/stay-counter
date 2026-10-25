@@ -69,7 +69,7 @@ export function DesignSystem({ onBack, onClose, onDismiss }: { onBack?: () => vo
         </div>
 
         <h3>Stay timeline</h3>
-        <div className="sec sec-row" style={{ paddingTop: 0 }}><span>China trip</span><span className="sec-aside">4 stays · 2 not booked</span></div>
+        <div className="sec" style={{ paddingTop: 0 }}>China trip</div>
         <div className="card timeline">
           {([['Sep 8 – Oct 7', 'Done', 'past', false, 'off', 'solid'], ['Oct 9 – Nov 7', 'Now', 'now', false, 'solid', 'solid'], ['Nov 9 – Dec 8', 'Booked', 'booked', false, 'solid', 'dash'], ['Jan 2 – 31, 2027', 'Not booked', 'open', true, 'dash', 'off']] as const).map(([d, label, kind, late, a, b], i) => (
             <div key={i} className={`stay-row ${kind}`}>
@@ -80,7 +80,7 @@ export function DesignSystem({ onBack, onClose, onDismiss }: { onBack?: () => vo
               </span>
             </div>
           ))}
-          <div className="row trip-foot"><span className="body-text">Trip details</span><span className="s"><span>120 days in total</span><Chevron /></span></div>
+          <div className="row trip-foot"><span className="body-text">Trip details</span><span className="s"><Chevron /></span></div>
         </div>
         <div className="note">Grey dot done, large dot now, filled dot booked, hollow dot not booked. The coral icon marks a stay with something to check.</div>
 
