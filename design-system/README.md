@@ -81,7 +81,7 @@ Rules
 - A long trip splits into stays, one per entry. The app suggests where to leave and come back.
 - One line in `stay-line` joins the stays so they read as one trip. The header beside the trip name counts them, like 6 stays · 4 not booked.
 - Each stay says what it is. Done, Now, Back in N days, Booked or Not booked.
-- Booked is only what the person says. The stay screen has one switch, I booked travel for this stay. It never names flights, people also travel by train, ferry or car.
+- Booked is only what the person says. The stay screen has one switch, Booked. It never names flights, people also travel by train, ferry or car.
 - Dots and line show the same thing. Grey dot for done, large dot with a halo for now, filled dot for booked, hollow dot for not booked. The line into a stay is dashed while it is not booked and solid once it is booked, done or now.
 - A trip is Booked when every stay ahead is booked. Otherwise lists say Planning, Not booked or 1 of 2 booked. Only a trip with one stay asks Planning or Booked on Edit trip.
 - Editing a stay moves the stays after it. The edit screen says when the next stay can start.

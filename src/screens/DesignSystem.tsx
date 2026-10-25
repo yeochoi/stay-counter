@@ -144,7 +144,7 @@ function BookDemo() {
     <div className="card">
       <div className="row"><span className="k">Arrive</span><span className="v">Wed, Feb 3<Chevron /></span></div>
       <div className="row"><span className="k">Leave</span><span className="v">Thu, Mar 4<Chevron /></span></div>
-      <Switch label="I booked travel for this stay" on={on} onChange={setOn} />
+      <Switch label="Booked" on={on} onChange={setOn} />
     </div>
   )
 }

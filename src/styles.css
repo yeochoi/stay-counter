@@ -256,11 +256,11 @@ button.row:hover, label.row:hover { background: #fbfaf8; }
   .welcome .w-gap { flex-grow: 0; min-height: 24px; }
 }
 .trip-foot .body-text { font-size: 15px; } .trip-foot .s { font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 6px; } .bad-note { font-size: 13px; color: var(--coral-text); }
-/* On and off switch. Off has an outline that passes 3 to 1, on fills with primary. */
+/* On and off switch in the iOS style. A flat grey track with no outline, white thumb, primary when on. The label beside it carries the meaning. */
 .switch-row { min-height: 56px; }
-.switch { position: relative; width: 51px; height: 31px; border-radius: 999px; background: var(--chip); border: 1.5px solid var(--chevron); box-sizing: border-box; flex-shrink: 0; transition: background 0.15s; }
-.switch i { position: absolute; left: 1.5px; top: 1.5px; width: 25px; height: 25px; border-radius: 999px; background: #fff; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25); transition: transform 0.15s; }
-.switch.on { background: var(--primary); border-color: var(--primary); }
+.switch { position: relative; width: 51px; height: 31px; border-radius: 999px; background: #E6E2DC; flex-shrink: 0; transition: background 0.15s; }
+.switch i { position: absolute; left: 2px; top: 2px; width: 27px; height: 27px; border-radius: 999px; background: #fff; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.16), 0 0 0 0.5px rgba(0, 0, 0, 0.04); transition: transform 0.15s; }
+.switch.on { background: var(--primary); }
 .switch.on i { transform: translateX(20px); }
 .switch-row:focus-visible { outline: 2px solid var(--primary); outline-offset: -2px; }
 

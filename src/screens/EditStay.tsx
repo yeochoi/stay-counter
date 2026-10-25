@@ -49,7 +49,7 @@ export function EditStay({ trip, profile, index, today, nav = 'close', onCancel,
       <div className="card" style={{ marginTop: 20 }}>
         <DateRow k="Arrive" value={start} today={today} onChange={(d) => { setStart(d); if (toNum(end) < toNum(d)) setEnd(d) }} />
         <DateRow k="Leave" value={end} today={today} min={start} onChange={setEnd} />
-        {!started && <Switch label="I booked travel for this stay" on={booked} onChange={setBooked} />}
+        {!started && <Switch label="Booked" on={booked} onChange={setBooked} />}
       </div>
       {!done && hasNext && valid && !over && (
         <div className="note">Stay {index + 2} can start from {fmtWeekday(addDays(end, 1), today)}.</div>

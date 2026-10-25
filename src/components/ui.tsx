@@ -72,7 +72,7 @@ export function Seg<T extends string>({ value, options, onChange, label }: { val
 export function Switch({ label, on, onChange }: { label: string; on: boolean; onChange: (v: boolean) => void }) {
   return (
     <button type="button" className="row switch-row" role="switch" aria-checked={on} onClick={() => onChange(!on)}>
-      <span className="body-text">{label}</span>
+      <span className="k">{label}</span>
       <span className={`switch${on ? ' on' : ''}`} aria-hidden="true"><i /></span>
     </button>
   )
