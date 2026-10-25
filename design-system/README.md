@@ -46,13 +46,13 @@ Text inputs use 16 so iOS does not zoom. That is the only other size.
 Rules
 - Only 400 and 600. Bold only for titles and labels. Chips use regular weight, their fill already stands out.
 - Large text uses minus 0.02em letter spacing.
-- Text next to the ring uses the same sizes as the ring. The number and the date share `answer`, the unit and the label share `body`, so tops and bottoms line up.
+- Text next to the ring uses the same sizes as the ring. The number and the date share `display`, the unit and the label share `body`, so tops and bottoms line up.
 
 ## Layout
 
 - Phones use a 22 side margin on every screen and sheet.
 - Laptops keep the hero colour full width and place content inside `max-width` of 1040, all on one left edge.
-- Sections start with a `section` label 20 above the card. Cards are white with a 1px `line` border and `radius-card`. No shadows.
+- Sections start with a `label` 20 above the card. Cards are white with a 1px `line` border and `radius-card`. No shadows.
 - The add button floats bottom right and never covers content, the page leaves room under the last card.
 
 ## Navigation
