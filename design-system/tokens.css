@@ -9,7 +9,7 @@
   --current: #F1EDFD;
   --current-line: #E2DBFA;
   --stay-line: #5B3FD0;
-  --bg: #F7F5F2;
+  --bg: #FBFAF7;
   --surface: #FFFFFF;
   --ink: #1E1B2E;
   --muted: #6B6778;
@@ -44,6 +44,7 @@
   --font-sans: Outfit, -apple-system, system-ui, sans-serif;
 }
 .display { font-family: var(--font-sans); font-size: 34px; line-height: 34px; font-weight: 600; letter-spacing: -0.02em; }
-.title { font-family: var(--font-sans); font-size: 15px; line-height: 20px; font-weight: 600; }
-.body { font-family: var(--font-sans); font-size: 15px; line-height: 20px; font-weight: 400; }
+.section { font-family: var(--font-sans); font-size: 20px; line-height: 26px; font-weight: 600; }
+.title { font-family: var(--font-sans); font-size: 17px; line-height: 22px; font-weight: 600; }
+.body { font-family: var(--font-sans); font-size: 17px; line-height: 22px; font-weight: 400; }
 .small { font-family: var(--font-sans); font-size: 13px; line-height: 19px; font-weight: 400; }

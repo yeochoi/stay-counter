@@ -11,22 +11,24 @@ const COLORS: [string, string][] = [
 
 const TYPE: [string, React.CSSProperties, string][] = [
   ['Sat, Nov 28', { fontSize: 34, fontWeight: 600, letterSpacing: '-0.02em' }, '34 semibold. The one answer and page titles. 44 on laptops'],
-  ['China trip', { fontSize: 15, fontWeight: 600 }, '15 semibold. Section headers, stay dates, buttons, sheet titles'],
-  ['Leave China by', { fontSize: 15, color: 'var(--muted)' }, '15 regular. Everything you read, labels and values'],
+  ['China trip', { fontSize: 20, fontWeight: 600 }, '20 semibold. Section headers, 32 above and 12 below'],
+  ['Oct 15 – Nov 13', { fontSize: 17, fontWeight: 600 }, '17 semibold. Stay dates, buttons, sheet titles'],
+  ['Leave China by', { fontSize: 17, color: 'var(--muted)' }, '17 regular. Everything you read, labels and values. Like iOS body text'],
   ['Not booked', { fontSize: 13, color: 'var(--muted)' }, '13 regular. Status, days, notes, chips, tab labels'],
 ]
 
 const RULES = [
   'One typeface, Outfit, everywhere.',
   'The hero answers one question with one number and one date.',
-  'Four text styles. 34 semibold, 15 semibold, 15 regular, 13 regular. Inputs use 16.',
-  'Headers differ from text by weight only, never by size.',
+  'Five text styles, like iOS. 34 semibold, 20 semibold, 17 semibold, 17 regular, 13 regular. The same in all three apps.',
+  'Layers follow iOS. Things that float over content get a shadow. The tab bar is glass, the add button keeps its purple. Things on the page are flat.',
+  'Every round button is 44 wide with a 20 icon, flat with no shadow.',
   'Top left leaves a sheet. × closes it, ‹ goes back one step. The bottom holds one forward action.',
   'Show each problem once, where it lives. A problem with a stay is an icon on that stay, the reason is inside it. A problem with the whole trip is a count on Trip details.',
   'Booked is only what the person says. Each stay has its own switch, the trip is booked when every stay is.',
   'One line joins the stays of a trip. Grey between finished stays, purple from now on, dashed into a stay not booked yet. No dividers between stays.',
   'A chevron means a row opens something. Rows without one only show information.',
-  'White cards with a 1px line and radius 16. No shadows.',
+  'Cards only for controls and tappable lists. White with a 1px line and radius 16. No shadows.',
 ]
 
 const X = <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
@@ -131,7 +133,7 @@ export function DesignSystem({ onBack, onClose, onDismiss }: { onBack?: () => vo
 
         <h3>Rules</h3>
         <div className="card">
-          {RULES.map((r) => <div key={r} className="row two" style={{ fontSize: 15, lineHeight: 1.45 }}>{r}</div>)}
+          {RULES.map((r) => <div key={r} className="row two" style={{ fontSize: 17, lineHeight: 1.45 }}>{r}</div>)}
         </div>
       </div>
     </Sheet>

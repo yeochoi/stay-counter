@@ -59,7 +59,7 @@ export function Onboarding({ onDone }: { onDone: (p: Profile) => void }) {
         <div className="chips"><span>Visa free limits</span><span>Tax days</span><span>Leave by dates</span></div>
       </header>
       <main className="content w-form">
-        <div style={{ fontSize: 15, color: 'var(--muted)' }}>We use these to find the rules that apply to you.</div>
+        <div style={{ fontSize: 17, color: 'var(--muted)' }}>We use these to find the rules that apply to you.</div>
         <div style={{ marginTop: 2 }}><PassportCard p={p} setP={setP} /></div>
         <PickCard k="Home" value={p.home} options={HOMES} onChange={(v) => setP({ ...p, home: v })} />
         <div className="w-gap" />

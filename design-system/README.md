@@ -36,11 +36,12 @@ Four styles, three sizes, two weights. The same scale runs across Stay Counter, 
 | Style | Size | Weight | For |
 | --- | --- | --- | --- |
 | `display` | 34, 44 on laptop | Semibold | The one answer, page titles, first open headline |
-| `title` | 15 | Semibold | Section headers, stay dates, country names, buttons, sheet titles |
-| `body` | 15 | Regular | Everything you read, row labels, values, hero labels |
+| `section` | 20 | Semibold | Section headers, 32 above and 12 below |
+| `title` | 17 | Semibold | Stay dates, country names, buttons, sheet titles |
+| `body` | 17 | Regular | Everything you read, row labels, values, hero labels. Like iOS body text |
 | `small` | 13 | Regular | Status, days, notes, chips, warnings, tab labels |
 
-Text inputs use 16 so iOS does not zoom. The ring number is 28, 34 on laptop, so the date beside it leads.
+Text inputs use 17, so iOS does not zoom. The ring number uses `display`, 34. No other exceptions.
 
 Rules
 - Only 400 and 600. A header differs from text by weight only, never by size. Chips use regular weight, their fill already stands out.
@@ -50,8 +51,10 @@ Rules
 
 - Phones use a 22 side margin on every screen and sheet.
 - Laptops keep the hero colour full width and place content inside `max-width` of 1040, all on one left edge.
-- Sections start with a `title` header in ink 22 above the card. A count or note can sit on the right in `small`. Cards are white with a 1px `line` border and `radius-card`. No shadows.
-- The add button floats bottom right and never covers content, the page leaves room under the last card.
+- Sections start with a `section` header in ink, 32 above and 12 below. A count or note can sit on the right in `small`.
+- Cards only for controls and tappable lists. White with a 1px `line` border and `radius-card`. No shadows.
+- Layers follow iOS, the same in all three apps. Things that float over content get a shadow. The tab bar is a glass pill and the add button keeps its `primary` fill, side by side at the bottom. Everything on the page is flat.
+- Round buttons on the hero are 44 wide with a 20 icon and a 2 line, flat, in white at 10 percent because they sit on dark purple. Same size and icon as the grey round buttons in Manna and Shuo.
 
 ## Navigation
 
