@@ -105,7 +105,9 @@ button { cursor: pointer; }
 .btn.primary { background: var(--primary); color: #fff; }
 .btn.soft { background: var(--soft); color: var(--purple-text); }
 .btn:disabled { opacity: 0.45; cursor: default; }
-.text-btn { border: 0; background: none; font-size: 17px; font-weight: 600; color: var(--coral-text); padding: 12px; }
+.text-btn { border: 0; background: none; font-family: inherit; font-size: 17px; line-height: 22px; font-weight: 600; color: var(--coral-text); padding: 11px 16px; min-height: 44px; border-radius: 12px; }
+/* Delete style actions are plain coral text, centered at the bottom, the same in all three apps. */
+.del-wrap { display: flex; flex-direction: column; align-items: center; margin-top: 24px; }
 
 .seg { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2px; padding: 3px; background: var(--line); border-radius: 999px; }
 .seg button { min-height: 38px; border: 0; background: transparent; border-radius: 999px; font-size: 17px; color: var(--muted); }

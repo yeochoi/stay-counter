@@ -1,9 +1,8 @@
 import { useState } from 'react'
-import { Day, todayDay } from '../lib/dates'
 import { Profile } from '../lib/plan'
 import { COUNTRIES, PASSPORTS } from '../lib/rules'
 import { Chevron, Plus } from '../components/Icons'
-import { DateRow, Sec, Sheet } from '../components/ui'
+import { Sec, Sheet } from '../components/ui'
 
 const HOMES = [...new Set([...COUNTRIES, 'Netherlands', 'South Korea'])].sort()
 
@@ -71,43 +70,31 @@ export function Onboarding({ onDone }: { onDone: (p: Profile) => void }) {
 
 type SettingsProps = {
   profile: Profile
-  previewDate?: Day
   onProfile: (p: Profile) => void
-  onPreview: (d?: Day) => void
-  onSample: () => void
   onClear: () => void
   onReset: () => void
   onDesign: () => void
   onClose: () => void
 }
 
-export function Settings({ profile, previewDate, onProfile, onPreview, onSample, onClear, onReset, onDesign, onClose }: SettingsProps) {
-  const real = todayDay()
+export function Settings({ profile, onProfile, onClear, onReset, onDesign, onClose }: SettingsProps) {
   return (
     <Sheet title="Settings" onClose={onClose}>
       <Sec>You</Sec>
       <div style={{ marginTop: -12 }}><PassportCard p={profile} setP={onProfile} /></div>
       <PickCard k="Home" value={profile.home} options={HOMES} onChange={(v) => onProfile({ ...profile, home: v })} />
 
-      <Sec>Testing</Sec>
-      <div className="card">
-        <DateRow k="Pretend today is" value={previewDate ?? real} today={previewDate ?? real} onChange={(d) => onPreview(d === real ? undefined : d)} />
-        <button className="row" onClick={() => onPreview('2026-10-15')}><span className="k">Before the China trip</span><span className="v">Oct 15<Chevron /></span></button>
-        <button className="row" onClick={() => onPreview('2026-11-22')}><span className="k">During stay 1</span><span className="v">Nov 22<Chevron /></span></button>
-        <button className="row" onClick={() => onPreview('2026-12-01')}><span className="k">Between stays</span><span className="v">Dec 1<Chevron /></span></button>
-        {previewDate && <button className="row" onClick={() => onPreview(undefined)}><span className="k">Use the real date</span><span className="v">{real.slice(5).replace('-', '/')}<Chevron /></span></button>}
-      </div>
-      <div className="card" style={{ marginTop: 12 }}>
-        <button className="row" onClick={onSample}><span className="t" style={{ color: 'var(--purple-text)' }}>Load sample trips</span></button>
-        <button className="row" onClick={() => confirm('Remove all trips?') && onClear()}><span className="t" style={{ color: 'var(--coral-text)' }}>Remove all trips</span></button>
-        <button className="row" onClick={() => confirm('Start over from the first screen? This removes everything.') && onReset()}><span className="t" style={{ color: 'var(--coral-text)' }}>Start over</span></button>
-      </div>
-
       <Sec>About</Sec>
       <div className="card">
         <button className="row" onClick={onDesign}><span className="k">Design system</span><Chevron /></button>
       </div>
       <div className="note">Your trips stay on this device only. General information, not legal or tax advice.</div>
+      {/* Destructive actions go last. Two or more related ones are grouped in one card, a single one is plain coral text. They always ask first. */}
+      <Sec>Trips</Sec>
+      <div className="card">
+        <button className="row" onClick={() => confirm('Remove all trips?') && onClear()}><span className="t" style={{ color: 'var(--coral-text)' }}>Remove all trips</span></button>
+        <button className="row" onClick={() => confirm('Start over from the first screen? This removes everything.') && onReset()}><span className="t" style={{ color: 'var(--coral-text)' }}>Start over</span></button>
+      </div>
     </Sheet>
   )
 }

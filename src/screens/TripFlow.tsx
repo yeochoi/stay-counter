@@ -134,7 +134,7 @@ export function TripFlow({ profile, trips, today, existing, startBooked, onClose
       <Sec>Rules for this trip</Sec>
       <RulesCard trip={trip} profile={profile} visa={visa} />
       </>}
-      {saved && <button className="text-btn" style={{ marginTop: 20, alignSelf: 'center' }} onClick={() => { if (confirm('Delete this trip?')) onDelete(saved.id) }}>Delete trip</button>}
+      {saved && <div className="del-wrap"><button className="text-btn" onClick={() => { if (confirm('Delete this trip?')) onDelete(saved.id) }}>Delete trip</button></div>}
     </Sheet>
   )
 }

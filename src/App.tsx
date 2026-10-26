@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { todayDay } from './lib/dates'
 import { editStay, legs, Trip } from './lib/plan'
-import { sampleTrips, useStore } from './lib/store'
+import { useStore } from './lib/store'
 import { Tab, TabBar } from './components/ui'
 import { Today } from './screens/Today'
 import { ExportKind, Trips } from './screens/Trips'
@@ -23,7 +23,7 @@ export default function App() {
   const [tab, setTab] = useState<Tab>(() => (location.hash === '#trips' ? 'trips' : 'today'))
   const [overlay, setOverlay] = useState<Overlay>(() => (location.hash === '#design' ? { kind: 'design' } : null))
   useEffect(() => { window.scrollTo(0, 0) }, [tab])
-  const today = state.previewDate ?? todayDay()
+  const today = todayDay()
   const profile = state.profile
   const closeDesign = () => { if (location.hash) history.replaceState(null, '', location.pathname); setOverlay(null) }
 
@@ -95,10 +95,7 @@ export default function App() {
       {overlay?.kind === 'settings' && (
         <Settings
           profile={profile}
-          previewDate={state.previewDate}
           onProfile={(p) => setState((s) => ({ ...s, profile: p }))}
-          onPreview={(d) => setState((s) => ({ ...s, previewDate: d }))}
-          onSample={() => { setState((s) => ({ ...s, trips: sampleTrips(), previewDate: '2026-10-15' })); setOverlay(null); setTab('today') }}
           onClear={() => { setState((s) => ({ ...s, trips: [] })); setOverlay(null) }}
           onReset={() => { setState({ trips: [] }); setOverlay(null); setTab('today') }}
           onDesign={() => setOverlay({ kind: 'design', from: 'settings' })}

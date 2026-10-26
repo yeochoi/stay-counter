@@ -53,6 +53,7 @@ Rules
 - Laptops keep the hero colour full width and place content inside `max-width` of 1040, all on one left edge.
 - Sections start with a `section` header in ink, 32 above and 12 below. A count or note can sit on the right in `small`.
 - Cards only for controls and tappable lists. White with a 1px `line` border and `radius-card`. No shadows.
+- Destructive actions always go last. A single one is plain coral text, centered. Two or more related ones are grouped in one card. They always ask first.
 - Layers follow iOS, the same in all three apps. Things that float over content get a shadow. The tab bar is a glass pill and the add button keeps its `primary` fill, side by side at the bottom. Everything on the page is flat.
 - Round buttons on the hero are 44 wide with a 20 icon and a 2 line, flat, in white at 10 percent because they sit on dark purple. Same size and icon as the grey round buttons in Manna and Shuo.
 

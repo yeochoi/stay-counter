@@ -23,6 +23,7 @@ const RULES = [
   'Five text styles, like iOS. 34 semibold, 20 semibold, 17 semibold, 17 regular, 13 regular. The same in all three apps.',
   'Layers follow iOS. Things that float over content get a shadow. The tab bar is glass, the add button keeps its purple. Things on the page are flat.',
   'Every round button is 44 wide with a 20 icon, flat with no shadow.',
+  'Destructive actions always go last. A single one is plain coral text, centered. Two or more related ones are grouped in one card. They always ask first.',
   'Top left leaves a sheet. × closes it, ‹ goes back one step. The bottom holds one forward action.',
   'Show each problem once, where it lives. A problem with a stay is an icon on that stay, the reason is inside it. A problem with the whole trip is a count on Trip details.',
   'Booked is only what the person says. Each stay has its own switch, the trip is booked when every stay is.',
