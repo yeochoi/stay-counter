@@ -300,5 +300,5 @@ button { cursor: pointer; }
   }
   .nav button { padding: 6px 22px; border-radius: 999px; }
   .nav button.on { background: rgba(238, 234, 251, 0.9); }
-  .fab { bottom: calc(var(--bottom) + 16px); right: max(var(--gutter), calc(50% - 175px)); width: 62px; height: 62px; box-shadow: 0 4px 24px rgba(28, 33, 30, 0.16); }
+  .fab { bottom: calc(var(--bottom) + 20px); right: max(var(--gutter), calc(50% - 175px)); width: 62px; height: 62px; box-shadow: 0 4px 24px rgba(28, 33, 30, 0.16); }
 }
