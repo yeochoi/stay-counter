@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react'
+import { CSSProperties, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { todayDay } from './lib/dates'
 import { editStay, legs, Trip } from './lib/plan'
 import { useStore } from './lib/store'
+import { SheetClosing, useSheetOpen } from './lib/layers'
 import { Tab, TabBar } from './components/ui'
 import { Today } from './screens/Today'
 import { ExportKind, Trips } from './screens/Trips'
@@ -23,6 +24,33 @@ export default function App() {
   const [tab, setTab] = useState<Tab>(() => (location.hash === '#trips' ? 'trips' : 'today'))
   const [overlay, setOverlay] = useState<Overlay>(() => (location.hash === '#design' ? { kind: 'design' } : null))
   useEffect(() => { window.scrollTo(0, 0) }, [tab])
+
+  // A closing sheet stays on screen a moment longer, so it can slide down.
+  const last = useRef(overlay)
+  if (overlay) last.current = overlay
+  const [gone, setGone] = useState(true)
+  useEffect(() => {
+    if (overlay) { setGone(false); return }
+    const t = window.setTimeout(() => setGone(true), 320)
+    return () => window.clearTimeout(t)
+  }, [overlay])
+  const closing = !overlay && !gone
+  const shown = overlay ?? (closing ? last.current : null)
+
+  // While a sheet is open on a phone, the page steps back behind it, smaller and dimmed, like iOS.
+  const behind = useSheetOpen()
+  const [sy, setSy] = useState(0)
+  const syRef = useRef(0)
+  useLayoutEffect(() => {
+    document.documentElement.classList.toggle('sheet-open', behind)
+    if (behind) {
+      syRef.current = window.scrollY
+      setSy(window.scrollY)
+    } else {
+      window.scrollTo(0, syRef.current)
+    }
+  }, [behind])
+
   const today = todayDay()
   const profile = state.profile
   const closeDesign = () => { if (location.hash) history.replaceState(null, '', location.pathname); setOverlay(null) }
@@ -61,6 +89,7 @@ export default function App() {
 
   return (
     <div className="app">
+      <div className={`page${behind ? ' behind' : ''}`} style={{ '--sy': `${sy}px` } as CSSProperties}>
       {tab === 'today' ? (
         <Today
           trips={state.trips}
@@ -75,24 +104,27 @@ export default function App() {
         <Trips trips={state.trips} profile={profile} today={today} onOpen={(trip) => setOverlay({ kind: 'trip', trip })} onExport={exportCsv} onNew={() => setOverlay({ kind: 'new', booked: false })} />
       )}
       <TabBar tab={tab} onChange={setTab} />
+      </div>
 
-      {overlay?.kind === 'new' && (
-        <TripFlow profile={profile} trips={state.trips} today={today} startBooked={overlay.booked} onClose={() => setOverlay(null)} onSave={save} onUpdate={update} onDelete={remove} />
+      <SheetClosing.Provider value={closing}>
+      <div className={closing ? 'layer closing' : 'layer'}>
+      {shown?.kind === 'new' && (
+        <TripFlow profile={profile} trips={state.trips} today={today} startBooked={shown.booked} onClose={() => setOverlay(null)} onSave={save} onUpdate={update} onDelete={remove} />
       )}
-      {overlay?.kind === 'trip' && (
-        <TripFlow key={overlay.trip.id} profile={profile} trips={state.trips} today={today} existing={overlay.trip} onClose={() => setOverlay(null)} onSave={save} onUpdate={update} onDelete={remove} />
+      {shown?.kind === 'trip' && (
+        <TripFlow key={shown.trip.id} profile={profile} trips={state.trips} today={today} existing={shown.trip} onClose={() => setOverlay(null)} onSave={save} onUpdate={update} onDelete={remove} />
       )}
-      {overlay?.kind === 'stay' && (
+      {shown?.kind === 'stay' && (
         <EditStay
-          trip={overlay.trip}
+          trip={shown.trip}
           profile={profile}
-          index={overlay.index}
+          index={shown.index}
           today={today}
           onCancel={() => setOverlay(null)}
-          onSave={(s, e, b) => save(editStay(overlay.trip, profile, overlay.index, s, e, b))}
+          onSave={(s, e, b) => save(editStay(shown.trip, profile, shown.index, s, e, b))}
         />
       )}
-      {overlay?.kind === 'settings' && (
+      {shown?.kind === 'settings' && (
         <Settings
           profile={profile}
           onProfile={(p) => setState((s) => ({ ...s, profile: p }))}
@@ -102,7 +134,9 @@ export default function App() {
           onClose={() => setOverlay(null)}
         />
       )}
-      {overlay?.kind === 'design' && (overlay.from === 'settings' ? <DesignSystem onBack={() => setOverlay({ kind: 'settings' })} onDismiss={() => setOverlay(null)} /> : <DesignSystem onClose={closeDesign} />)}
+      {shown?.kind === 'design' && (shown.from === 'settings' ? <DesignSystem onBack={() => setOverlay({ kind: 'settings' })} onDismiss={() => setOverlay(null)} /> : <DesignSystem onClose={closeDesign} />)}
+      </div>
+      </SheetClosing.Provider>
     </div>
   )
 }
