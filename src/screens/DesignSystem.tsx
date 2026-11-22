@@ -22,6 +22,7 @@ const RULES = [
   'One typeface, Outfit, everywhere. Light for big text, regular for reading, medium for buttons and headers. Never bold.',
   'Every screen has the same background. No colored hero. The same in SaySay and Manna.',
   'One picture per screen at most. Today has the ring, a trip has the stay bar. Nothing else is drawn.',
+  'In China, the ring counts the days left in this stay. Anywhere else, it counts this year\'s days in China against the tax limit, because that is the number that matters most.',
   'Content sits on the page. White cards only for settings and controls, with a 1px line and radius 16. No shadows.',
   'Numbers come in pairs, big and light, split by a thin line, like the Manna journal.',
   'Purple means now or an action. Light purple means planned. Coral means something to check, and is used only for that.',

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Day, fmtRange, toNum, year } from '../lib/dates'
-import { bookingNote, daysIn, Profile, Trip } from '../lib/plan'
+import { bookingNote, daysIn, Profile, taxCount, Trip, yearDays } from '../lib/plan'
 import { Chevron, Plus } from '../components/Icons'
 import { PageHead } from '../components/ui'
 
@@ -13,19 +13,21 @@ export function Trips({ trips, profile, today, onOpen, onNew }: { trips: Trip[];
   const t = toNum(today)
   const ahead = [...trips].filter((x) => toNum(x.end) >= t).sort((a, b) => a.start.localeCompare(b.start))
   const past = [...trips].filter((x) => toNum(x.end) < t).sort((a, b) => b.start.localeCompare(a.start))
-  const years = [...new Set(past.map((x) => year(x.start)))]
+  // A trip that crosses New Year shows under both years.
+  const years = [...new Set(past.flatMap((x) => { const out = []; for (let y = year(x.end); y >= year(x.start); y--) out.push(y); return out }))].sort((a, b) => b - a)
+  const limit = taxCount(trips, profile, 'China', today).limit
 
-  const row = (x: Trip) => {
+  const row = (x: Trip, inYear?: number) => {
     const now = toNum(x.start) <= t && t <= toNum(x.end)
     const done = toNum(x.end) < t
     const n = daysIn(x, profile)
     const note = now ? 'now' : done ? '' : bookingNote(x, profile, today).toLowerCase()
     return (
-      <button key={x.id} className="list-row" onClick={() => onOpen(x)}>
+      <button key={`${x.id}-${inYear ?? ''}`} className="list-row" onClick={() => onOpen(x)}>
         {now && <span className="dot" aria-hidden="true" />}
         <span className="col">
           <span className="t">{fmtRange(x.start, x.end, today)}</span>
-          <span className="sub">{n} {n === 1 ? 'day' : 'days'}, {x.type}{note ? `, ${note}` : ''}</span>
+          <span className="sub">{n} {n === 1 ? 'day' : 'days'}, {inYear !== undefined && year(x.start) !== year(x.end) ? `${yearDays([x], profile, x.country, inYear)} of them in ${inYear}` : x.type}{note ? `, ${note}` : ''}</span>
         </span>
         <Chevron />
       </button>
@@ -47,18 +49,22 @@ export function Trips({ trips, profile, today, onOpen, onNew }: { trips: Trip[];
         </div>
         {tab === 'Upcoming' && (
           <div className="list">
-            {ahead.map(row)}
+            {ahead.map((x) => row(x))}
             {ahead.length === 0 && <div className="list-note">{trips.length ? 'No trips ahead. Tap + to plan one.' : 'Trips you plan or book show up here.'}</div>}
           </div>
         )}
         {tab === 'Past' && (
           <>
-            {years.map((y) => (
-              <section key={y}>
-                <h2 className="sec">{y}</h2>
-                <div className="list">{past.filter((x) => year(x.start) === y).map(row)}</div>
-              </section>
-            ))}
+            {years.map((y) => {
+              const used = yearDays(trips, profile, 'China', y, today)
+              return (
+                <section key={y}>
+                  <div className="year-head"><h2 className="sec">{y}</h2><span>{used} of {limit} days in China</span></div>
+                  <div className={`thin${used >= limit ? ' bad' : ''}`} aria-hidden="true"><span style={{ width: `${Math.min(100, (used / limit) * 100)}%` }} /></div>
+                  <div className="list" style={{ marginTop: 4 }}>{past.filter((x) => year(x.start) <= y && year(x.end) >= y).map((x) => row(x, y))}</div>
+                </section>
+              )
+            })}
             {past.length === 0 && <div className="list-note">Trips you finish show up here.</div>}
           </>
         )}

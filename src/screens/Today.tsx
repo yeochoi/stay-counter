@@ -1,9 +1,9 @@
 import { Day, fmtDate, fmtRange, fmtWeekday, toNum } from '../lib/dates'
-import { daysIn, Profile, status, taxCount, taxHit, Trip } from '../lib/plan'
-import { shortName } from '../lib/rules'
+import { daysIn, Profile, status, taxCount, taxHit, Trip, yearDays } from '../lib/plan'
 import { Chevron, Plus } from '../components/Icons'
 import { Ring, Stats } from '../components/ui'
 import { StayBar } from '../components/StayBar'
+import { YearBar } from '../components/YearBar'
 
 type Props = {
   trips: Trip[]
@@ -45,37 +45,66 @@ export function Today({ trips, profile, today, onNew, onOpen, onEditStay }: Prop
     )
   }
 
-  if (!main) {
+  const CHINA = 'China'
+  const y = Number(today.slice(0, 4))
+  const st = main ? status(main, profile, today) : undefined
+
+  // In China, the ring counts the days left in this stay. Anywhere else it counts this year's days in China.
+  if (!main || !st || st.phase !== 'in') {
+    const limit = taxCount(trips, profile, CHINA, today).limit
+    const used = yearDays(trips, profile, CHINA, y, today)
+    const left = limit - used
+    const lastEnd = sorted.filter((x) => toNum(x.end) < t).map((x) => toNum(x.end)).sort((a, b) => b - a)[0]
+    const ahead = sorted.filter((x) => toNum(x.end) >= t).length
+    const thisYear = sorted.filter((x) => x.country === CHINA && Number(x.start.slice(0, 4)) <= y && Number(x.end.slice(0, 4)) >= y).length
     return (
       <main className="today-page">
         <h1 className="sr-only">Today</h1>
         {head}
-        <div className="empty-mid">
-          <h2 className="first-title">No trips ahead</h2>
-          <p className="first-sub">Tap + to plan your next stay.</p>
+        <div className="ring-btn" role="group" aria-label={`${used} of ${limit} days in China in ${y}`}>
+          <Ring label={`In China in ${y}`} n={used} unit={`of ${limit} days`} left={used} of={limit} />
+          <span className={`ring-line${left <= 0 ? ' bad' : ''}`}>{left > 0 ? `${left} ${left === 1 ? 'day' : 'days'} left before the tax limit` : `Past the tax limit by ${-left} ${left === -1 ? 'day' : 'days'}`}</span>
+        </div>
+        <div className="today-body">
+          {main ? (
+            <>
+              <button className="link-line" onClick={() => onOpen(main)}>
+                <span>{current ? 'This trip' : 'Next trip'}</span>
+                <span className="s">{fmtRange(main.start, main.end, today)}<Chevron /></span>
+              </button>
+              <StayBar trip={main} profile={profile} today={today} />
+              {(() => {
+                const hit = taxHit(main, trips.filter((x) => x.id !== main.id), profile)
+                const go = st && (st.phase === 'out' || st.phase === 'before') ? st.daysToGo : 0
+                return (
+                  <Stats items={[
+                    { n: go, label: st?.phase === 'out' ? `Days until back in China` : 'Days to go' },
+                    hit ? { n: fmtDate(hit, today), label: `You reach ${limit} days`, bad: true } : { n: daysIn(main, profile), label: current ? 'Days this trip' : 'Days next trip' },
+                  ]} />
+                )
+              })()}
+            </>
+          ) : (
+            <>
+              <div className="link-line" style={{ cursor: 'default' }}>
+                <span>This year</span>
+                <span className="s">{thisYear} {thisYear === 1 ? 'trip' : 'trips'}</span>
+              </div>
+              <YearBar trips={trips} profile={profile} country={CHINA} today={today} />
+              <Stats items={[
+                { n: lastEnd !== undefined ? t - lastEnd : 0, label: 'Days at home' },
+                { n: ahead, label: ahead === 1 ? 'Trip ahead' : 'Trips ahead' },
+              ]} />
+            </>
+          )}
         </div>
       </main>
     )
   }
 
-  const st = status(main, profile, today)
-  const country = shortName(main.country)
-  let ring
-  let line
-  let tap: () => void = () => onOpen(main)
-  if (st.phase === 'in') {
-    ring = <Ring label="This stay" n={st.daysLeft} unit={st.daysLeft === 1 ? 'day left' : 'days left'} left={st.daysLeft} of={st.leg.days} />
-    line = `Leave by ${fmtWeekday(st.leg.end, today)}`
-    tap = () => onEditStay(main, st.index)
-  } else if (st.phase === 'out') {
-    ring = <Ring label={`Out of ${country}`} n={st.daysToGo} unit={st.daysToGo === 1 ? 'day to go' : 'days to go'} />
-    line = `Back in ${country} on ${fmtWeekday(st.legs[st.next].start, today)}`
-    tap = () => onEditStay(main, st.next)
-  } else {
-    const days = toNum(main.start) - t
-    ring = <Ring label="At home" n={days} unit={days === 1 ? 'day to go' : 'days to go'} />
-    line = `${country} from ${fmtWeekday(main.start, today)}`
-  }
+  const ring = <Ring label="This stay" n={st.daysLeft} unit={st.daysLeft === 1 ? 'day left' : 'days left'} left={st.daysLeft} of={st.leg.days} />
+  const line = `Leave by ${fmtWeekday(st.leg.end, today)}`
+  const tap = () => onEditStay(main, st.index)
 
   const tax = taxCount(trips, profile, main.country, today)
   const hit = taxHit(main, trips.filter((x) => x.id !== main.id), profile)
@@ -89,14 +118,14 @@ export function Today({ trips, profile, today, onNew, onOpen, onEditStay }: Prop
       </button>
       <div className="today-body">
         <button className="link-line" onClick={() => onOpen(main)}>
-          <span>{current ? 'This trip' : 'Next trip'}</span>
+          <span>This trip</span>
           <span className="s">{fmtRange(main.start, main.end, today)}<Chevron /></span>
         </button>
         <StayBar trip={main} profile={profile} today={today} />
         <Stats
           items={[
-            { n: daysIn(main, profile), label: current ? 'Days this trip' : 'Days next trip' },
-            { n: tax.days, label: hit ? `Tax days, ${tax.limit} on ${fmtDate(hit, today)}` : `Tax days of ${tax.limit}`, bad: !!hit },
+            { n: daysIn(main, profile), label: 'Days this trip' },
+            { n: tax.days, label: hit ? `Days in China this year, ${tax.limit} on ${fmtDate(hit, today)}` : `Days in China this year, of ${tax.limit}`, bad: !!hit },
           ]}
         />
       </div>

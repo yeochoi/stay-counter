@@ -261,3 +261,12 @@ function fmtShort(d: Day) {
 export function newId() {
   return Math.random().toString(36).slice(2, 10)
 }
+
+/** Days inside a country during one calendar year, across all trips. Optionally only up to a day. */
+export function yearDays(trips: Trip[], profile: Profile, country: string, y: number, upTo?: Day): number {
+  const from = toNum(`${y}-01-01`)
+  const to = Math.min(toNum(`${y}-12-31`), upTo ? toNum(upTo) : Infinity)
+  let n = 0
+  for (const d of presence(trips, profile, country)) if (d >= from && d <= to) n++
+  return n
+}

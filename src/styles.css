@@ -453,3 +453,14 @@ button { cursor: pointer; }
   .list-row:hover .t, .link-line:hover span:first-child { color: var(--purple-text); }
 }
 .row .label { font-size: 17px; color: var(--ink); }
+.yearbar-track { position: relative; height: 10px; border-radius: 4px; background: var(--line); }
+.yearbar-track .ypiece { position: absolute; top: 0; height: 10px; min-width: 3px; border-radius: 4px; background: var(--primary); }
+.yearbar-track .ypiece.future { background: var(--planned); }
+.yearbar-track .today { position: absolute; top: -5px; width: 2px; height: 20px; margin-left: -1px; border-radius: 2px; background: var(--ink); }
+.year-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 32px 0 0; }
+.year-head .sec { padding: 0; }
+.year-head span { font-size: 15px; color: var(--muted); }
+.thin { margin-top: 10px; height: 4px; border-radius: 999px; background: var(--line); overflow: hidden; }
+.thin > span { display: block; height: 4px; border-radius: 999px; background: var(--primary); }
+.thin.bad > span { background: var(--coral); }
+.ring-line.bad { color: var(--coral-text); }
