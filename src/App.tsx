@@ -15,13 +15,12 @@ type Overlay =
   | { kind: 'new'; booked: boolean }
   | { kind: 'trip'; trip: Trip }
   | { kind: 'stay'; trip: Trip; index: number }
-  | { kind: 'settings' }
   | { kind: 'design'; from?: 'settings' }
   | null
 
 export default function App() {
   const [state, setState] = useStore()
-  const [tab, setTab] = useState<Tab>(() => (location.hash === '#trips' ? 'trips' : 'today'))
+  const [tab, setTab] = useState<Tab>(() => (location.hash === '#trips' ? 'trips' : location.hash === '#settings' ? 'settings' : 'today'))
   const [overlay, setOverlay] = useState<Overlay>(() => (location.hash === '#design' ? { kind: 'design' } : null))
   useEffect(() => { window.scrollTo(0, 0) }, [tab])
 
@@ -90,7 +89,7 @@ export default function App() {
   return (
     <div className="app">
       <div className={`page${behind ? ' behind' : ''}`} style={{ '--sy': `${sy}px` } as CSSProperties}>
-      {tab === 'today' ? (
+      {tab === 'today' && (
         <Today
           trips={state.trips}
           profile={profile}
@@ -98,10 +97,19 @@ export default function App() {
           onNew={(booked) => setOverlay({ kind: 'new', booked })}
           onOpen={(trip) => setOverlay({ kind: 'trip', trip })}
           onEditStay={(trip, index) => setOverlay({ kind: 'stay', trip, index })}
-          onSettings={() => setOverlay({ kind: 'settings' })}
         />
-      ) : (
-        <Trips trips={state.trips} profile={profile} today={today} onOpen={(trip) => setOverlay({ kind: 'trip', trip })} onExport={exportCsv} onNew={() => setOverlay({ kind: 'new', booked: false })} />
+      )}
+      {tab === 'trips' && <Trips trips={state.trips} profile={profile} today={today} onOpen={(trip) => setOverlay({ kind: 'trip', trip })} onNew={() => setOverlay({ kind: 'new', booked: false })} />}
+      {tab === 'settings' && (
+        <Settings
+          profile={profile}
+          trips={state.trips.length}
+          onProfile={(p) => setState((s) => ({ ...s, profile: p }))}
+          onExport={exportCsv}
+          onClear={() => setState((s) => ({ ...s, trips: [] }))}
+          onReset={() => { setState({ trips: [] }); setTab('today') }}
+          onDesign={() => setOverlay({ kind: 'design', from: 'settings' })}
+        />
       )}
       <TabBar tab={tab} onChange={setTab} />
       </div>
@@ -124,17 +132,7 @@ export default function App() {
           onSave={(s, e, b) => save(editStay(shown.trip, profile, shown.index, s, e, b))}
         />
       )}
-      {shown?.kind === 'settings' && (
-        <Settings
-          profile={profile}
-          onProfile={(p) => setState((s) => ({ ...s, profile: p }))}
-          onClear={() => { setState((s) => ({ ...s, trips: [] })); setOverlay(null) }}
-          onReset={() => { setState({ trips: [] }); setOverlay(null); setTab('today') }}
-          onDesign={() => setOverlay({ kind: 'design', from: 'settings' })}
-          onClose={() => setOverlay(null)}
-        />
-      )}
-      {shown?.kind === 'design' && (shown.from === 'settings' ? <DesignSystem onBack={() => setOverlay({ kind: 'settings' })} onDismiss={() => setOverlay(null)} /> : <DesignSystem onClose={closeDesign} />)}
+      {shown?.kind === 'design' && <DesignSystem onClose={closeDesign} />}
       </div>
       </SheetClosing.Provider>
     </div>

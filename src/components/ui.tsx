@@ -1,90 +1,40 @@
 import { PointerEvent as RPointerEvent, ReactNode, useContext, useEffect, useLayoutEffect, useRef } from 'react'
 import { Day, fmtWeekday } from '../lib/dates'
 import { sheetLayer, SheetClosing } from '../lib/layers'
-import { Chevron, HomeIcon, TripsIcon } from './Icons'
+import { Chevron } from './Icons'
 
-export type Tab = 'today' | 'trips'
+export type Tab = 'today' | 'trips' | 'settings'
 
-const TABS: Tab[] = ['today', 'trips']
+const TAB_ICONS: Record<Tab, ReactNode> = {
+  today: <><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></>,
+  trips: <><rect x="3" y="5" width="18" height="16" rx="2" /><path d="M16 3v4M8 3v4M3 10h18" /></>,
+  settings: <><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" /><circle cx="12" cy="12" r="3" /></>,
+}
+const TAB_LABELS: Record<Tab, string> = { today: 'Today', trips: 'Trips', settings: 'Settings' }
 
-/** On phones a glass pill sits behind the selected tab. It slides when you tap, and you can drag it from one tab to the other. */
+/** A full width tab bar on the page background, the same as SaySay and Manna. */
 export function TabBar({ tab, onChange }: { tab: Tab; onChange: (t: Tab) => void }) {
-  const nav = useRef<HTMLElement>(null)
-  const pill = useRef<HTMLSpanElement>(null)
-  const drag = useRef<{ x: number; id: number; moved: boolean } | null>(null)
-  const skipClick = useRef(false)
-
-  const buttons = () => Array.from(nav.current?.querySelectorAll<HTMLButtonElement>('button[data-tab]') ?? [])
-  const place = (i: number) => {
-    const b = buttons()[i]
-    if (!b || !pill.current) return
-    pill.current.style.transform = `translateX(${b.offsetLeft}px)`
-    pill.current.style.width = `${b.offsetWidth}px`
-  }
-  const nearest = (clientX: number) => {
-    let best = 0, d = Infinity
-    buttons().forEach((b, i) => {
-      const r = b.getBoundingClientRect()
-      const dd = Math.abs(clientX - (r.left + r.width / 2))
-      if (dd < d) { d = dd; best = i }
-    })
-    return best
-  }
-
-  useLayoutEffect(() => {
-    place(TABS.indexOf(tab))
-    const onResize = () => place(TABS.indexOf(tab))
-    window.addEventListener('resize', onResize)
-    return () => window.removeEventListener('resize', onResize)
-  })
-
-  const down = (e: RPointerEvent) => {
-    skipClick.current = false
-    if (e.pointerType === 'mouse' && e.button !== 0) return
-    drag.current = { x: e.clientX, id: e.pointerId, moved: false }
-  }
-  const move = (e: RPointerEvent) => {
-    const d = drag.current
-    if (!d || !pill.current || !nav.current) return
-    if (!d.moved) {
-      if (Math.abs(e.clientX - d.x) < 6) return
-      d.moved = true
-      nav.current.setPointerCapture(d.id)
-      pill.current.classList.add('dragging')
-    }
-    const bs = buttons()
-    const first = bs[0], last = bs[bs.length - 1]
-    const w = pill.current.offsetWidth
-    const navLeft = nav.current.getBoundingClientRect().left
-    const x = Math.max(first.offsetLeft, Math.min(last.offsetLeft + last.offsetWidth - w, e.clientX - navLeft - w / 2))
-    pill.current.style.transform = `translateX(${x}px)`
-    const i = nearest(e.clientX)
-    bs.forEach((b, j) => b.classList.toggle('hover', j === i))
-  }
-  const up = (e: RPointerEvent) => {
-    const d = drag.current
-    drag.current = null
-    if (!d?.moved) return
-    skipClick.current = true
-    window.setTimeout(() => { skipClick.current = false }, 0)
-    pill.current?.classList.remove('dragging')
-    buttons().forEach((b) => b.classList.remove('hover'))
-    const i = nearest(e.clientX)
-    place(i)
-    if (TABS[i] !== tab) onChange(TABS[i])
-  }
-  const pick = (t: Tab) => {
-    if (skipClick.current) { skipClick.current = false; return }
-    onChange(t)
-  }
-
   return (
-    <nav className="nav" ref={nav} onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up}>
-      <span className="nav-pill" ref={pill} aria-hidden="true" />
-      <button className="brand" onClick={() => onChange('today')}>Stay Counter</button>
-      <button data-tab="today" className={tab === 'today' ? 'on' : ''} onClick={() => pick('today')}><HomeIcon on={tab === 'today'} />Today</button>
-      <button data-tab="trips" className={tab === 'trips' ? 'on' : ''} onClick={() => pick('trips')}><TripsIcon on={tab === 'trips'} />Trips</button>
+    <nav className="tabbar" aria-label="Main">
+      <div className="tabbar-in">
+        {(['today', 'trips', 'settings'] as Tab[]).map((t) => (
+          <button key={t} className={`tab${t === tab ? ' on' : ''}`} aria-current={t === tab ? 'page' : undefined} onClick={() => onChange(t)}>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{TAB_ICONS[t]}</svg>
+            {TAB_LABELS[t]}
+          </button>
+        ))}
+      </div>
     </nav>
+  )
+}
+
+/** Page title with an optional action on the right, like SaySay. */
+export function PageHead({ title, children }: { title: string; children?: ReactNode }) {
+  return (
+    <div className="tv-head">
+      <h1 className="tv-title">{title}</h1>
+      {children}
+    </div>
   )
 }
 
@@ -277,19 +227,34 @@ export function DateRow({ k, value, today, onChange, min }: { k: string; value: 
   )
 }
 
-export function Ring({ n, unit, of, value }: { n: number; unit: string; of?: number; value?: number }) {
-  // A clean ring. No filled disc, a visible 6px track and a 6px arc that runs inside it, so it reads as one shape.
-  const r = 53
+/** The big ring on Today. A thin track, and an arc for the part that is left. */
+export function Ring({ label, n, unit, left, of, soft }: { label: string; n: number; unit: string; left?: number; of?: number; soft?: boolean }) {
+  const r = 106
   const c = 2 * Math.PI * r
-  const frac = of && value !== undefined ? Math.max(0, Math.min(1, value / of)) : 0
+  const frac = of ? Math.max(0, Math.min(1, (left ?? 0) / of)) : 0
   return (
-    <div className="disc" style={{ background: 'none' }}>
-      <svg width="112" height="112" viewBox="0 0 112 112" aria-hidden="true">
-        <circle cx="56" cy="56" r={r} fill="none" stroke="rgba(255,255,255,0.16)" strokeWidth="6" />
-        {of && <circle cx="56" cy="56" r={r} fill="none" stroke="#B7A5FF" strokeWidth="6" strokeLinecap="round" strokeDasharray={`${(c * frac).toFixed(1)} ${c.toFixed(1)}`} transform="rotate(-90 56 56)" />}
+    <div className="ring">
+      <svg width="232" height="232" viewBox="0 0 232 232" aria-hidden="true">
+        <circle cx="116" cy="116" r={r} fill="none" stroke="var(--line)" strokeWidth="6" />
+        {frac > 0 && <circle cx="116" cy="116" r={r} fill="none" stroke={soft ? 'var(--planned)' : 'var(--primary)'} strokeWidth="6" strokeLinecap="round" strokeDasharray={`${(c * frac).toFixed(1)} ${c.toFixed(1)}`} transform="rotate(-90 116 116)" />}
       </svg>
-      <div className="n">{n}</div>
-      <div className="u">{unit}</div>
+      <span className="ring-l">{label}</span>
+      <span className="ring-n">{n}</span>
+      <span className="ring-u">{unit}</span>
+    </div>
+  )
+}
+
+/** Two big numbers side by side with a thin line between them, like the Manna journal. */
+export function Stats({ items }: { items: { n: ReactNode; label: string; bad?: boolean }[] }) {
+  return (
+    <div className="stats">
+      {items.map((it, i) => (
+        <div key={i} className="stat">
+          <span className="stat-n">{it.n}</span>
+          <span className={`stat-l${it.bad ? ' bad' : ''}`}>{it.label}</span>
+        </div>
+      ))}
     </div>
   )
 }

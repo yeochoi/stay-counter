@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { Day, fmtDate, fmtRange, toNum } from '../lib/dates'
 import { daysIn, daysPerEntry, editStay, Entry, legs, newId, Profile, taxHit, Trip, tripStatus, warnings } from '../lib/plan'
-import { COUNTRIES, entryRule, shortName, taxRule } from '../lib/rules'
+import { entryRule, shortName, taxRule } from '../lib/rules'
 import { Alert, Check, Chevron } from '../components/Icons'
-import { DateRow, Primary, Sec, Seg, SelectRow, Sheet } from '../components/ui'
+import { DateRow, Primary, Sec, Seg, Sheet, Stats } from '../components/ui'
+import { StayBar } from '../components/StayBar'
 import { EditStay } from './EditStay'
 import { StayTimeline } from '../components/StayTimeline'
 
@@ -27,7 +28,7 @@ const long = (d: Day) => { const [y, m, dd] = d.split('-').map(Number); return `
 
 export function TripFlow({ profile, trips, today, existing, startBooked, onClose, onSave, onUpdate, onDelete }: Props) {
   const [trip, setTrip] = useState<Trip>(
-    () => existing ?? { id: newId(), country: '', start: '', end: '', entry: { kind: 'visafree' }, type: 'Business', booked: !!startBooked },
+    () => existing ?? { id: newId(), country: 'China', start: '', end: '', entry: { kind: 'visafree' }, type: 'Business', booked: !!startBooked },
   )
   // A saved trip opens on its overview. Editing is a choice.
   const [step, setStep] = useState<Step>(existing ? { kind: 'overview' } : { kind: 'form' })
@@ -65,8 +66,14 @@ export function TripFlow({ profile, trips, today, existing, startBooked, onClose
   if (step.kind === 'overview' && saved) {
     const max = daysPerEntry(trip, profile)
     return (
-      <Sheet title={shortName(trip.country)} onClose={onClose} action={{ label: 'Edit', onClick: () => setStep({ kind: 'form' }) }}>
-        <Summary trip={trip} profile={profile} max={max} broken={warnings(trip, others, profile).length} />
+      <Sheet title="Trip" onClose={onClose} action={{ label: 'Edit', onClick: () => setStep({ kind: 'form' }) }}>
+        <div className="trip-sub">{trip.type}, {tripStatus(trip, profile, today).toLowerCase()}</div>
+        <div className="trip-title">{fmtRange(trip.start, trip.end, today)}</div>
+        <Stats items={[
+          { n: daysIn(trip, profile), label: `Days in ${shortName(trip.country)}` },
+          { n: legs(trip, profile).length, label: max ? `Stays of up to ${max} days` : 'Stays' },
+        ]} />
+        <StayBar trip={trip} profile={profile} today={today} />
         <Sec>Stays</Sec>
         <StayList trip={trip} profile={profile} today={today} others={others} showWarnings={false} onStay={(i) => setStep({ kind: 'stay', index: i, from: 'overview' })} />
         <Sec>Rules for this trip</Sec>
@@ -96,7 +103,7 @@ export function TripFlow({ profile, trips, today, existing, startBooked, onClose
 
   // Form
   const visa = entryPicked && trip.entry.kind === 'visa' ? trip.entry : undefined
-  const valid = !!trip.country && !!trip.start && !!trip.end && toNum(trip.end) >= toNum(trip.start) && entryPicked && typePicked
+  const valid = !!trip.start && !!trip.end && toNum(trip.end) >= toNum(trip.start) && entryPicked && typePicked
   // Booked belongs to each stay. Only a trip with one stay asks here.
   const single = !trip.start || !trip.end || toNum(trip.end) < toNum(trip.start) || legs(trip, profile).length === 1
   return (
@@ -114,7 +121,6 @@ export function TripFlow({ profile, trips, today, existing, startBooked, onClose
         </div>
       )}
       <div className="card" style={{ marginTop: single ? 14 : 6 }}>
-        <SelectRow k="Country" value={trip.country} options={COUNTRIES} onChange={(c) => change({ country: c })} />
         <DateRow k="Arrive" value={trip.start} today={today} onChange={(d) => change({ start: d, end: trip.end && toNum(trip.end) < toNum(d) ? d : trip.end })} />
         <DateRow k="Leave" value={trip.end} today={today} min={trip.start} onChange={(d) => change({ end: d })} />
       </div>
@@ -130,10 +136,8 @@ export function TripFlow({ profile, trips, today, existing, startBooked, onClose
       </div>
       <Sec>Type</Sec>
       <Seg label="Type" value={typePicked ? trip.type : ''} options={['Business', 'Personal']} onChange={(v) => { setTrip((t) => ({ ...t, type: v })); setTypePicked(true) }} />
-      {trip.country && <>
       <Sec>Rules for this trip</Sec>
       <RulesCard trip={trip} profile={profile} visa={visa} />
-      </>}
       {saved && <div className="del-wrap"><button className="text-btn" onClick={() => { if (confirm('Delete this trip?')) onDelete(saved.id) }}>Delete trip</button></div>}
     </Sheet>
   )

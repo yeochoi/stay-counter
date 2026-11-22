@@ -21,6 +21,8 @@
   --coral: #e2683c;
   --coral-soft: #fceee8;
   --coral-track: #f6e1d8;
+  --planned: #d9d1f7;
+  --border: #d9d5ce;
   --chevron: #878394;
   --backdrop: #3a3550;
   --sans: 'Outfit', -apple-system, system-ui, sans-serif;
@@ -36,7 +38,7 @@
 * { box-sizing: border-box; }
 /* The page behind everything is hero purple, so Safari tints the status bar area solid purple with no fade.
    The app column keeps the light background for content. */
-html { background: var(--hero); }
+html { background: var(--bg); }
 html, body { margin: 0; color: var(--ink); font-family: var(--sans); -webkit-font-smoothing: antialiased; -webkit-text-size-adjust: 100%; }
 button, input, select { font-family: inherit; color: inherit; }
 button { cursor: pointer; }
@@ -362,3 +364,92 @@ button { cursor: pointer; }
   .nav button.on { background: none; }
   .nav button.hover { color: var(--purple-text); }
 }
+
+
+/* ============================================================
+   In the middle. The look Stay Counter shares with SaySay and Manna.
+   One background on every screen, no colored hero, light titles,
+   content on the page instead of in cards, a full width tab bar.
+   ============================================================ */
+.page { min-height: 100vh; min-height: 100dvh; }
+.page > main { flex-grow: 1; width: 100%; max-width: 560px; margin: 0 auto; display: flex; flex-direction: column; }
+.tabbar { position: sticky; bottom: 0; z-index: 5; flex-shrink: 0; padding: 4px var(--gutter) calc(var(--bottom) + 6px); background: var(--bg); }
+.tabbar-in { display: flex; justify-content: space-between; max-width: 516px; margin: 0 auto; }
+.tab { width: 96px; height: 52px; border: 0; background: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 11px; font-weight: 400; color: var(--muted); }
+.tab.on { color: var(--purple-text); font-weight: 500; }
+.tab:focus-visible, .add-round:focus-visible, .ring-btn:focus-visible, .link-line:focus-visible, .list-row:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; border-radius: 12px; }
+
+.add-round { width: 44px; height: 44px; border-radius: 999px; border: 0; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; padding: 0; flex-shrink: 0; }
+.tv-head { height: 44px; flex-shrink: 0; padding: 0 var(--gutter); display: flex; align-items: center; justify-content: space-between; }
+.tv { padding-top: calc(var(--top) + 20px); }
+.tv-title { margin: 0; font-size: 28px; line-height: 34px; font-weight: 300; letter-spacing: -0.02em; color: var(--ink); }
+.tv-body { padding: 20px var(--gutter) 32px; display: flex; flex-direction: column; }
+
+/* Today */
+.today-page { padding-top: calc(var(--top) + 20px); }
+.today-head { height: 44px; padding: 0 var(--gutter); display: flex; align-items: center; justify-content: space-between; }
+.today-date { font-size: 13px; line-height: 18px; color: var(--muted); }
+.ring-btn { align-self: center; margin-top: 20px; border: 0; background: none; padding: 0; display: flex; flex-direction: column; align-items: center; color: var(--ink); }
+.ring { position: relative; width: 232px; height: 232px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.ring svg { position: absolute; inset: 0; }
+.ring-l { position: relative; font-size: 15px; line-height: 20px; color: var(--muted); }
+.ring-n { position: relative; font-size: 80px; line-height: 84px; font-weight: 300; letter-spacing: -0.03em; }
+.ring-u { position: relative; font-size: 17px; line-height: 22px; }
+.ring-line { margin-top: 20px; font-size: 17px; line-height: 24px; text-align: center; }
+.today-body { padding: 32px var(--gutter) 24px; display: flex; flex-direction: column; }
+.link-line { min-height: 44px; border: 0; background: none; padding: 0; display: flex; align-items: center; justify-content: space-between; font-size: 17px; color: var(--ink); }
+.link-line .s { display: flex; align-items: center; gap: 6px; font-size: 15px; color: var(--muted); }
+
+.staybar { margin-top: 10px; }
+.staybar-track { height: 10px; display: flex; gap: 3px; }
+.staybar .piece { position: relative; flex-basis: 0; border-radius: 4px; background: var(--planned); }
+.staybar .piece.now { background: var(--primary); }
+.staybar .piece.done { background: var(--done-dot); }
+.staybar .today { position: absolute; top: -5px; width: 2px; height: 20px; margin-left: -1px; border-radius: 2px; background: var(--ink); }
+.staybar .late { position: absolute; left: 50%; top: -18px; transform: translateX(-50%); }
+.staybar-ends { margin-top: 8px; display: flex; justify-content: space-between; font-size: 11px; line-height: 14px; color: var(--muted); }
+
+.stats { margin: 32px 0 0; display: flex; }
+.stat { flex: 1 1 0; display: flex; flex-direction: column; min-width: 0; }
+.stat + .stat { border-left: 1px solid var(--line); padding-left: 24px; }
+.stat-n { font-size: 36px; line-height: 42px; font-weight: 300; }
+.stat-l { font-size: 13px; line-height: 18px; color: var(--muted); }
+.stat-l.bad { color: var(--coral-text); }
+
+.empty-mid { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; padding: 24px var(--gutter); }
+.pair { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 0 var(--gutter) 24px; }
+
+/* Trips list, rows on the page */
+.list { display: flex; flex-direction: column; margin-top: 12px; }
+.list-row { position: relative; width: 100%; min-height: 72px; border: 0; background: none; padding: 0; display: flex; align-items: center; gap: 10px; text-align: left; color: var(--ink); }
+.list-row .col { flex-grow: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.list-row .t { font-size: 17px; line-height: 22px; }
+.list-row .sub { font-size: 13px; line-height: 18px; color: var(--muted); }
+.list-row .dot { position: absolute; left: -14px; width: 6px; height: 6px; border-radius: 999px; background: var(--primary); }
+.list-note { padding: 18px 0; font-size: 13px; line-height: 19px; color: var(--muted); }
+
+/* First open, the same calm page as SaySay and Manna */
+.first { min-height: 100vh; min-height: 100dvh; max-width: 560px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; padding: calc(var(--top) + 20px) var(--gutter) calc(var(--bottom) + 24px); }
+.first-name { color: var(--primary); font-size: 20px; line-height: 26px; font-weight: 500; height: 44px; display: flex; align-items: center; }
+.first-mid { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 24px 0; }
+.first-title { margin: 0; font-size: 36px; line-height: 44px; font-weight: 300; letter-spacing: -0.02em; color: var(--ink); }
+.first-sub { margin: 14px 0 20px; font-size: 17px; line-height: 24px; color: var(--muted); }
+
+/* Trip overview */
+.trip-sub { padding-top: 8px; font-size: 13px; line-height: 18px; color: var(--muted); }
+.trip-title { margin-top: 6px; font-size: 34px; line-height: 40px; font-weight: 300; letter-spacing: -0.02em; }
+.trip-title + .stats { margin-top: 24px; margin-bottom: 24px; }
+
+/* Family type and buttons. Medium weight, never bold. */
+.sec { font-weight: 500; }
+.row .t, .rule-bad .v, .row input.num, .timeline .t, .head-action, .sheet-head, .link-row, .text-btn { font-weight: 500; }
+.btn { min-height: 56px; font-weight: 500; }
+.btn.outline { background: transparent; border: 1.5px solid var(--border); color: var(--ink); }
+.seg button.on { font-weight: 500; color: var(--ink); }
+.big { font-weight: 300; }
+@media (hover: hover) {
+  .add-round:hover { background: #4f35bf; }
+  .btn.outline:hover { background: var(--card); }
+  .list-row:hover .t, .link-line:hover span:first-child { color: var(--purple-text); }
+}
+.row .label { font-size: 17px; color: var(--ink); }

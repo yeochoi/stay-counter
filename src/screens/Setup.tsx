@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { Profile } from '../lib/plan'
 import { COUNTRIES, PASSPORTS } from '../lib/rules'
 import { Chevron, Plus } from '../components/Icons'
-import { Sec, Sheet } from '../components/ui'
+import { PageHead } from '../components/ui'
+import { ExportKind } from './Trips'
 
 const HOMES = [...new Set([...COUNTRIES, 'Netherlands', 'South Korea'])].sort()
 
@@ -51,50 +52,58 @@ function PassportCard({ p, setP }: { p: Profile; setP: (p: Profile) => void }) {
 export function Onboarding({ onDone }: { onDone: (p: Profile) => void }) {
   const [p, setP] = useState<Profile>({ passport: '', home: '' })
   return (
-    <div className="welcome">
-      <header className="hero w-intro">
-        <div className="eyebrow">Stay Counter</div>
-        <h1>Know your days,<br /><span style={{ color: 'var(--hero-text)' }}>Wherever you are</span></h1>
-        <div className="chips"><span>Visa free limits</span><span>Tax days</span><span>Leave by dates</span></div>
-      </header>
-      <main className="content w-form">
-        <div style={{ fontSize: 17, color: 'var(--muted)' }}>We use these to find the rules that apply to you.</div>
-        <div style={{ marginTop: 2 }}><PassportCard p={p} setP={setP} /></div>
+    <div className="first">
+      <div className="first-name">Stay Counter</div>
+      <div className="first-mid">
+        <h1 className="first-title">Know your days<br />in China.</h1>
+        <p className="first-sub">We use your passport and home to find the rules that apply to you.</p>
+        <PassportCard p={p} setP={setP} />
         <PickCard k="Home" value={p.home} options={HOMES} onChange={(v) => setP({ ...p, home: v })} />
-        <div className="w-gap" />
-        <button className="btn primary" disabled={!p.passport || !p.home} onClick={() => onDone(p)}>Continue</button>
-      </main>
+      </div>
+      <button className="btn primary" disabled={!p.passport || !p.home} onClick={() => onDone(p)}>Continue</button>
     </div>
   )
 }
 
 type SettingsProps = {
   profile: Profile
+  trips: number
   onProfile: (p: Profile) => void
+  onExport: (k: ExportKind) => void
   onClear: () => void
   onReset: () => void
   onDesign: () => void
-  onClose: () => void
 }
 
-export function Settings({ profile, onProfile, onClear, onReset, onDesign, onClose }: SettingsProps) {
+/** Settings is a tab, like SaySay and Manna. Same background, a light title, white cards. */
+export function Settings({ profile, trips, onProfile, onExport, onClear, onReset, onDesign }: SettingsProps) {
   return (
-    <Sheet title="Settings" onClose={onClose}>
-      <Sec>You</Sec>
-      <div style={{ marginTop: -12 }}><PassportCard p={profile} setP={onProfile} /></div>
-      <PickCard k="Home" value={profile.home} options={HOMES} onChange={(v) => onProfile({ ...profile, home: v })} />
+    <main className="tv">
+      <PageHead title="Settings" />
+      <div className="tv-body">
+        <h2 className="sec" style={{ paddingTop: 8 }}>You</h2>
+        <div style={{ marginTop: -12 }}><PassportCard p={profile} setP={onProfile} /></div>
+        <PickCard k="Home" value={profile.home} options={HOMES} onChange={(v) => onProfile({ ...profile, home: v })} />
 
-      <Sec>About</Sec>
-      <div className="card">
-        <button className="row" onClick={onDesign}><span className="k">Design system</span><Chevron /></button>
+        <h2 className="sec">Your trips</h2>
+        <div className="card">
+          <button className="row" onClick={() => onExport('All')} disabled={!trips}><span className="label">Export all trips</span><span className="s">{trips}<Chevron /></span></button>
+          <button className="row" onClick={() => onExport('Business')} disabled={!trips}><span className="label">Export business trips</span><Chevron /></button>
+        </div>
+        <div className="note">A spreadsheet with dates and days, for tax or HR.</div>
+
+        <h2 className="sec">About</h2>
+        <div className="card">
+          <button className="row" onClick={onDesign}><span className="label">Design system</span><Chevron /></button>
+        </div>
+        <div className="note">Your trips stay on this device only. General information, not legal or tax advice.</div>
+
+        {/* Destructive actions go last, grouped in one card. They always ask first. */}
+        <div className="card" style={{ marginTop: 40 }}>
+          <button className="row" onClick={() => confirm('Remove all trips?') && onClear()}><span className="label" style={{ color: 'var(--coral-text)' }}>Remove all trips</span></button>
+          <button className="row" onClick={() => confirm('Start over from the first screen? This removes everything.') && onReset()}><span className="label" style={{ color: 'var(--coral-text)' }}>Start over</span></button>
+        </div>
       </div>
-      <div className="note">Your trips stay on this device only. General information, not legal or tax advice.</div>
-      {/* Destructive actions go last. Two or more related ones are grouped in one card, a single one is plain coral text. They always ask first. */}
-      <Sec>Trips</Sec>
-      <div className="card">
-        <button className="row" onClick={() => confirm('Remove all trips?') && onClear()}><span className="t" style={{ color: 'var(--coral-text)' }}>Remove all trips</span></button>
-        <button className="row" onClick={() => confirm('Start over from the first screen? This removes everything.') && onReset()}><span className="t" style={{ color: 'var(--coral-text)' }}>Start over</span></button>
-      </div>
-    </Sheet>
+    </main>
   )
 }

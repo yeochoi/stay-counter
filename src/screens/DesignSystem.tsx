@@ -1,35 +1,36 @@
 import { useState } from 'react'
 import { AlertSmall, Chevron } from '../components/Icons'
-import { Primary, Ring, Seg, Sheet, Switch } from '../components/ui'
+import { Primary, Ring, Seg, Sheet, Stats, Switch } from '../components/ui'
 
 const COLORS: [string, string][] = [
-  ['Hero', '#2F2360'], ['Hero text', '#CFC4FF'], ['Ring', '#B7A5FF'], ['Primary', '#5B3FD0'],
-  ['Purple text', '#4B32B8'], ['Soft', '#EEEAFB'], ['Current', '#F1EDFD'], ['Background', '#F7F5F2'],
-  ['Ink', '#1E1B2E'], ['Muted', '#6B6778'], ['Line', '#ECE9E4'], ['Chip', '#EFECE7'],
-  ['Coral text', '#A83C18'], ['Coral', '#E2683C'], ['Coral soft', '#FCEEE8'], ['Backdrop', '#3A3550'],
+  ['Background', '#FBFAF7'], ['Card', '#FFFFFF'], ['Ink', '#1E1B2E'], ['Muted', '#6B6778'],
+  ['Line', '#ECE9E4'], ['Border', '#D9D5CE'], ['Primary', '#5B3FD0'], ['Purple text', '#4B32B8'],
+  ['Planned', '#D9D1F7'], ['Soft', '#EEEAFB'], ['Coral text', '#A83C18'], ['Coral soft', '#FCEEE8'],
 ]
 
 const TYPE: [string, React.CSSProperties, string][] = [
-  ['Sat, Nov 28', { fontSize: 34, fontWeight: 600, letterSpacing: '-0.02em' }, '34 semibold. The one answer and page titles. 44 on laptops'],
-  ['China trip', { fontSize: 20, fontWeight: 600 }, '20 semibold. Section headers, 32 above and 12 below'],
-  ['Oct 15 – Nov 13', { fontSize: 17, fontWeight: 600 }, '17 semibold. Stay dates, buttons, sheet titles'],
-  ['Leave China by', { fontSize: 17, color: 'var(--muted)' }, '17 regular. Everything you read, labels and values. Like iOS body text'],
-  ['Not booked', { fontSize: 13, color: 'var(--muted)' }, '13 regular. Status, days, notes, chips, tab labels'],
+  ['8', { fontSize: 80, lineHeight: 1, fontWeight: 300, letterSpacing: '-0.03em' }, '80 light. The number in the ring, once per screen'],
+  ['Know your days', { fontSize: 36, fontWeight: 300, letterSpacing: '-0.02em' }, '36 light. First open title and big numbers'],
+  ['Trips', { fontSize: 28, fontWeight: 300, letterSpacing: '-0.02em' }, '28 light. Page titles'],
+  ['Stays', { fontSize: 20, fontWeight: 500 }, '20 medium. Section headers, 32 above and 12 below'],
+  ['Leave by Mon, Nov 30', { fontSize: 17 }, '17 regular. Everything you read. Buttons use 17 medium'],
+  ['147 days, Business', { fontSize: 13, color: 'var(--muted)' }, '13 regular. Second lines, notes, labels under numbers'],
+  ['Today', { fontSize: 11, color: 'var(--purple-text)', fontWeight: 500 }, '11. Tab labels only'],
 ]
 
 const RULES = [
-  'One typeface, Outfit, everywhere.',
-  'The hero answers one question with one number and one date.',
-  'Five text styles, like iOS. 34 semibold, 20 semibold, 17 semibold, 17 regular, 13 regular. The same in all three apps.',
-  'Layers follow iOS. Things that float over content get a shadow. The tab bar is glass, the add button keeps its purple. Things on the page are flat.',
-  'Every round button is 44 wide with a 20 icon, flat with no shadow.',
-  'Destructive actions always go last. A single one is plain coral text, centered. Two or more related ones are grouped in one card. They always ask first.',
+  'One typeface, Outfit, everywhere. Light for big text, regular for reading, medium for buttons and headers. Never bold.',
+  'Every screen has the same background. No colored hero. The same in SaySay and Manna.',
+  'One picture per screen at most. Today has the ring, a trip has the stay bar. Nothing else is drawn.',
+  'Content sits on the page. White cards only for settings and controls, with a 1px line and radius 16. No shadows.',
+  'Numbers come in pairs, big and light, split by a thin line, like the Manna journal.',
+  'Purple means now or an action. Light purple means planned. Coral means something to check, and is used only for that.',
+  'The tab bar runs full width at the bottom, on the background. Today, Trips, Settings.',
+  'Add is a round purple button, 44 wide, top right of the page.',
+  'Destructive actions always go last, in coral, and always ask first.',
   'Top left leaves a sheet. × closes it, ‹ goes back one step. The bottom holds one forward action.',
-  'Show each problem once, where it lives. A problem with a stay is an icon on that stay, the reason is inside it. A problem with the whole trip is a count on Trip details.',
-  'Booked is only what the person says. Each stay has its own switch, the trip is booked when every stay is.',
-  'One line joins the stays of a trip. Grey between finished stays, purple from now on, dashed into a stay not booked yet. No dividers between stays.',
+  'Booked is only what the person says. The trip is booked when every stay is.',
   'A chevron means a row opens something. Rows without one only show information.',
-  'Cards only for controls and tappable lists. White with a 1px line and radius 16. No shadows.',
 ]
 
 const X = <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
@@ -59,20 +60,40 @@ export function DesignSystem({ onBack, onClose, onDismiss }: { onBack?: () => vo
           ))}
         </div>
 
-        <h3>Hero</h3>
-        <div className="hero" style={{ borderRadius: 16, padding: 16, display: 'flex', flexDirection: 'column', gap: 20 }}>
-          <div className="hero-main" style={{ paddingTop: 0, gap: 16 }}>
-            <Ring n={20} unit="days left" of={30} value={10} />
-            <div className="stack"><div className="l">Leave China by</div><div className="a">Sat, Nov 7</div></div>
+        <h3>Ring</h3>
+        <div style={{ display: 'flex', justifyContent: 'center' }}><Ring label="This stay" n={8} unit="days left" left={8} of={30} /></div>
+        <div className="ring-line">Leave by Mon, Nov 30</div>
+
+        <h3>Stay bar</h3>
+        <div className="staybar" style={{ marginTop: 24 }}>
+          <div className="staybar-track" aria-hidden="true">
+            <span className="piece now" style={{ flexGrow: 30 }}><i className="today" style={{ left: '73%' }} /></span>
+            <span className="piece" style={{ flexGrow: 30 }} />
+            <span className="piece" style={{ flexGrow: 30 }}>
+              <svg className="late" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#A83C18" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3l9.5 17H2.5z" /><path d="M12 10v4M12 17.5v.01" /></svg>
+            </span>
           </div>
-          <div className="hero-main" style={{ paddingTop: 0, gap: 16 }}>
-            <Ring n={17} unit="days to go" />
-            <div className="stack"><div className="l">Next trip</div><div className="a">China</div></div>
-          </div>
+          <div className="staybar-ends"><span>Nov 1</span><span>Jan 31, 2027</span></div>
+        </div>
+        <div className="note">Purple is the stay you are in, light purple is planned, grey is done. The dark line is today. A coral mark sits over a stay after the entry ends.</div>
+
+        <h3>Numbers</h3>
+        <Stats items={[{ n: 147, label: 'Days this trip' }, { n: 164, label: 'Tax days, 183 on Dec 12', bad: true }]} />
+
+        <h3>List</h3>
+        <div className="list" style={{ marginTop: 0, paddingLeft: 14 }}>
+          <div className="list-row"><span className="dot" aria-hidden="true" /><span className="col"><span className="t">Nov 1 – Mar 31, 2027</span><span className="sub">147 days, Business, now</span></span><Chevron /></div>
+          <div className="list-row"><span className="col"><span className="t">May 10 – Jun 5, 2027</span><span className="sub">27 days, Business, not booked</span></span><Chevron /></div>
+        </div>
+
+        <h3>Buttons</h3>
+        <div className="pair" style={{ padding: 0 }}>
+          <button className="btn primary">Plan a stay</button>
+          <button className="btn outline">Add booked trip</button>
         </div>
 
         <h3>Stay timeline</h3>
-        <div className="sec" style={{ paddingTop: 0 }}>China trip</div>
+        <div className="sec" style={{ paddingTop: 0 }}>Stays</div>
         <div className="card timeline">
           {([['Sep 8 – Oct 7', 'Done', 'past', false, 'off', 'solid'], ['Oct 9 – Nov 7', 'Now', 'now', false, 'solid', 'solid'], ['Nov 9 – Dec 8', 'Booked', 'booked', false, 'solid', 'dash'], ['Jan 2 – 31, 2027', 'Not booked', 'open', true, 'dash', 'off']] as const).map(([d, label, kind, late, a, b], i) => (
             <div key={i} className={`stay-row ${kind}`}>
@@ -102,7 +123,7 @@ export function DesignSystem({ onBack, onClose, onDismiss }: { onBack?: () => vo
 
         <h3>Sheet bar</h3>
         <div className="card" style={{ padding: '8px 0' }}>
-          <Bar icon={X} title="China" action="Edit" />
+          <Bar icon={X} title="Trip" action="Edit" />
           <Bar icon={B} title="Edit trip" />
           <Bar icon={B} title="Stay 2 of 5" />
         </div>
@@ -111,20 +132,9 @@ export function DesignSystem({ onBack, onClose, onDismiss }: { onBack?: () => vo
         <div className="card">
           <div className="row"><span className="k">Arrive</span><span className="v">Wed, Dec 2<Chevron /></span></div>
           <div className="row"><span className="k">Leave</span><span className="v"><span className="placeholder">Choose</span><Chevron /></span></div>
-          <div className="row two"><span className="col"><span className="t">Japan</span><span className="sub">Sep 26 – Oct 2 · 7 days · Personal</span></span><Chevron /></div>
-        </div>
+                  </div>
 
-        <h3>Tax days</h3>
-        <div className="card" style={{ padding: '0 16px' }}>
-          <div className="row" style={{ padding: '14px 0', display: 'block' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}><span className="col"><span className="t">China</span><span className="sub">In 2026</span></span><span className="pill coral">164 of 183 days</span></div>
-            <div className="bar coral"><div style={{ width: '90%' }} /></div>
-          </div>
-          <div className="row" style={{ padding: '14px 0' }}><span className="col"><span className="t">Korea</span><span className="sub">Past 12 months</span></span><span className="s">15 days</span></div>
-        </div>
-
-        <h3>Chips and notes</h3>
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}><span className="pill now">8 days left</span><span className="pill coral">164 of 183 days</span></div>
+        <h3>Notes</h3>
         <div className="done-note">This stay is done. Change the dates only if you arrived or left on a different day.</div>
 
         <h3>Controls</h3>
