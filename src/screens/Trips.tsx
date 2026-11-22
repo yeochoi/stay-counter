@@ -16,9 +16,10 @@ export function Trips({ trips, profile, today, onOpen, onNew }: { trips: Trip[];
   const years = [...new Set(past.map((x) => year(x.start)))]
 
   const row = (x: Trip) => {
-    const now = toNum(x.start) <= t
+    const now = toNum(x.start) <= t && t <= toNum(x.end)
+    const done = toNum(x.end) < t
     const n = daysIn(x, profile)
-    const note = now ? 'now' : bookingNote(x, profile, today).toLowerCase()
+    const note = now ? 'now' : done ? '' : bookingNote(x, profile, today).toLowerCase()
     return (
       <button key={x.id} className="list-row" onClick={() => onOpen(x)}>
         {now && <span className="dot" aria-hidden="true" />}
